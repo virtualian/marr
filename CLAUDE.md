@@ -24,6 +24,11 @@
 - The specification for the configuration system
 - A working example of the system itself
 
+## Startup Imperatives
+
+When starting work in this repository:
+- Read all standards in ./prompts/
+
 ## Project-Specific Reminders
 
 - This repo follows its own specification in `docs/functional-specification.md`
@@ -46,6 +51,7 @@ This project follows the standards defined in:
 - @prompts/prj-git-workflow-standard.md
 - @prompts/prj-testing-standard.md
 - @prompts/prj-mcp-usage-standard.md
+- @prompts/prj-documentation-standard.md
 
 ## Documentation Organization
 

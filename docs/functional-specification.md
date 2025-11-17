@@ -50,7 +50,7 @@ Every repository includes these project-level standards:
 
 Projects may add additional standards as needed:
 - `prj-ui-ux-standard.md` (for user-facing applications)
-- `prj-documentation-standard.md` (for documentation sites)
+- `prj-documentation-standard.md` (for projects with significant documentation)
 - `prj-api-standard.md` (for API development)
 - `prj-doc-parity-standard.md` (for CLI/tooling projects with script documentation)
 
