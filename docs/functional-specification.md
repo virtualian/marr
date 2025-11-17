@@ -1,123 +1,84 @@
 # Claude Code Project Configuration System
-## Functional Specification - Updated Analysis
+## Functional Specification
 
-**Version:** 2.0  
-**Date:** 2025-11-15  
-**Author:** Comprehensive analysis of all projects under /Users/ianmarr/projects/
+**Date:** 2025-11-17
 
 ---
 
 ## Executive Summary
 
-Analysis of 9 active projects reveals significant evolution and variation in Claude Code configuration patterns. While the two-layer system (user + project) remains consistent, implementation details vary considerably. Several projects use simplified CLAUDE.md files without the comprehensive standards system, while others have fully adopted the prompt-based architecture.
+This specification defines a simplified, unified Claude Code configuration system that applies the same comprehensive standards to all repositories regardless of project type or technology stack.
 
-### Key Findings
+### Key Principles
 
-1. **Configuration Consistency**: Only 4 of 9 projects use comprehensive CLAUDE.md with referenced prompts
-2. **Pattern Variations**: Three distinct configuration patterns identified
-3. **Standards Evolution**: Evidence of standards migration from older to newer formats
-4. **Missing Standardization**: Several projects use minimal or outdated configurations
+1. **Unified Standards**: All repositories use the same comprehensive configuration
+2. **Two-Layer System**: User-level preferences + project-level technical standards
+3. **No Project Type Classification**: Same standards apply universally
+4. **Standards Included By Default**: Git workflow, testing, and MCP usage standards in every repo
+5. **Git-Based Versioning**: All changes tracked through Git history, not filename versions
 
 ---
 
-## Project Configuration Patterns Identified
+## Unified Repository Structure
 
-### Pattern 1: Comprehensive Standards-Based (4 projects)
+All repositories follow the same standardized structure regardless of project type or technology:
 
-**Projects:**
-- gainfunction/website
-- marrbox/set-up-and-admin
-- sv/specverse-app-portal
-- sv/specverse-lang (parent level)
-
-**Characteristics:**
-- Full two-layer CLAUDE.md system
-- References prompts with `@prompts/filename.md` syntax
-- Mandatory startup actions specified
-- Project-specific prompt files in `./prompts/`
-- Clear precedence rules (project overrides user technical, preserves preferences)
-
-**Example Structure:**
 ```
 project-root/
-├── CLAUDE.md                          # References @prompts/prj-*.md
+├── CLAUDE.md                          # Project-level configuration
 ├── prompts/
-│   ├── prompt-git-workflow-standard.md   # or prj-git-workflow-standard.md
-│   ├── prompt-testing-standard.md         # or prj-testing-standard.md
-│   └── prj-ui-ux-standard.md              # Project-specific
-└── docs/                                  # Generated documentation
-```
-
----
-
-### Pattern 2: Simplified Project-Specific (3 projects)
-
-**Projects:**
-- npm-protect
-- scoremyclays
-- scoremyclays-onlook
-
-**Characteristics:**
-- Basic CLAUDE.md with project overview only
-- No referenced prompt files
-- No mandatory startup actions
-- Focused on project documentation structure
-- Minimal AI agent directives
-
-**Example Structure:**
-```
-project-root/
-├── CLAUDE.md                          # Simple project overview
-├── docs/                              # Documentation
+│   ├── prj-git-workflow-standard.md
+│   ├── prj-testing-standard.md
+│   └── prj-mcp-usage-standard.md
+├── docs/                              # Technical documentation
+├── plans/                             # Implementation plans
 ├── research/                          # Research reports
-└── src/                               # Source code
+└── src/                               # Source code (if applicable)
 ```
 
-**CLAUDE.md Content:**
-- Project overview paragraph
-- File structure documentation
-- Command references (if applicable)
-- Architecture notes (to be filled in)
+### Standard Prompt Files (All Repositories)
+
+Every repository includes these project-level standards:
+
+1. **prj-git-workflow-standard.md** - Git workflow, branching, PR standards
+2. **prj-testing-standard.md** - Testing philosophy and practices
+3. **prj-mcp-usage-standard.md** - MCP tool usage patterns
+
+**Naming Convention:** `prj-{standard-name}.md`
+
+### Optional Project-Specific Standards
+
+Projects may add additional standards as needed:
+- `prj-ui-ux-standard.md` (for user-facing applications)
+- `prj-documentation-standard.md` (for documentation sites)
+- `prj-api-standard.md` (for API development)
 
 ---
 
-### Pattern 3: Template/Default Configuration (2 projects)
+## User-Level Configuration
 
-**Projects:**
-- sv/specverse-lang/templates/default
-- sv/specverse-lang/ai-support-mcp-clean-impl
-
-**Characteristics:**
-- Template-based CLAUDE.md with placeholders
-- References comprehensive AI-GUIDE.md
-- Claude Code specific feature documentation
-- Integration with specialized workflows (MCP servers, SpecVerse)
-
-**Example Structure:**
-```
-project-root/
-├── CLAUDE.md                          # Template with {{projectName}}
-├── AI-GUIDE.md                        # Comprehensive tool guide
-└── docs/                              # Generated or deployment docs
-```
-
----
-
-## User-Level Configuration Analysis
-
-### Current User-Level Setup
+### Standard User-Level Setup
 
 **Location:** `~/.claude/`
 
-**Files Present:**
+**Files Structure:**
 ```
 ~/.claude/
 ├── CLAUDE.md                          # User-level master configuration
-└── prompts/
-    ├── user-git-workflow-standard.md
-    ├── user-mcp-usage-standard.md
-    └── user-testing-standard.md
+├── prompts/
+│   ├── user-git-workflow-standard.md
+│   ├── user-mcp-usage-standard.md
+│   └── user-testing-standard.md
+└── prompt-templates/
+    ├── prj-git-workflow-standard.md
+    ├── prj-testing-standard.md
+    ├── prj-mcp-usage-standard.md
+    ├── CLAUDE-project.md
+    └── metadata/
+        └── template-registry.yaml
 ```
+
+**Naming Convention:** `{prefix}-{name}.md` (no version suffixes)
 
 **User CLAUDE.md Structure:**
 - Guard rail authority directives
@@ -458,146 +419,46 @@ Whenever a script is modified, MUST update:
 
 ---
 
-## Project Type Classification Enhancement
+## Universal Standards Application
 
-### Identified Project Types
+### All Repositories Include
 
-1. **Web Development (React/Next.js)**
-   - gainfunction/website
-   - scoremyclays
-   - scoremyclays-onlook
-   - sv/specverse-app-portal
-   
-   **Required Standards:**
-   - Git workflow
-   - Testing (Vitest + Playwright)
-   - UI/UX (if user-facing)
-   - MCP usage (if using Claude-assisted development)
+**Required Standards (Every Repository):**
+1. **Git Workflow Standard** - Branching, commits, PRs, issue tracking
+2. **Testing Standard** - Testing philosophy and practices
+3. **MCP Usage Standard** - Tool usage patterns for AI-assisted development
 
-2. **Documentation Repository (MkDocs/Docusaurus)**
-   - marrbox/set-up-and-admin
-   
-   **Required Standards:**
-   - Git workflow
-   - Documentation standards (Diataxis framework)
-
-3. **Language/Tool Development (TypeScript/Node)**
-   - sv/specverse-lang
-   - sv/specverse-lang/ai-support-mcp-clean-impl
-   
-   **Required Standards:**
-   - Git workflow
-   - Testing (comprehensive, 5-tier)
-   - API documentation
-   - Feature addition process
-
-4. **CLI/Tooling (Bash/Node.js)**
-   - npm-protect
-   
-   **Required Standards:**
-   - Git workflow
-   - Script-level documentation parity
-   - Testing (if applicable)
-
-5. **MCP Server Implementation**
-   - sv/specverse-lang/ai-support-mcp-clean-impl
-   
-   **Required Standards:**
-   - Git workflow
-   - Testing
-   - Multi-environment deployment
-   - Integration documentation
-
-### Project Type Metadata Structure
-
-```yaml
-project-types:
-  web-nextjs:
-    name: "Next.js Web Application"
-    required_prompts:
-      - user-git-workflow-standard
-      - user-testing-standard
-      - user-mcp-usage-standard
-      - prj-testing-standard
-    optional_prompts:
-      - prj-ui-ux-standard (if user-facing)
-    directory_structure:
-      - docs/
-      - plans/
-      - research/
-      - prompts/
-    technology_stack:
-      - Next.js 14+
-      - TypeScript
-      - Vitest
-      - Playwright
-  
-  documentation-mkdocs:
-    name: "MkDocs Documentation Site"
-    required_prompts:
-      - user-git-workflow-standard
-      - prompt-documentation-standard
-    directory_structure:
-      - docs/
-      - prompts/
-    technology_stack:
-      - MkDocs
-      - Material theme
-      - Diataxis framework
-  
-  language-tooling:
-    name: "Language/Tool Development"
-    required_prompts:
-      - user-git-workflow-standard
-      - user-testing-standard
-    directory_structure:
-      - docs/
-      - examples/
-      - prompts/
-      - src/
-      - tests/
-    technology_stack:
-      - TypeScript
-      - Node.js
-      - Vitest (or similar)
-  
-  bash-tooling:
-    name: "Bash/Node.js CLI Tooling"
-    required_prompts:
-      - user-git-workflow-standard
-    directory_structure:
-      - docs/ (with script-level parity)
-      - scripts/
-    special_requirements:
-      - Script documentation parity
-      - Pre-commit documentation check
-  
-  mcp-server:
-    name: "MCP Server Implementation"
-    required_prompts:
-      - user-git-workflow-standard
-      - user-testing-standard
-    directory_structure:
-      - docs/
-      - src/
-      - tests/
-      - dist/ (build outputs)
-    special_requirements:
-      - Multi-environment build
-      - Integration examples
+**Common Directory Structure:**
 ```
+project-root/
+├── CLAUDE.md
+├── prompts/
+│   ├── prj-git-workflow-standard.md
+│   ├── prj-testing-standard.md
+│   └── prj-mcp-usage-standard.md
+├── docs/
+├── plans/
+├── research/
+└── src/ (or appropriate source directory)
+```
+
+**Technology Agnostic:** Standards apply whether project uses:
+- Next.js, React, Vue (web frameworks)
+- TypeScript, JavaScript, Python, Bash (languages)
+- MkDocs, Docusaurus (documentation)
+- CLI tools, MCP servers, libraries (project types)
+
+**Rationale:** Core development practices (git workflow, testing philosophy, tool usage) transcend technology choices.
 
 ---
 
-## GitHub Helper Scripts Discovery
+## Helper Scripts
 
 **Location:** `~/bin/` (in user's PATH)
 
-**Scripts:**
-- `gh-add-subissue.sh <parent-issue-number> <sub-issue-number>`
-- `gh-list-subissues.sh <parent-issue-number>`
-
-**Purpose:** GitHub sub-issues management until native gh CLI support
+**Standard Helper Scripts:**
+- `gh-add-subissue.sh` - Link sub-issue to parent issue
+- `gh-list-subissues.sh` - List all sub-issues of parent
 
 **Usage Pattern:**
 ```bash
@@ -608,69 +469,30 @@ gh-add-subissue.sh 45 47
 gh-list-subissues.sh 45
 ```
 
-**Referenced in:**
-- User-level CLAUDE.md
-- User-level user-git-workflow-standard.md
-- Project-level prompt-git-workflow-standard.md (specverse-app-portal)
+**Implementation:** Uses GitHub GraphQL API with proper error handling
 
-**Implementation Detail:** Uses GitHub GraphQL API with proper error handling
-
-**Deprecation Plan:** When GitHub CLI adds native sub-issue support, deprecate these scripts
-
-**Discovery:** This is a cross-project utility that should be documented in user-level standards and available via initialization
+**Installation:** Helper scripts installed to `~/bin/` during initialization and available system-wide
 
 ---
 
-## Standards Evolution Tracking
+## Version Control
 
-### V1: Simplified Project Notes
+All configuration files, templates, and standards are tracked in Git repositories:
 
-**Examples:** npm-protect, scoremyclays, scoremyclays-onlook
+### User-Level Configuration
+- Repository: `~/.claude/` (Git-tracked)
+- All changes tracked via Git commits
+- No version suffixes in filenames
 
-**Characteristics:**
-- Basic CLAUDE.md with project overview
-- No referenced prompts
-- File structure documentation
-- Command references
+### Project-Level Configuration
+- Repository: Each project's Git repository
+- Prompt files in `./prompts/` directory
+- All changes tracked via project Git history
 
-**Purpose:** Project orientation for AI agents, not comprehensive standards
-
-### V2: Two-Layer with Partial Standards
-
-**Examples:** sv/specverse-app-portal (earlier state)
-
-**Characteristics:**
-- Two-layer CLAUDE.md system established
-- References some prompts
-- Startup imperatives present
-- Incomplete prompt coverage
-
-**Purpose:** Transition to comprehensive standards system
-
-### V3: Full Standards-Based System
-
-**Examples:** gainfunction/website, marrbox/set-up-and-admin, sv/specverse-app-portal (current)
-
-**Characteristics:**
-- Complete two-layer system
-- Comprehensive prompt references
-- Project-specific prompt files
-- Mandatory sections all present
-- Clear precedence rules
-
-**Purpose:** Complete AI agent directive system with project-specific standards
-
-### V4: Specialized Standards (Emerging)
-
-**Examples:** sv/specverse-lang (comprehensive dev guide), npm-protect (doc parity)
-
-**Characteristics:**
-- CLAUDE.md serves multiple purposes (AI guide + dev docs)
-- Project-specific standards (script doc parity, feature addition process)
-- Extended sections for complex projects
-- Integration of project workflows
-
-**Purpose:** Project-specific adaptation of standards system
+### Template Updates
+- Templates stored in `~/.claude/prompt-templates/`
+- Updates pulled from central repository
+- Git history shows template evolution
 
 ---
 
