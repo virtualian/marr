@@ -52,6 +52,7 @@ Projects may add additional standards as needed:
 - `prj-ui-ux-standard.md` (for user-facing applications)
 - `prj-documentation-standard.md` (for documentation sites)
 - `prj-api-standard.md` (for API development)
+- `prj-doc-parity-standard.md` (for CLI/tooling projects with script documentation)
 
 ---
 
@@ -493,6 +494,155 @@ All configuration files, templates, and standards are tracked in Git repositorie
 - Templates stored in `~/.claude/prompt-templates/`
 - Updates pulled from central repository
 - Git history shows template evolution
+
+---
+
+## Optional Standard: Documentation Parity Protocol
+
+### Overview
+
+For CLI tools, bash scripts, and executable tooling projects, code and documentation must maintain strict parity. This pattern is inspired by the npm-protect project.
+
+**When to use:** Projects where users primarily interact through command-line scripts rather than application UI.
+
+### Core Principle
+
+**"If it's not documented, it doesn't exist."**
+
+Every script change that affects user behavior MUST have a corresponding documentation update before commit.
+
+### Documentation Structure
+
+```
+project-root/
+├── scripts/
+│   ├── script-one.sh
+│   ├── script-two.sh
+│   └── shared-lib.sh
+└── docs/
+    ├── README.md                  # Navigation index
+    ├── overview.md                # System architecture
+    ├── script-one.md              # Mirrors script-one.sh
+    ├── script-two.md              # Mirrors script-two.sh
+    └── shared-lib.md              # Mirrors shared-lib.sh
+```
+
+### Mandatory Update Protocol
+
+**When modifying a script, ALWAYS update:**
+
+1. **Corresponding docs file** - Same changes to documentation
+2. **docs/README.md** - If navigation/features affected
+3. **docs/overview.md** - If architecture changed
+4. **Cross-references** - Test all links still work
+5. **Version numbers** - Both script headers and docs
+
+### What Requires Documentation Updates
+
+**✅ ALWAYS UPDATE:**
+- New command-line options or parameters
+- Changed default behavior
+- New output formats or report types
+- Modified algorithms or detection methods
+- New dependencies or requirements
+- Changed file locations or names
+- New error messages or exit codes
+- Performance improvements with measurable impact
+
+**⚠️ CONSIDER UPDATING:**
+- Bug fixes that affect behavior
+- Internal refactoring that changes how features work
+- Optimization affecting performance characteristics
+
+**❌ NO UPDATE NEEDED:**
+- Code comments only
+- Variable name changes (internal)
+- Pure refactoring with no behavioral changes
+
+### Documentation Quality Standards
+
+Each script documentation file MUST include:
+- **Purpose** - What the script does
+- **Functionality** - How it works (technical details)
+- **Input Parameters** - All command-line options
+- **Output Format** - What the script produces
+- **Performance Characteristics** - Speed, memory, scalability
+- **Use Cases** - Real-world examples
+- **Cross-references** - Links to related docs
+
+### Pre-Commit Checklist
+
+Before committing script changes:
+- [ ] Corresponding docs/ file(s) updated
+- [ ] Code examples in docs tested
+- [ ] Cross-references verified
+- [ ] Performance characteristics updated if changed
+- [ ] README.md updated if navigation changed
+- [ ] Git commit message mentions doc updates
+
+### Detection Script
+
+Detect stale documentation:
+
+```bash
+#!/bin/bash
+# Find scripts modified after their documentation
+
+for script in scripts/*.sh scripts/*.js; do
+  doc="docs/$(basename "$script" .sh).md"
+  doc="${doc%.js.md}.md"
+
+  if [ -f "$doc" ]; then
+    script_time=$(stat -f %m "$script" 2>/dev/null || stat -c %Y "$script")
+    doc_time=$(stat -f %m "$doc" 2>/dev/null || stat -c %Y "$doc")
+
+    if [ "$script_time" -gt "$doc_time" ]; then
+      echo "⚠️  $script modified after $doc"
+    fi
+  else
+    echo "❌ Missing documentation for $script"
+  fi
+done
+```
+
+### Example Commit Message
+
+```
+Fix output directory bug in audit-script.sh
+
+- Convert OUTPUT_DIR to absolute path before cd
+- Fixes "No such file or directory" errors
+- Update docs/audit-script.md:
+  - Add troubleshooting section
+  - Update performance characteristics
+  - Add example for custom output directory
+
+Fixes #123
+```
+
+### Consequences of Outdated Documentation
+
+- Users follow incorrect instructions → broken workflows
+- Wrong parameters documented → errors and confusion
+- Outdated examples → frustration and time waste
+- Missing features → underutilization of tools
+- Incorrect performance info → wrong architecture decisions
+
+### Implementation in CLAUDE.md
+
+Projects using this standard should include in their CLAUDE.md:
+
+```markdown
+## Documentation Parity (CRITICAL)
+
+This project uses the Documentation Parity Protocol.
+
+**MANDATORY:** When modifying any script, update corresponding docs/ file.
+
+See `prj-doc-parity-standard.md` for complete requirements.
+```
+
+**Rationale:** CLI tools are discovered and understood through documentation. Outdated docs are worse than no docs—they actively mislead users.
 
 ---
 
