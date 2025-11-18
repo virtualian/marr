@@ -24,8 +24,13 @@
 
 ```
 repo-setup/
-├── docs/                          # Technical specifications
-│   └── functional-specification.md
+├── docs/                          # Role-first documentation
+│   ├── product/                   # Product Owner/Manager role
+│   │   └── prd.md
+│   ├── implementation/            # Developer/Implementer role
+│   │   └── functional-specification.md
+│   └── user/                      # User/Adopter role
+│       └── getting-started.md
 ├── examples/                      # Real-world reference implementations
 │   ├── user-level/
 │   ├── project-level/
@@ -38,11 +43,28 @@ repo-setup/
 
 ### Directory Purposes
 
-**docs/**
-- Purpose: Technical specifications and design documents
-- Audience: Developers and AI agents implementing the system
-- Format: Detailed, comprehensive markdown
-- Updates: When system design changes
+**docs/** (Role-First Organization)
+- Purpose: All MARR documentation organized by user role
+- Structure: Following user-documentation-standard (Diataxis/role-first pattern)
+- Rationale: Users think "I'm a product owner" before "I need a specification"
+
+**docs/product/**
+- Role: Product Owner/Manager
+- Content: Strategic direction, requirements, success criteria, roadmaps
+- Audience: Stakeholders, product managers
+- Examples: PRD, roadmaps, success metrics
+
+**docs/implementation/**
+- Role: Developer/Implementer
+- Content: Technical specifications, architecture, implementation details
+- Audience: Developers building MARR
+- Examples: Functional specs, architecture docs, API design
+
+**docs/user/**
+- Role: User/Adopter
+- Content: Getting started guides, how-tos, templates reference
+- Audience: People using MARR to configure their projects
+- Examples: Getting started, template guides, troubleshooting
 
 **examples/**
 - Purpose: Real working configurations from production projects
@@ -182,10 +204,20 @@ repo-setup/
 
 ### Current Documentation
 
-**Functional Spec:**
-- Location: `docs/functional-specification.md`
-- Status: Living document, actively refined
-- Updates: As system design evolves
+**Product Documentation (docs/product/):**
+- PRD: `docs/product/prd.md` - Product Requirements Document
+- Status: Complete, defines MARR vision and requirements
+- Audience: Product owners, stakeholders
+
+**Implementation Documentation (docs/implementation/):**
+- Status: Empty (ready for functional specs, architecture docs)
+- Future: Functional specifications, technical designs
+- Audience: Developers building MARR
+
+**User Documentation (docs/user/):**
+- Status: Empty (ready for getting started, guides)
+- Future: Getting started, template guides, how-tos
+- Audience: People using MARR
 
 **Examples:**
 - Location: `examples/`
@@ -195,7 +227,7 @@ repo-setup/
 
 **Plans:**
 - Location: `plans/`
-- Status: Empty (ready for implementation planning)
+- Current: `phase1-marr-implementation.md`
 - Usage: Created as needed for specific work
 
 **Standards:**
