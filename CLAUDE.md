@@ -1,4 +1,4 @@
-# repo-setup
+# marr
 
 > [!IMPORTANT]
 >
@@ -13,7 +13,7 @@
 
 ## Project Overview
 
-**repo-setup** is a Claude Code Project Configuration System that provides:
+**MARR (Making Agents Really Reliable)** is a Claude Code Project Configuration System that provides:
 - Unified standards applied to all repositories (git workflow, testing, MCP usage)
 - Two-layer configuration system (user-level + project-level)
 - Real-world examples from production projects

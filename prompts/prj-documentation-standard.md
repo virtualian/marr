@@ -23,7 +23,7 @@
 ### Directory Structure
 
 ```
-repo-setup/
+marr/
 ├── docs/                          # Role-first documentation
 │   ├── product/                   # Product Owner/Manager role
 │   │   └── prd.md

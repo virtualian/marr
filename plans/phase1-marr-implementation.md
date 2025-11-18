@@ -228,6 +228,6 @@ After completing all steps, verify Phase 1 meets PRD requirements:
 
 **[ASSUMPTION: Projects use Git]** - All MARR projects assumed to be Git repositories as per PRD CR4.
 
-**Repository Location:** This plan creates infrastructure in ~/.marr/ but does NOT modify the repo-setup project itself (that's for Phase 2).
+**Repository Location:** This plan creates infrastructure in ~/.marr/ (the MARR project repository at virtualian/marr contains the specifications and templates).
 
 **Migration Note:** Phase 1 creates NEW project initialization; migrating EXISTING projects to MARR is Phase 2 scope.

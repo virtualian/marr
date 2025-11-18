@@ -16,7 +16,7 @@ This repository defines and implements **MARR**, a two-layer configuration syste
 ## Repository Structure
 
 ```
-repo-setup/
+marr/
 ├── README.md                      # This file
 ├── CLAUDE.md                      # Project configuration (follows its own spec)
 ├── docs/
@@ -128,6 +128,6 @@ The repo "eats its own dog food" by following the unified standards approach it 
 
 ## Repository
 
-**GitHub**: virtualian/repo-setup
-**Branch**: create-scaffold (current development)
-**Main**: Not yet merged (scaffold in progress)
+**GitHub**: virtualian/marr
+**Branch**: main
+**Status**: Phase 1 Complete
