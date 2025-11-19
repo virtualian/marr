@@ -1,0 +1,58 @@
+{
+  "name": "marr-cli",
+  "version": "1.0.0",
+  "description": "MARR (Making Agents Really Reliable) - AI agent configuration system for consistent project context and standards",
+  "type": "module",
+  "bin": {
+    "marr": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node --test dist/**/*.test.js",
+    "lint": "eslint src/**/*.ts",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "claude",
+    "configuration",
+    "cli",
+    "marr",
+    "development",
+    "standards",
+    "project-setup"
+  ],
+  "author": "Ian Marr <virtualian@gmail.com>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/virtualian/marr.git",
+    "directory": "package"
+  },
+  "bugs": {
+    "url": "https://github.com/virtualian/marr/issues"
+  },
+  "homepage": "https://github.com/virtualian/marr#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2"
+  },
+  "files": [
+    "dist/",
+    "templates/",
+    "README.md",
+    "LICENSE"
+  ]
+}
