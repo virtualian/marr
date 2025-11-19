@@ -38,7 +38,7 @@ MARR is a two-layer configuration system:
 **Recommended (npm):**
 ```bash
 # Install globally
-npm install -g marr-cli
+npm install -g @virtualian/marr
 
 # Initialize new project
 marr init --name my-project --type "web app" --template standards
@@ -79,12 +79,12 @@ This repo follows its own specification:
 
 ## npm Package
 
-The `marr-cli` package provides easy installation and management:
+The `@virtualian/marr` package provides easy installation and management:
 
-- **Install**: `npm install -g marr-cli`
+- **Install**: `npm install -g @virtualian/marr`
 - **Commands**: `marr init`, `marr validate`, `marr install-scripts`
 - **Documentation**: See `package/README.md` for full CLI documentation
-- **npm Registry**: [marr-cli on npm](https://www.npmjs.com/package/marr-cli) *(coming soon)*
+- **npm Registry**: [@virtualian/marr on npm](https://www.npmjs.com/package/@virtualian/marr) *(coming soon)*
 
 ## Repository
 

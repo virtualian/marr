@@ -1,8 +1,8 @@
-# marr-cli
+# @virtualian/marr
 
 **MARR (Making Agents Really Reliable)** - AI agent configuration system for consistent project context and standards.
 
-[![npm version](https://img.shields.io/npm/v/marr-cli.svg)](https://www.npmjs.com/package/marr-cli)
+[![npm version](https://img.shields.io/npm/v/@virtualian/marr.svg)](https://www.npmjs.com/package/@virtualian/marr)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
 ## What is MARR?
@@ -17,7 +17,7 @@ MARR provides a two-layer configuration system for AI agents (Claude Code first)
 ## Installation
 
 ```bash
-npm install -g marr-cli
+npm install -g @virtualian/marr
 ```
 
 **First Run:** The CLI automatically creates `~/.marr/` infrastructure and copies all templates on first use.
@@ -233,7 +233,7 @@ gh-list-subissues.sh <parent>
 **Solution:**
 ```bash
 # Verify installation
-npm list -g marr-cli
+npm list -g @virtualian/marr
 
 # If installed but not found, check npm global bin path
 npm config get prefix
@@ -262,7 +262,7 @@ This is expected behavior - MARR won't overwrite existing configuration. Either:
 ls ~/.marr/
 
 # If missing, reinstall package
-npm install -g marr-cli
+npm install -g @virtualian/marr
 
 # First run should recreate ~/.marr/
 marr init -n test --dir /tmp/test
