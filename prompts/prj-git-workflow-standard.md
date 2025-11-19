@@ -82,7 +82,7 @@ git commit -m "Create functional specification document"
 
 ## This Project Specifics
 
-- **Repository**: virtualian/repo-setup
+- **Repository**: virtualian/marr
 - **Main branch**: main
 - **Merge strategy**: Squash only
 - **Branch cleanup**: Automatic after merge
