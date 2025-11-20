@@ -33,17 +33,25 @@ MARR is a two-layer configuration system:
 
 ## Getting Started
 
-### Install MARR
+### Install MARR CLI
+
+**Recommended (npm):**
 ```bash
-# Install helper scripts
-marr-install-scripts
+# Install globally
+npm install -g @virtualian/marr
 
 # Initialize new project
-marr-init --name my-project --type "web app" --template standards
+marr init --name my-project --type "web app" --template standards
 
 # Validate configuration
-marr-validate
+marr validate
+
+# Install helper scripts
+marr install-scripts
 ```
+
+**Alternative (Manual):**
+See `~/.marr/` Phase 1 installation in the repository documentation.
 
 ### Explore This Repository
 ```bash
@@ -64,10 +72,20 @@ This repo follows its own specification:
 ## Documentation
 
 - **Product Requirements**: `docs/product/prd.md` - Vision and requirements
+- **CLI Package**: `package/README.md` - marr-cli npm package documentation
 - **Examples**: `examples/README.md` - Real-world configuration examples
 - **Project Config**: `CLAUDE.md` - This repo's configuration
 - **Standards**: `prompts/*.md` - Project-level standard prompt files
 
+## npm Package
+
+The `@virtualian/marr` package provides easy installation and management:
+
+- **Install**: `npm install -g @virtualian/marr`
+- **Commands**: `marr init`, `marr validate`, `marr install-scripts`
+- **Documentation**: See `package/README.md` for full CLI documentation
+- **npm Registry**: [@virtualian/marr on npm](https://www.npmjs.com/package/@virtualian/marr) *(coming soon)*
+
 ## Repository
 
-**GitHub**: virtualian/marr
+**GitHub**: https://github.com/virtualian/marr
