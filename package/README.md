@@ -356,6 +356,54 @@ marr-cli/
 └── README.md
 ```
 
+## Development
+
+### Setting Up Development Environment
+
+```bash
+cd package
+npm install
+npm run build
+```
+
+### Development Workflow
+
+```bash
+# Watch mode for automatic rebuilds
+npm run dev
+
+# Build for testing
+npm run build
+```
+
+### Testing with testuser Account
+
+The recommended way to test MARR is using a clean macOS user account for complete isolation. This tests the exact user experience including first-run setup, template installation, and all commands.
+
+See [TESTING.md](./TESTING.md) for comprehensive testing documentation.
+
+**Quick Test Cycle:**
+
+```bash
+# In package directory: Build test tarball
+bash scripts/build-test-tarball.sh
+
+# Switch to testuser and run automated tests
+# (Use the actual path where you cloned the repo)
+sudo su - testuser
+bash /path/to/marr/package/scripts/test-in-testuser.sh
+```
+
+### Publishing
+
+```bash
+# Build and publish
+npm run build
+npm publish
+
+# The prepublishOnly hook will run check-bin, build, and tests automatically
+```
+
 ## License
 
 ISC

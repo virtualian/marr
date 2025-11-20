@@ -11,7 +11,9 @@
     "dev": "tsc --watch",
     "test": "node --test dist/**/*.test.js",
     "lint": "eslint src/**/*.ts",
-    "prepublishOnly": "npm run build && npm test"
+    "check-bin": "node scripts/check-binary-name.js",
+    "prepack": "npm run check-bin && npm run build",
+    "prepublishOnly": "npm run check-bin && npm run build && npm test"
   },
   "keywords": [
     "ai",

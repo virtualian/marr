@@ -16,3 +16,7 @@ package-lock.json
 
 # Test coverage
 coverage/
+recap/
+
+# Build artifacts (test tarballs)
+*.tgz
