@@ -13,7 +13,6 @@ import { dirname, join } from 'path';
 // Import commands
 import { initCommand } from './commands/init.js';
 import { validateCommand } from './commands/validate.js';
-import { installScriptsCommand } from './commands/install-scripts.js';
 import { cleanCommand } from './commands/clean.js';
 
 // Get package.json for version
@@ -35,7 +34,6 @@ program
 // Register commands
 initCommand(program);
 validateCommand(program);
-installScriptsCommand(program);
 cleanCommand(program);
 
 // Parse arguments

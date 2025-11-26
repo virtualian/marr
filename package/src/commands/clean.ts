@@ -4,11 +4,17 @@
  */
 
 import { Command } from 'commander';
-import { rmSync } from 'fs';
+import { rmSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import * as fileOps from '../utils/file-ops.js';
 import * as logger from '../utils/logger.js';
 import { removeMarrImport, isMarrSetup, hasMarrImport } from '../utils/marr-setup.js';
+
+/** Helper scripts installed by MARR */
+const HELPER_SCRIPTS = [
+  'gh-add-subissue.sh',
+  'gh-list-subissues.sh',
+];
 
 interface CleanOptions {
   user: boolean;
@@ -19,6 +25,14 @@ interface CleanOptions {
 }
 
 /**
+ * Check if any helper scripts are installed in ~/bin/
+ */
+function hasHelperScripts(): boolean {
+  const binDir = join(fileOps.getHomeDir(), 'bin');
+  return HELPER_SCRIPTS.some(script => fileOps.exists(join(binDir, script)));
+}
+
+/**
  * Clean user-level MARR configuration (~/.claude/marr/)
  */
 function cleanUser(dryRun: boolean): { removed: string[]; errors: string[] } {
@@ -26,6 +40,7 @@ function cleanUser(dryRun: boolean): { removed: string[]; errors: string[] } {
   const errors: string[] = [];
 
   const marrRoot = fileOps.getMarrRoot();
+  const binDir = join(fileOps.getHomeDir(), 'bin');
 
   // Remove import from ~/.claude/CLAUDE.md
   if (hasMarrImport()) {
@@ -51,6 +66,23 @@ function cleanUser(dryRun: boolean): { removed: string[]; errors: string[] } {
         removed.push('~/.claude/marr/ directory');
       } catch (err) {
         errors.push(`Failed to remove ~/.claude/marr/: ${(err as Error).message}`);
+      }
+    }
+  }
+
+  // Remove helper scripts from ~/bin/
+  for (const script of HELPER_SCRIPTS) {
+    const scriptPath = join(binDir, script);
+    if (fileOps.exists(scriptPath)) {
+      if (dryRun) {
+        removed.push(`~/bin/${script}`);
+      } else {
+        try {
+          unlinkSync(scriptPath);
+          removed.push(`~/bin/${script}`);
+        } catch (err) {
+          errors.push(`Failed to remove ~/bin/${script}: ${(err as Error).message}`);
+        }
       }
     }
   }
@@ -111,7 +143,7 @@ function executeClean(options: CleanOptions): void {
   const cleanProjectConfig = project || all;
 
   // Validate there's something to clean
-  const userHasContent = isMarrSetup() || hasMarrImport();
+  const userHasContent = isMarrSetup() || hasMarrImport() || hasHelperScripts();
   const projectHasContent = fileOps.exists(join(process.cwd(), 'CLAUDE.md')) ||
     fileOps.exists(join(process.cwd(), 'prompts'));
 

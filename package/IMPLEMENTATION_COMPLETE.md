@@ -1,358 +1,155 @@
-# marr-cli npm Package - Implementation Complete ✅
+# marr-cli npm Package - Implementation Complete
 
 **Issue**: #10 - Add npm package for MARR installation
-**Branch**: 10-npm-package-installation
+**Updated**: Issue #15 - Refactor CLI to simplified --user/--project design
 **Status**: Complete - Ready for npm publish
-**Date**: 2025-11-19
+**Date**: 2025-11-26
 
 ---
 
 ## Summary
 
-Successfully implemented `marr-cli` npm package that transforms MARR from manual installation to a professional, npm-installable CLI tool. All core functionality complete, tested, and documented.
+The `marr-cli` npm package provides a professional, npm-installable CLI tool for MARR. The CLI has been refactored (issue #15) to use a simplified `--user`/`--project` design that better separates concerns.
 
-## Implementation Steps Completed
+## CLI Reference (Current Design)
 
-### ✅ STEP01: Package Foundation
-**Commit**: `68c63c7` - Create marr-cli package foundation with TypeScript
+```bash
+# User setup (one-time per machine)
+marr init --user          # or: marr init -u
 
-- TypeScript-based CLI with Commander.js framework
-- Complete package structure (package.json, tsconfig.json)
-- Three command stubs (init, validate, install-scripts)
-- Utility modules (logger with colors, file operations)
-- Build pipeline working (compiles cleanly, CLI executes)
+# Project setup
+marr init --project       # Current directory (confirms with user)
+marr init --project /path # Specific path
 
-### ✅ STEP02: Implement `marr init` Command
-**Commit**: `16f17e1` - Implement 'marr init' command
+# Both
+marr init --all           # User + current project
 
-- Full project initialization logic
-- Template substitution for project variables
-- Directory structure creation (prompts/, docs/, plans/, research/)
-- CLAUDE.md template copying with customization
-- Project-level prompt files copying
-- marr-setup utility for first-run ~/.claude/marr/ initialization
-- All templates bundled (claude-md, project, user, helper-scripts)
-- Comprehensive error handling
-- Tested with all templates: basic, standards, dev-guide, status
+# Cleanup
+marr clean --user         # Remove ~/.claude/marr/ + import + ~/bin/ scripts
+marr clean --project      # Remove ./CLAUDE.md + ./prompts/
+marr clean --all          # Both
 
-### ✅ STEP03: Implement `marr validate` Command
-**Commit**: `4302b88` - Implement 'marr validate' command
+# Validation
+marr validate             # Check current project
+marr validate --strict    # Warnings as errors
 
-- Comprehensive configuration checks
-- CLAUDE.md structure validation
-- prompts/ directory and file verification
-- Naming convention validation (user-*, prj-*)
-- Prompt reference validation (@prompts/)
-- File link checking
-- --strict mode for warnings-as-errors
-- Clear, actionable error and warning messages
-- Tested on valid projects, invalid projects, strict mode
-
-### ✅ STEP04: Implement `marr install-scripts` Command
-**Commit**: `b78600b` - Implement 'marr install-scripts' command
-
-- GitHub helper scripts installation
-- Copy from bundled templates to ~/bin/
-- Automatic executable permissions
-- PATH detection and setup instructions
-- Edge case handling (existing files, missing scripts)
-- Tested installation and PATH detection
-
-### ✅ STEP05: Bundle Templates and Config
-**Status**: Completed in STEP02
-
-- All templates copied to package/templates/
-- Config files bundled
-- First-run ~/.claude/marr/ setup implemented
-- Backward compatible with Phase 1 manual setup
-
-### ✅ STEP06: Testing and Documentation
-**Commit**: `95309c9` - Add comprehensive documentation and testing
-
-- Complete package README.md with usage examples
-- Troubleshooting guide with common issues
-- All commands documented with options and examples
-- Development instructions
-- Main MARR README updated with npm installation
-- LICENSE file copied to package
-- Local installation tested with npm link
-- All commands verified working
-
-### ✅ STEP07: Publish Preparation
-**Commit**: `dcf09ac` - Prepare package for npm publication
-
-- .npmignore added to exclude source files
-- Comprehensive npm publish checklist created
-- npm pack tested (43.2 kB package size, 47 files)
-- Package contents verified correct
-- Publication process documented
-- Ready for npm publish
-
-### ✅ STEP08: Final Validation
-**Status**: Complete
-
-- Full integration tests passed
-- All commands work correctly
-- Package size appropriate (43.2 kB)
-- Documentation accurate and complete
-- Implementation plan updated
-- Summary created
-
----
-
-## Technical Specifications
-
-### Package Details
-- **Name**: marr-cli
-- **Version**: 1.0.0
-- **Size**: 43.2 kB (packaged)
-- **Files**: 47 files total
-- **Node**: >= 18.0.0
-- **License**: ISC
-
-### Commands Implemented
-1. **marr init** - Initialize new project with MARR configuration
-   - Options: --name, --type, --template, --dir
-   - Templates: basic, standards, dev-guide, status
-   - Creates: CLAUDE.md, prompts/, docs/, plans/, research/
-
-2. **marr validate** - Validate MARR configuration
-   - Options: --strict
-   - Checks: CLAUDE.md, prompts/, naming, references
-   - Exit codes: 0 (pass), 1 (fail)
-
-3. **marr install-scripts** - Install GitHub helper scripts
-   - Installs: gh-add-subissue.sh, gh-list-subissues.sh
-   - Location: ~/bin/
-   - PATH: Detects and provides setup instructions
-
-### Architecture
+# Options (apply to init and clean)
+--dry-run                 # Preview without changes
+--force                   # Skip confirmations
 ```
-marr-cli/
-├── src/                     # TypeScript source
-│   ├── index.ts            # CLI entry point
-│   ├── commands/           # Command implementations
-│   │   ├── init.ts
-│   │   ├── validate.ts
-│   │   └── install-scripts.ts
-│   └── utils/              # Shared utilities
-│       ├── logger.ts
-│       ├── file-ops.ts
-│       └── marr-setup.ts
-├── templates/              # Bundled templates
-│   ├── claude-md/         # 4 CLAUDE.md templates
-│   ├── project/common/    # 4 project prompts
-│   ├── user/              # 5 user prompts
-│   └── helper-scripts/    # 2 GitHub scripts
-├── dist/                   # Compiled JavaScript
+
+## Key Changes (Issue #15)
+
+### Removed
+- `marr install-scripts` command (folded into `--user`)
+- Template selection (`--template` flag)
+- Multiple CLAUDE.md templates (basic, standards, dev-guide, status)
+- `--name` and `--type` options (project name derived from directory)
+
+### Added
+- `--user` / `-u` flag for user-level setup
+- `--project` / `-p [path]` flag for project-level setup
+- `--all` / `-a [path]` flag for both
+- `--dry-run` / `-n` for preview mode
+- `--force` / `-f` for skipping confirmations
+- Confirmation prompt for project path
+- Warning if config already exists
+- Helper script cleanup in `marr clean --user`
+
+### Behavior Changes
+- `marr init` with no flags shows help (previously required `--name`)
+- Helper scripts installed as part of `--user`, not separate command
+- Single project template (simpler, cleaner)
+- Clean command now removes `~/bin/` scripts with `--user`
+
+## Architecture
+
+```
+package/
+├── src/
+│   ├── index.ts              # CLI entry point
+│   ├── commands/
+│   │   ├── init.ts           # marr init (--user/--project/--all)
+│   │   ├── validate.ts       # marr validate
+│   │   └── clean.ts          # marr clean
+│   └── utils/
+│       ├── logger.ts         # Colored output
+│       ├── file-ops.ts       # File operations
+│       └── marr-setup.ts     # First-run setup
+├── templates/
+│   ├── project/common/       # 4 project prompts
+│   ├── user/                 # User-level prompts
+│   └── helper-scripts/       # 2 GitHub scripts
+├── dist/                     # Compiled JavaScript
 ├── package.json
 ├── tsconfig.json
-├── README.md
-└── LICENSE
+└── README.md
 ```
 
----
+## Testing
 
-## Testing Summary
+### To Test Changes
 
-### Manual Testing Completed
-- ✅ `marr init` with all 4 templates
-- ✅ `marr validate` on valid projects
-- ✅ `marr validate` on invalid projects
-- ✅ `marr validate --strict` with warnings
-- ✅ `marr install-scripts` installation
-- ✅ Error handling (missing name, invalid template, duplicate init)
-- ✅ npm link local installation
-- ✅ First-run ~/.claude/marr/ setup
-- ✅ Template substitution (PROJECT_NAME, PROJECT_TYPE)
-- ✅ PATH detection
-- ✅ Cross-platform file operations
+```bash
+cd /Users/ianmarr/projects/marr/package
 
-### Test Coverage
-- ✅ Command-line argument parsing
-- ✅ File operations (read, write, copy, chmod)
-- ✅ Template processing
-- ✅ Validation logic
-- ✅ Error messages
-- ✅ Success messages
-- ✅ Colored output
+# Build
+npm run build
 
----
+# Test locally
+npm link
 
-## Success Criteria (from Issue #10)
+# Test commands
+marr init                    # Should show help
+marr init --user --dry-run   # Preview user setup
+marr init --project --dry-run # Preview project setup
+marr clean --user --dry-run  # Preview cleanup (includes ~/bin/ scripts)
+```
 
-### Acceptance Criteria
-- ✅ npm package published and installable globally
-- ✅ `marr init` creates project configuration (CLAUDE.md + prompts/)
-- ✅ `marr validate` checks configuration correctness
-- ✅ `marr install-scripts` sets up helper scripts
-- ✅ Package includes all necessary templates
-- ✅ Documentation updated with npm installation instructions
-- ✅ Backward compatible with manual installation approach
+### Full Test with testuser
 
-### Benefits Achieved
-- ✅ **Simpler onboarding**: Single command installation
-- ✅ **Version management**: npm handles updates and dependencies
-- ✅ **Discoverability**: npm registry makes MARR easier to find
-- ✅ **Standard workflow**: Developers expect `npm install` for CLI tools
-- ✅ **First-run automation**: Automatically creates ~/.claude/marr/ infrastructure
-- ✅ **Cross-platform**: Node.js runs on Windows, Mac, Linux
+```bash
+# Build tarball
+bash scripts/build-test-tarball.sh
 
----
+# Test in clean environment
+sudo su - testuser
+bash /path/to/marr/package/scripts/test-in-testuser.sh
+```
+
+## Success Criteria (Issue #15)
+
+- [x] `marr init --user` creates `~/.claude/marr/`, adds import, installs scripts to `~/bin/`
+- [x] `marr init --project` prompts for confirmation, creates `./CLAUDE.md` + `./prompts/`
+- [x] `marr init --project /path` works with explicit path
+- [x] Warning shown if running init a second time (config exists)
+- [x] `marr clean --user` removes scripts from `~/bin/`
+- [x] `marr install-scripts` command removed
+- [x] Template selection removed (no `--template` flag)
+- [x] `marr init` with no flags shows help
+- [ ] All tests pass
+- [x] Documentation updated
 
 ## What's Ready
 
 ### For Users
-1. **Installation**: `npm install -g marr-cli`
-2. **Quick Start**: `marr init -n my-project -t "web app" --template standards`
-3. **Validation**: `marr validate`
-4. **Helper Scripts**: `marr install-scripts`
-5. **Help**: `marr --help`, `marr init --help`, etc.
+1. **Installation**: `npm install -g @virtualian/marr`
+2. **User Setup**: `marr init --user`
+3. **Project Setup**: `marr init --project`
+4. **Validation**: `marr validate`
+5. **Cleanup**: `marr clean --user/--project/--all`
 
 ### For Developers
 1. **Source Code**: Complete TypeScript implementation
 2. **Build Process**: `npm run build`
 3. **Local Testing**: `npm link`
-4. **Documentation**: README.md, inline comments, JSDoc
-5. **Examples**: Working test projects
-
-### For Publication
-1. **Package**: Tested with `npm pack`
-2. **Metadata**: Complete package.json
-3. **License**: ISC license included
-4. **Documentation**: Comprehensive README
-5. **Checklist**: NPM_PUBLISH_CHECKLIST.md ready
-
----
-
-## Next Steps
-
-### To Publish (When Ready)
-```bash
-# 1. Login to npm
-npm login
-
-# 2. Publish package
-cd /Users/ianmarr/projects/marr/package
-npm publish
-
-# 3. Verify publication
-npm install -g marr-cli
-marr --version
-```
-
-### Post-Publication
-1. Update main README with npm registry link
-2. Create GitHub release (tag v1.0.0)
-3. Update issue #10 with completion notes
-4. Close issue #10
-5. Announce availability
-
----
-
-## Key Decisions Made
-
-### Technical Decisions
-1. **TypeScript over JavaScript**: Type safety, better IDE support
-2. **Commander.js over yargs**: Simpler, lighter, sufficient features
-3. **Node.js over bash**: Cross-platform, better error handling
-4. **Bundle templates in package**: Offline usage, version controlled
-5. **Preserve ~/.claude/marr/ structure**: Backward compatibility
-
-### Design Decisions
-1. **Package name: marr-cli**: Available, descriptive, clear
-2. **Commands: init, validate, install-scripts**: Focused, clear purpose
-3. **Template substitution**: {{PROJECT_NAME}}, {{PROJECT_TYPE}}
-4. **First-run automation**: Automatic ~/.claude/marr/ setup
-5. **Colored output**: Better UX, clear status messages
-
----
-
-## Metrics
-
-### Development
-- **Total Commits**: 8 (STEP01-STEP07 + setup + docs)
-- **Lines of Code**: ~1,500 TypeScript
-- **Templates**: 18 files bundled
-- **Commands**: 3 implemented
-- **Documentation**: 380+ lines README
-
-### Package
-- **Package Size**: 43.2 kB
-- **Total Files**: 47
-- **Dependencies**: 2 (commander, yaml)
-- **DevDependencies**: 4 (TypeScript, types, eslint)
-- **Node Requirement**: >= 18.0.0
-
----
-
-## Lessons Learned
-
-### What Worked Well
-1. **TypeScript**: Caught errors early, great IDE support
-2. **Modular architecture**: Easy to test and maintain
-3. **Commander.js**: Clean API, good documentation
-4. **Incremental steps**: STEP01-08 provided clear progress
-5. **Manual testing**: Caught edge cases automated tests miss
-
-### Challenges Overcome
-1. **ESM modules**: Proper TypeScript configuration for ES modules
-2. **File paths**: Correct path resolution for bundled templates
-3. **First-run setup**: Detecting and creating ~/.claude/marr/ transparently
-4. **chmod on scripts**: Making helper scripts executable cross-platform
-5. **Package size**: Keeping bundle under 50KB
-
----
-
-## Future Enhancements (Not in Scope)
-
-### Phase 2 Potential Features
-- Migration tool for existing projects
-- Propagation tool for standard updates
-- Advanced validation with auto-fix
-- Config file (marr.config.json)
-- Custom template support
-
-### Phase 3 Potential Features
-- Interactive initialization wizard
-- Template versioning
-- Configuration drift detection
-- Plugin system
-
-### Phase 4 Potential Features
-- Multi-agent support (Cursor, Jules, etc.)
-- Community template sharing
-- Team collaboration features
-- Cloud template registry
-
----
-
-## Acknowledgments
-
-### Tools Used
-- **TypeScript**: Type-safe JavaScript
-- **Commander.js**: CLI framework
-- **Node.js**: Runtime platform
-- **npm**: Package management
-- **Git**: Version control
-
-### Standards Followed
-- **Semantic Versioning**: 1.0.0 initial release
-- **ISC License**: Open source license
-- **npm Best Practices**: Package structure, metadata
-- **TypeScript Best Practices**: Strict mode, types
-- **Git Best Practices**: Conventional commits
+4. **Documentation**: README.md updated
 
 ---
 
 ## Conclusion
 
-The `marr-cli` npm package is **complete and ready for publication**. All core functionality has been implemented, tested, and documented. The package provides a professional, easy-to-use CLI for installing and managing MARR configuration across all projects.
+The CLI has been refactored to a cleaner `--user`/`--project` design that better separates concerns and simplifies the user experience. The `install-scripts` command has been folded into `--user`, and template selection has been removed in favor of a single, opinionated project template.
 
-**Status**: ✅ Implementation Complete
-**Next Action**: npm publish (when ready)
-**Issue**: Ready to close after publication
-
----
-
-**marr-cli makes MARR accessible to everyone through a single npm install command.**
+**Status**: Ready for testing and publication
+**Next Action**: Run tests, then npm publish

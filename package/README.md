@@ -20,55 +20,79 @@ MARR provides a two-layer configuration system for AI agents (Claude Code first)
 npm install -g @virtualian/marr
 ```
 
-**First Run:** The CLI automatically creates `~/.claude/marr/` infrastructure and copies all templates on first use.
-
 ## Quick Start
 
 ```bash
+# One-time user setup (creates ~/.claude/marr/, installs helper scripts)
+marr init --user
+
 # Initialize a new project
-marr init --name my-project --type "web application" --template standards
+marr init --project
+
+# Or do both at once
+marr init --all
 
 # Validate configuration
 marr validate
-
-# Install helper scripts
-marr install-scripts
 ```
 
 ## Commands
 
 ### `marr init`
 
-Initialize new project with MARR configuration.
+Initialize MARR configuration. Supports three modes:
 
 **Usage:**
 ```bash
-marr init --name <name> [options]
+marr init [options]
 ```
 
 **Options:**
-- `-n, --name <name>` - Project name (required)
-- `-t, --type <type>` - Project type/description (default: "software project")
-- `--template <template>` - CLAUDE.md template (default: "basic")
-  - `basic` - Simple project orientation
-  - `standards` - Full standards with prompt references
-  - `dev-guide` - Comprehensive development guide
-  - `status` - Phase-based status tracking
-- `--dir <path>` - Target directory (default: current directory)
+- `-u, --user` - Set up user-level config (~/.claude/marr/, helper scripts in ~/bin/)
+- `-p, --project [path]` - Set up project-level config (./CLAUDE.md, ./prompts/)
+- `-a, --all [path]` - Set up both user and project config
+- `-n, --dry-run` - Show what would be created without actually creating
+- `-f, --force` - Skip confirmation prompts
 
 **Examples:**
 ```bash
-# Basic initialization
-marr init -n my-app -t "web application"
+# One-time user setup (run once per machine)
+marr init --user
 
-# With standards template
-marr init -n my-api -t "REST API" --template standards
+# Initialize current directory as MARR project
+marr init --project
 
-# Specify target directory
-marr init -n tool -t "CLI" --dir ~/projects/tool
+# Initialize specific directory
+marr init --project /path/to/project
+
+# Both user + current project (new machine + new project)
+marr init --all
+
+# Preview what would be created
+marr init --user --dry-run
+
+# Force overwrite existing config
+marr init --project --force
 ```
 
-**What it creates:**
+**What `--user` creates:**
+```
+~/.claude/
+├── CLAUDE.md                   # Updated with MARR import
+└── marr/
+    ├── CLAUDE.md               # MARR user configuration
+    ├── prompts/                # User-level standards
+    │   ├── user-git-workflow-standard.md
+    │   ├── user-testing-standard.md
+    │   └── user-mcp-usage-standard.md
+    └── templates/              # Templates for new projects
+
+~/bin/
+├── gh-add-subissue.sh          # GitHub helper script
+└── gh-list-subissues.sh        # GitHub helper script
+```
+
+**What `--project` creates:**
 ```
 your-project/
 ├── CLAUDE.md                   # Project configuration
@@ -78,8 +102,7 @@ your-project/
 │   ├── prj-mcp-usage-standard.md
 │   └── prj-documentation-standard.md
 ├── docs/                       # Documentation
-├── plans/                      # Implementation plans
-└── research/                   # Research notes
+└── plans/                      # Implementation plans
 ```
 
 ### `marr validate`
@@ -95,12 +118,12 @@ marr validate [options]
 - `--strict` - Fail on warnings (treat warnings as errors)
 
 **What it checks:**
-- ✅ CLAUDE.md exists and has required sections
-- ✅ prompts/ directory exists
-- ✅ Required prompt files present
-- ✅ Naming conventions followed (user-*, prj-*)
-- ✅ Prompt references (@prompts/) are valid
-- ✅ No broken file references
+- CLAUDE.md exists and has required sections
+- prompts/ directory exists
+- Required prompt files present
+- Naming conventions followed (user-*, prj-*)
+- Prompt references (@prompts/) are valid
+- No broken file references
 
 **Examples:**
 ```bash
@@ -115,42 +138,46 @@ marr validate --strict
 - `0` - Validation passed
 - `1` - Validation failed (errors found, or warnings in strict mode)
 
-### `marr install-scripts`
+### `marr clean`
 
-Install GitHub helper scripts to `~/bin/`.
+Remove MARR configuration files.
 
 **Usage:**
 ```bash
-marr install-scripts
+marr clean [options]
 ```
 
-**What it installs:**
-- `gh-add-subissue.sh` - Link sub-issue to parent issue
-- `gh-list-subissues.sh` - List all sub-issues of parent
+**Options:**
+- `-u, --user` - Clean user-level config (~/.claude/marr/, helper scripts)
+- `-p, --project` - Clean project-level config (./CLAUDE.md, ./prompts/)
+- `-a, --all` - Clean both user and project config
+- `-n, --dry-run` - Show what would be removed without actually removing
+- `-f, --force` - Skip confirmation prompts
 
 **Examples:**
 ```bash
-# After installation, use scripts:
-gh-add-subissue.sh 45 47      # Link issue #47 as sub-issue of #45
-gh-list-subissues.sh 45       # List all sub-issues of #45
+# Preview what would be removed
+marr clean --user --dry-run
+
+# Remove user-level config
+marr clean --user
+
+# Remove project-level config
+marr clean --project
+
+# Remove everything
+marr clean --all
 ```
-
-**Requirements:**
-- GitHub CLI (`gh`) must be installed
-- `jq` must be installed for JSON parsing
-
-**PATH setup:**
-The command will detect if `~/bin/` is in your PATH and provide setup instructions if needed.
 
 ## What MARR Provides
 
 ### Two-Layer Configuration
 
 **User Level** (`~/.claude/marr/`):
-- Universal standards (git workflow, testing, MCP usage, documentation)
+- Universal standards (git workflow, testing, MCP usage)
 - Personal preferences and working style
+- Helper scripts for GitHub sub-issues
 - Templates for all projects
-- Helper scripts
 
 **Project Level** (`./CLAUDE.md` and `./prompts/`):
 - Project-specific technical requirements
@@ -163,7 +190,6 @@ The command will detect if `~/bin/` is in your PATH and provide setup instructio
 - `user-git-workflow-standard.md` - Branch management, commit conventions
 - `user-testing-standard.md` - Testing philosophy and principles
 - `user-mcp-usage-standard.md` - MCP tool usage patterns
-- `user-documentation-standard.md` - Diataxis framework, role-first organization
 
 **Project-Level** (apply to specific project):
 - `prj-git-workflow-standard.md` - Project git rules
@@ -171,57 +197,65 @@ The command will detect if `~/bin/` is in your PATH and provide setup instructio
 - `prj-mcp-usage-standard.md` - Project MCP usage
 - `prj-documentation-standard.md` - Project documentation organization
 
-### Unified Standards Approach
+### Helper Scripts
 
-MARR includes three core standards by default for all projects:
+GitHub helper scripts installed to `~/bin/`:
 
-1. **Git Workflow** - Branching, commits, PRs, issue management
-2. **Testing Philosophy** - Test behavior not implementation, coverage principles
-3. **MCP Tool Usage** - Consistent patterns for v0, playwright, a11y, shadcn-ui, tailwind
+```bash
+# Link issue #47 as sub-issue of #45
+gh-add-subissue.sh 45 47
 
-Optional project-specific standards can be added as needed (UI/UX, API design, etc.).
+# List all sub-issues of #45
+gh-list-subissues.sh 45
+```
+
+**Requirements:**
+- GitHub CLI (`gh`) must be installed
+- `jq` must be installed for JSON parsing
 
 ## Common Workflows
+
+### New Machine Setup
+
+```bash
+# Install MARR
+npm install -g @virtualian/marr
+
+# One-time user setup
+marr init --user
+
+# Verify installation
+ls ~/.claude/marr/
+ls ~/bin/*.sh
+```
 
 ### Starting a New Project
 
 ```bash
-# 1. Create project directory
+# Create project directory
 mkdir my-new-project && cd my-new-project
 
-# 2. Initialize with MARR
-marr init -n my-new-project -t "web application" --template standards
+# Initialize with MARR
+marr init --project
 
-# 3. Initialize git
+# Initialize git
 git init
 git add .
 git commit -m "Initial commit with MARR configuration"
 
-# 4. Validate configuration
+# Validate configuration
 marr validate
-
-# 5. Start coding!
 ```
 
-### Validating Existing Project
+### First Time (New Machine + New Project)
 
 ```bash
-# Quick validation
+# Do everything at once
+cd my-new-project
+marr init --all
+
+# Validate
 marr validate
-
-# Strict validation (fail on warnings)
-marr validate --strict
-```
-
-### Installing Helper Scripts
-
-```bash
-# One-time installation
-marr install-scripts
-
-# Scripts are now available globally:
-gh-add-subissue.sh <parent> <sub>
-gh-list-subissues.sh <parent>
 ```
 
 ## Troubleshooting
@@ -244,29 +278,13 @@ export PATH="$(npm config get prefix)/bin:$PATH"
 
 ### CLAUDE.md already exists
 
-**Problem:** Running `marr init` in a directory that already has CLAUDE.md.
+**Problem:** Running `marr init --project` in a directory that already has CLAUDE.md.
 
 **Solution:**
 This is expected behavior - MARR won't overwrite existing configuration. Either:
 - Remove existing CLAUDE.md first
+- Use `--force` flag to overwrite
 - Initialize in a different directory
-- Manually update your configuration
-
-### Templates not found
-
-**Problem:** Error about missing templates after installation.
-
-**Solution:**
-```bash
-# Check if ~/.claude/marr/ exists
-ls ~/.claude/marr/
-
-# If missing, reinstall package
-npm install -g @virtualian/marr
-
-# First run should recreate ~/.claude/marr/
-marr init -n test --dir /tmp/test
-```
 
 ### Helper scripts not working
 
@@ -300,11 +318,6 @@ Warnings are informational - they suggest best practices but don't fail validati
 marr validate --strict
 ```
 
-Common warnings:
-- Missing recommended prompts → Add standard prompt files
-- User-level prompts in project → Move to `~/.claude/marr/prompts/`
-- No prompt references → Add `@prompts/prj-*.md` references to CLAUDE.md
-
 ## Requirements
 
 - **Node.js**: >= 18.0.0
@@ -334,46 +347,25 @@ marr --version
 ### Project Structure
 
 ```
-marr-cli/
+package/
 ├── src/
 │   ├── index.ts              # CLI entry point
 │   ├── commands/
 │   │   ├── init.ts           # marr init
 │   │   ├── validate.ts       # marr validate
-│   │   └── install-scripts.ts  # marr install-scripts
+│   │   └── clean.ts          # marr clean
 │   └── utils/
 │       ├── logger.ts         # Colored output
 │       ├── file-ops.ts       # File operations
 │       └── marr-setup.ts     # First-run setup
 ├── templates/                # Bundled templates
-│   ├── claude-md/           # CLAUDE.md templates
-│   ├── project/common/      # Project-level prompts
-│   ├── user/                # User-level prompts
-│   └── helper-scripts/      # GitHub scripts
-├── dist/                    # Compiled JavaScript (gitignored)
+│   ├── project/common/       # Project-level prompts
+│   ├── user/                 # User-level prompts
+│   └── helper-scripts/       # GitHub scripts
+├── dist/                     # Compiled JavaScript (gitignored)
 ├── package.json
 ├── tsconfig.json
 └── README.md
-```
-
-## Development
-
-### Setting Up Development Environment
-
-```bash
-cd package
-npm install
-npm run build
-```
-
-### Development Workflow
-
-```bash
-# Watch mode for automatic rebuilds
-npm run dev
-
-# Build for testing
-npm run build
 ```
 
 ### Testing with testuser Account
@@ -389,19 +381,8 @@ See [TESTING.md](./TESTING.md) for comprehensive testing documentation.
 bash scripts/build-test-tarball.sh
 
 # Switch to testuser and run automated tests
-# (Use the actual path where you cloned the repo)
 sudo su - testuser
 bash /path/to/marr/package/scripts/test-in-testuser.sh
-```
-
-### Publishing
-
-```bash
-# Build and publish
-npm run build
-npm publish
-
-# The prepublishOnly hook will run check-bin, build, and tests automatically
 ```
 
 ## License
