@@ -25,10 +25,33 @@ export function getHomeDir(): string {
 }
 
 /**
- * Get MARR root directory (~/.marr)
+ * Get Claude Code config directory (~/.claude)
+ */
+export function getClaudeRoot(): string {
+  return join(getHomeDir(), '.claude');
+}
+
+/**
+ * Get MARR root directory (~/.claude/marr)
+ * MARR stores its configuration inside Claude Code's config directory
+ * so that Claude Code can discover it via imports.
  */
 export function getMarrRoot(): string {
-  return join(getHomeDir(), '.marr');
+  return join(getClaudeRoot(), 'marr');
+}
+
+/**
+ * Get path to user's Claude Code CLAUDE.md file
+ */
+export function getUserClaudeMdPath(): string {
+  return join(getClaudeRoot(), 'CLAUDE.md');
+}
+
+/**
+ * Get path to MARR's user-level CLAUDE.md file
+ */
+export function getMarrClaudeMdPath(): string {
+  return join(getMarrRoot(), 'CLAUDE.md');
 }
 
 /**

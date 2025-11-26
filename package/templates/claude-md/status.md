@@ -4,7 +4,7 @@
 >
 > This is the Project-level configuration (Layer 2 of 2):
 >
-> - User file: `~/.marr/CLAUDE.md` - contains User preferences & default standards
+> - User file: `~/.claude/marr/CLAUDE.md` - contains User preferences & default standards
 > - This file: `./CLAUDE.md` (at project root) contains Project-specific technical overrides
 >
 > **Precedence**

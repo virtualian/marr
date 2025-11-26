@@ -53,7 +53,7 @@ bash /Users/ianmarr/projects/marr/package/scripts/test-in-testuser.sh
 3. Tests `marr init` with template substitution
 4. Tests `marr validate`
 5. Verifies generated files (CLAUDE.md, prompts/)
-6. Verifies `~/.marr/` setup
+6. Verifies `~/.claude/marr/` setup and import integration
 7. Tests `marr install-scripts`
 8. Verifies helper scripts installed correctly
 
@@ -88,7 +88,8 @@ bash /path/to/package/scripts/cleanup-testuser.sh
 
 **What it does:**
 - Uninstalls `@virtualian/marr` npm package
-- Removes `~/.marr/` directory
+- Removes `~/.claude/marr/` directory
+- Removes MARR import from `~/.claude/CLAUDE.md`
 - Removes helper scripts from `~/bin/`
 - Removes test project directories (`marr-test-*`)
 

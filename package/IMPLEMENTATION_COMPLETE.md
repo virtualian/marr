@@ -30,7 +30,7 @@ Successfully implemented `marr-cli` npm package that transforms MARR from manual
 - Directory structure creation (prompts/, docs/, plans/, research/)
 - CLAUDE.md template copying with customization
 - Project-level prompt files copying
-- marr-setup utility for first-run ~/.marr/ initialization
+- marr-setup utility for first-run ~/.claude/marr/ initialization
 - All templates bundled (claude-md, project, user, helper-scripts)
 - Comprehensive error handling
 - Tested with all templates: basic, standards, dev-guide, status
@@ -63,7 +63,7 @@ Successfully implemented `marr-cli` npm package that transforms MARR from manual
 
 - All templates copied to package/templates/
 - Config files bundled
-- First-run ~/.marr/ setup implemented
+- First-run ~/.claude/marr/ setup implemented
 - Backward compatible with Phase 1 manual setup
 
 ### ✅ STEP06: Testing and Documentation
@@ -163,7 +163,7 @@ marr-cli/
 - ✅ `marr install-scripts` installation
 - ✅ Error handling (missing name, invalid template, duplicate init)
 - ✅ npm link local installation
-- ✅ First-run ~/.marr/ setup
+- ✅ First-run ~/.claude/marr/ setup
 - ✅ Template substitution (PROJECT_NAME, PROJECT_TYPE)
 - ✅ PATH detection
 - ✅ Cross-platform file operations
@@ -195,7 +195,7 @@ marr-cli/
 - ✅ **Version management**: npm handles updates and dependencies
 - ✅ **Discoverability**: npm registry makes MARR easier to find
 - ✅ **Standard workflow**: Developers expect `npm install` for CLI tools
-- ✅ **First-run automation**: Automatically creates ~/.marr/ infrastructure
+- ✅ **First-run automation**: Automatically creates ~/.claude/marr/ infrastructure
 - ✅ **Cross-platform**: Node.js runs on Windows, Mac, Linux
 
 ---
@@ -257,13 +257,13 @@ marr --version
 2. **Commander.js over yargs**: Simpler, lighter, sufficient features
 3. **Node.js over bash**: Cross-platform, better error handling
 4. **Bundle templates in package**: Offline usage, version controlled
-5. **Preserve ~/.marr/ structure**: Backward compatibility
+5. **Preserve ~/.claude/marr/ structure**: Backward compatibility
 
 ### Design Decisions
 1. **Package name: marr-cli**: Available, descriptive, clear
 2. **Commands: init, validate, install-scripts**: Focused, clear purpose
 3. **Template substitution**: {{PROJECT_NAME}}, {{PROJECT_TYPE}}
-4. **First-run automation**: Automatic ~/.marr/ setup
+4. **First-run automation**: Automatic ~/.claude/marr/ setup
 5. **Colored output**: Better UX, clear status messages
 
 ---
@@ -298,7 +298,7 @@ marr --version
 ### Challenges Overcome
 1. **ESM modules**: Proper TypeScript configuration for ES modules
 2. **File paths**: Correct path resolution for bundled templates
-3. **First-run setup**: Detecting and creating ~/.marr/ transparently
+3. **First-run setup**: Detecting and creating ~/.claude/marr/ transparently
 4. **chmod on scripts**: Making helper scripts executable cross-platform
 5. **Package size**: Keeping bundle under 50KB
 

@@ -33,7 +33,7 @@
 ### 5. Testing
 - [x] npm link tested locally
 - [x] Commands work after linking
-- [x] First-run ~/.marr/ setup works
+- [x] First-run ~/.claude/marr/ setup works
 - [x] Template substitution works
 - [x] Validation catches errors
 - [x] Helper scripts install correctly

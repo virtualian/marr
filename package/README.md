@@ -9,7 +9,7 @@
 
 MARR provides a two-layer configuration system for AI agents (Claude Code first):
 
-1. **User-level configuration** (`~/.marr/`) - Personal preferences and universal standards
+1. **User-level configuration** (`~/.claude/marr/`) - Personal preferences and universal standards
 2. **Project-level configuration** (`./CLAUDE.md` + `./prompts/`) - Project-specific technical requirements
 
 **Key principle**: All repositories use the same comprehensive standards (git workflow, testing, MCP usage) regardless of project type or technology stack.
@@ -20,7 +20,7 @@ MARR provides a two-layer configuration system for AI agents (Claude Code first)
 npm install -g @virtualian/marr
 ```
 
-**First Run:** The CLI automatically creates `~/.marr/` infrastructure and copies all templates on first use.
+**First Run:** The CLI automatically creates `~/.claude/marr/` infrastructure and copies all templates on first use.
 
 ## Quick Start
 
@@ -146,7 +146,7 @@ The command will detect if `~/bin/` is in your PATH and provide setup instructio
 
 ### Two-Layer Configuration
 
-**User Level** (`~/.marr/`):
+**User Level** (`~/.claude/marr/`):
 - Universal standards (git workflow, testing, MCP usage, documentation)
 - Personal preferences and working style
 - Templates for all projects
@@ -258,13 +258,13 @@ This is expected behavior - MARR won't overwrite existing configuration. Either:
 
 **Solution:**
 ```bash
-# Check if ~/.marr/ exists
-ls ~/.marr/
+# Check if ~/.claude/marr/ exists
+ls ~/.claude/marr/
 
 # If missing, reinstall package
 npm install -g @virtualian/marr
 
-# First run should recreate ~/.marr/
+# First run should recreate ~/.claude/marr/
 marr init -n test --dir /tmp/test
 ```
 
@@ -302,7 +302,7 @@ marr validate --strict
 
 Common warnings:
 - Missing recommended prompts → Add standard prompt files
-- User-level prompts in project → Move to `~/.marr/prompts/`
+- User-level prompts in project → Move to `~/.claude/marr/prompts/`
 - No prompt references → Add `@prompts/prj-*.md` references to CLAUDE.md
 
 ## Requirements

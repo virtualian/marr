@@ -167,7 +167,7 @@ function validatePromptNaming(result: ValidationResult): void {
     // Warn about user-level prompts in project prompts/
     if (filename.startsWith('user-')) {
       result.warnings.push(`User-level prompt found in project prompts/: ${filename}`);
-      result.warnings.push('  User-level prompts should be in ~/.marr/prompts/');
+      result.warnings.push('  User-level prompts should be in ~/.claude/marr/prompts/');
     }
   }
 
@@ -203,15 +203,12 @@ function validatePromptReferences(result: ValidationResult): void {
 }
 
 function displayResults(result: ValidationResult, options: ValidateOptions): void {
-  logger.blank();
-
   // Display errors
   if (result.errors.length > 0) {
     logger.section('Errors');
     for (const error of result.errors) {
       logger.error(error);
     }
-    logger.blank();
   }
 
   // Display warnings
@@ -220,11 +217,11 @@ function displayResults(result: ValidationResult, options: ValidateOptions): voi
     for (const warning of result.warnings) {
       logger.warning(warning);
     }
-    logger.blank();
   }
 
   // Summary
   if (result.errors.length === 0 && result.warnings.length === 0) {
+    logger.blank();
     logger.success('Validation passed! Configuration is valid.');
   } else {
     logger.section('Summary');

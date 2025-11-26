@@ -81,7 +81,7 @@ Copy scripts to a directory in your PATH:
 ```bash
 # Copy to ~/bin/ (create if needed)
 mkdir -p ~/bin
-cp ~/.marr/templates/helper-scripts/*.sh ~/bin/
+cp ~/.claude/marr/templates/helper-scripts/*.sh ~/bin/
 
 # Make executable (if not already)
 chmod +x ~/bin/gh-*.sh

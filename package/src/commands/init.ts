@@ -41,7 +41,7 @@ function initializeProject(options: InitOptions): void {
   // Validate options
   validateOptions(options);
 
-  // Ensure ~/.marr/ is set up
+  // Ensure ~/.claude/marr/ is set up
   marrSetup.ensureMarrSetup();
 
   // Resolve target directory

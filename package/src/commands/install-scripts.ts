@@ -33,7 +33,7 @@ function installScripts(): void {
   fileOps.ensureDir(binDir);
   logger.info(`Target directory: ${binDir}`);
 
-  // Get scripts from ~/.marr/templates/helper-scripts/
+  // Get scripts from ~/.claude/marr/templates/helper-scripts/
   const marrRoot = fileOps.getMarrRoot();
   const scriptsSource = join(marrRoot, 'templates/helper-scripts');
 
