@@ -1,15 +1,20 @@
 # Product Requirements Document
 ## MARR: Making Agents Really Reliable
 
-**Date:** 2025-11-18
+**Date:** 2025-11-26
 **Status:** Draft
-**Version:** 0.1
+**Version:** 0.2
 
 ---
 
 ## Executive Summary
 
-**MARR** (Making Agents Really Reliable) is a configuration system that provides AI coding agents with consistent project context and standards across all repositories. The system uses a two-layer approach (user-level in `~/.marr/` + project-level in `./CLAUDE.md`) with version-controlled prompt files, starting with Claude Code and designed to support multiple agents in the future.
+**MARR** (Making Agents Really Reliable) is a configuration system that provides AI coding agents with consistent project context and standards across all repositories. The system uses a two-layer approach:
+
+- **User-level** (`~/.claude/marr/`) - Personal preferences and universal standards, integrated with Claude Code via import mechanism
+- **Project-level** (`./CLAUDE.md` + `./prompts/`) - Project-specific requirements and standards
+
+MARR is installed via npm (`npm install -g @virtualian/marr`) and configured with a simple CLI.
 
 **Key Innovation:** Treat AI agent directives as first-class project infrastructure, not ad-hoc notes.
 
@@ -97,47 +102,57 @@
 
 ## Use Cases
 
-### UC1: Initialize New Project
+### UC1: First-Time User Setup
+
+**Actor:** Developer (new to MARR)
+**Goal:** Set up MARR user-level configuration
+**Flow:**
+1. Install MARR: `npm install -g @virtualian/marr`
+2. Run: `marr init --user`
+3. System creates `~/.claude/marr/` with user-level config and prompts
+4. System adds import line to `~/.claude/CLAUDE.md`
+5. System installs helper scripts to `~/bin/`
+6. Claude Code now loads MARR user standards automatically
+
+**Success Criteria:** Single command, <1 minute to complete
+
+### UC2: Initialize New Project
 
 **Actor:** Developer
 **Goal:** Create new project with AI agent configuration
 **Flow:**
-1. Run initialization command with project type
-2. System creates directory structure
-3. System generates CLAUDE.md from template
-4. System copies relevant standard prompt files
+1. Navigate to project directory
+2. Run: `marr init --project`
+3. System confirms target directory
+4. System creates `./CLAUDE.md` and `./prompts/` with project standards
 5. Developer customizes project-specific details
 6. AI agent immediately understands project standards
 
-**Success Criteria:** <3 minutes from command to working configuration
+**Success Criteria:** <2 minutes from command to working configuration
 
-### UC2: Migrate Existing Project
-
-**Actor:** Developer
-**Goal:** Add configuration to existing project
-**Flow:**
-1. Run migration tool on existing project
-2. System detects project type and current patterns
-3. System suggests appropriate configuration
-4. Developer approves or customizes
-5. System generates configuration files
-6. Developer commits configuration to Git
-
-**Success Criteria:** Preserves existing project patterns, non-breaking
-
-### UC3: Update Standards Across Projects
+### UC3: Remove MARR Configuration
 
 **Actor:** Developer
-**Goal:** Propagate improved standard to all projects
+**Goal:** Clean up MARR from user or project
 **Flow:**
-1. Update user-level standard file
-2. Run propagation tool
-3. System identifies projects using that standard
-4. System previews changes for each project
-5. Developer selectively approves updates
-6. System applies updates and reports results
+1. Run: `marr clean --user` or `marr clean --project`
+2. System shows what will be removed
+3. User confirms (or uses `--dry-run` to preview)
+4. System removes configuration files cleanly
 
-**Success Criteria:** Bulk update without manual editing
+**Success Criteria:** Complete removal, no orphaned files
+
+### UC4: Validate Configuration
+
+**Actor:** Developer
+**Goal:** Check configuration is correct
+**Flow:**
+1. Run: `marr validate` in project directory
+2. System checks CLAUDE.md structure
+3. System verifies prompt references
+4. System reports errors and warnings
+
+**Success Criteria:** Clear pass/fail with actionable feedback
 
 
 ---
@@ -147,22 +162,24 @@
 ### Core Requirements (Must Have)
 
 **CR1: Two-Layer Configuration Model**
-- User-level standards in ~/.marr/ (universal preferences)
-- Project-level standards in ./CLAUDE.md and ./prompts/ (project-specific)
+- User-level standards in `~/.claude/marr/` (universal preferences)
+- Project-level standards in `./CLAUDE.md` and `./prompts/` (project-specific)
+- Claude Code integration via import mechanism (`@~/.claude/marr/CLAUDE.md`)
 - Clear precedence: Project technical requirements override user preferences
-- **Rationale:** Separates personal from project-specific standards
+- **Rationale:** Separates personal from project-specific standards; integrates with Claude Code's native import system
 
 **CR2: Standard Prompt Files**
 - Git workflow standard (branching, commits, PRs)
 - Testing standard (philosophy, priorities, coverage)
 - MCP usage standard (tool usage patterns)
+- Documentation standard (organization, maintenance)
 - **Rationale:** Core development practices transcend project types
 
-**CR3: Claude Code First, Multi-Agent Ready**
-- Built for Claude Code with standard markdown format
-- Designed for future multi-agent support
-- Configuration decisions deferred until multi-agent needs are clear
-- **Rationale:** Start with one agent, expand based on real experience
+**CR3: Claude Code Integration**
+- User-level config at `~/.claude/marr/` (inside Claude Code's config directory)
+- Automatic import injection into `~/.claude/CLAUDE.md`
+- Claude Code discovers MARR config via official import mechanism
+- **Rationale:** Claude Code only reads from `~/.claude/`; MARR must integrate there
 
 **CR4: Version Control Integration**
 - All configuration in Git repositories
@@ -170,23 +187,25 @@
 - Changes tracked like code
 - **Rationale:** Configuration is code, treat it accordingly
 
-**CR5: Template System**
-- Templates for common project types
-- Variable substitution for project-specific details
-- Multiple CLAUDE.md templates (basic, standards, dev-guide, status)
-- **Rationale:** Accelerates project initialization
+**CR5: Simple CLI**
+- `marr init --user` - Set up user-level configuration (one-time)
+- `marr init --project [path]` - Set up project configuration
+- `marr clean --user` / `--project` - Remove MARR configuration
+- `marr validate` - Check configuration validity
+- No template selection - MARR is opinionated with one standard structure
+- **Rationale:** Single command per intent; standards not options
 
 **CR6: Naming and Discovery**
-- Consistent naming conventions (user-*, prj-*)
-- Clear reference syntax (@prompts/, @~/.marr/prompts/)
+- Consistent naming conventions (`user-*`, `prj-*`)
+- Clear reference syntax (`@prompts/`, `@~/.claude/marr/prompts/`)
 - Self-documenting file structure
 - **Rationale:** Discoverability and consistency
 
 **CR7: Helper Scripts Management**
-- GitHub sub-issue scripts (gh-add-subissue.sh, etc.)
-- Installation to ~/bin/
-- Update mechanism
-- **Rationale:** Configuration references scripts, must ensure availability
+- GitHub sub-issue scripts (`gh-add-subissue.sh`, `gh-list-subissues.sh`)
+- Installed to `~/bin/` as part of `marr init --user`
+- Removed as part of `marr clean --user`
+- **Rationale:** Configuration references scripts; single command installs everything
 
 ### Optional Requirements (Should Have)
 
@@ -197,12 +216,12 @@
 - Doc-parity standards for CLI tools
 - **Rationale:** Different project types need different domain standards
 
-**OR2: Automation Tools**
-- Initialization tool for new projects
-- Validation tool for existing configuration
-- Migration tool for upgrading patterns
-- Propagation tool for standard updates
-- **Rationale:** Reduces manual effort, ensures consistency
+**OR2: Advanced Validation**
+- Validation tool for existing configuration (`marr validate`)
+- Check CLAUDE.md structure and required sections
+- Verify prompt file references resolve correctly
+- Check naming conventions compliance
+- **Rationale:** Ensures configuration correctness
 
 **OR3: Slash Command Integration**
 - Document how slash commands (like /recap) access configuration
@@ -228,11 +247,12 @@
 
 ```
 ┌─────────────────────────────────────────┐
-│  User Level (~/.marr/)                  │
+│  User Level (~/.claude/marr/)           │
 │  - Universal preferences                │
 │  - Communication style                  │
 │  - Core standards (git, testing, MCP)   │
-│  - Helper scripts                       │
+│  - Helper scripts (installed to ~/bin/) │
+│  - Integrated via @import in CLAUDE.md  │
 └─────────────────────────────────────────┘
                  ↓ inherits
 ┌─────────────────────────────────────────┐
@@ -252,6 +272,26 @@
 ```
 
 **Two-layer configuration + emergent patterns from code**
+
+### Claude Code Integration
+
+```
+~/.claude/
+├── CLAUDE.md              ← User's file (MARR adds import line)
+│   └── @~/.claude/marr/CLAUDE.md   ← Import injected by MARR
+└── marr/                  ← MARR's managed directory
+    ├── CLAUDE.md          ← MARR's user-level config
+    └── prompts/           ← MARR's user-level standards
+        ├── user-git-workflow-standard.md
+        ├── user-testing-standard.md
+        └── user-mcp-usage-standard.md
+
+~/bin/                     ← Helper scripts (installed by marr init --user)
+├── gh-add-subissue.sh
+└── gh-list-subissues.sh
+```
+
+**MARR integrates with Claude Code via the official import mechanism**
 
 ### Multi-Agent Vision (Future)
 
@@ -327,29 +367,28 @@ project-root/
 
 ## Future Considerations
 
-### Phase 1 (Immediate - Core System)
-- Finalize PRD and get alignment
-- Create implementation plan
-- Build core template repository
-- Implement helper script management
-- Create initialization tool for new projects
+### Phase 1 (Current - Core System)
+- ✅ npm package `@virtualian/marr` published (v1.0.0)
+- 🔄 `marr init --user` / `--project` commands (refactoring in progress)
+- 🔄 `marr clean --user` / `--project` commands (refactoring in progress)
+- ✅ `marr validate` command
+- 🔄 Claude Code integration via import mechanism (implemented, needs testing)
+- 🔄 Helper scripts installation to `~/bin/` (fold into `--user`)
 
-### Phase 2 (Near-term - Automation & Quality)
-- Validation tool for existing configuration
-- Migration tool for upgrading patterns
-- Propagation tool for standard updates
-- Project-specific standards templates (UI/UX, docs, API)
+### Phase 2 (Next - Refinement)
+- Refine CLI UX based on usage feedback
+- Add `--force` flag for scripting
+- Improve validation error messages
+- Project-specific standards (UI/UX, docs, API)
 
-### Phase 3 (Medium-term - Advanced Features)
+### Phase 3 (Near-term - Advanced Features)
 - Slash command integration documentation
 - Advanced validation and auto-fix
-- Template versioning and updates
 - Configuration drift detection
 
 ### Phase 4 (Long-term - Expansion)
 - Multi-agent support (Cursor, Jules, Codex)
-- Community template sharing
-- Third-party project adoption patterns
+- Community standards sharing
 - Team collaboration features
 
 ### Deferred to v2+
@@ -416,12 +455,40 @@ project-root/
 
 ---
 
-## Appendix: Related Documents
+## Appendix
 
-- **Original Functional Spec:** `research/functional-specification-original.md` (historical reference)
-- **User Standards:** `~/.marr/prompts/user-*.md` (git workflow, testing, MCP usage)
+### CLI Reference
+
+```bash
+# Installation
+npm install -g @virtualian/marr
+
+# User setup (one-time)
+marr init --user          # or: marr init -u
+marr clean --user         # Remove user config + scripts
+
+# Project setup
+marr init --project       # Current directory (confirms with user)
+marr init --project /path # Specific path
+marr clean --project      # Remove project config
+
+# Both
+marr init --all           # User + project
+marr clean --all          # Remove both
+
+# Validation
+marr validate             # Check current project
+marr validate --strict    # Warnings as errors
+
+# Options
+--dry-run                 # Preview without changes
+--force                   # Skip confirmations
+```
+
+### Related Documents
+
+- **User Standards:** `~/.claude/marr/prompts/user-*.md` (git workflow, testing, MCP usage)
 - **Project Examples:** `examples/` (real-world implementations)
-- **Session Recap:** `recap/recap-2025-11-18-11h01m47s.md` (previous discussion)
 
 ---
 
