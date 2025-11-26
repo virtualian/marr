@@ -28,13 +28,24 @@ else
   echo "ℹ️  No MARR package installed"
 fi
 
-# Remove ~/.marr/ directory
-if [ -d "$HOME/.marr" ]; then
-  echo "🗑️  Removing ~/.marr/ directory..."
-  rm -rf "$HOME/.marr"
-  CLEANED+=("~/.marr/ directory")
+# Remove ~/.claude/marr/ directory
+if [ -d "$HOME/.claude/marr" ]; then
+  echo "🗑️  Removing ~/.claude/marr/ directory..."
+  rm -rf "$HOME/.claude/marr"
+  CLEANED+=("~/.claude/marr/ directory")
 else
-  echo "ℹ️  No ~/.marr/ directory found"
+  echo "ℹ️  No ~/.claude/marr/ directory found"
+fi
+
+# Remove MARR import from ~/.claude/CLAUDE.md (if it exists)
+if [ -f "$HOME/.claude/CLAUDE.md" ]; then
+  if grep -q "@~/.claude/marr/CLAUDE.md" "$HOME/.claude/CLAUDE.md"; then
+    echo "🗑️  Removing MARR import from ~/.claude/CLAUDE.md..."
+    # Remove the MARR import block
+    sed -i '' '/<!-- MARR: Making Agents Really Reliable -->/d' "$HOME/.claude/CLAUDE.md"
+    sed -i '' '/@~\/.claude\/marr\/CLAUDE.md/d' "$HOME/.claude/CLAUDE.md"
+    CLEANED+=("MARR import from ~/.claude/CLAUDE.md")
+  fi
 fi
 
 # Remove helper scripts from ~/bin/

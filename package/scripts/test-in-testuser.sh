@@ -54,7 +54,7 @@ echo "🧹 Cleaning previous test state..."
 # Change to home directory before cleaning to avoid being in a directory we're about to delete
 cd "$HOME"
 npm uninstall -g @virtualian/marr 2>/dev/null || true
-rm -rf ~/.marr
+rm -rf ~/.claude/marr
 rm -f ~/bin/gh-add-subissue.sh ~/bin/gh-list-subissues.sh
 rm -rf ~/marr-test-*
 
@@ -97,11 +97,13 @@ echo "Test 4: Checking generated files..."
 [ -f prompts/prj-git-workflow-standard.md ] && echo "  ✅ Git workflow prompt exists" || echo "  ❌ Git workflow prompt missing"
 echo ""
 
-# Test 5: Check ~/.marr/ setup
-echo "Test 5: Checking ~/.marr/ setup..."
-[ -d ~/.marr ] && echo "  ✅ ~/.marr/ exists" || echo "  ❌ ~/.marr/ missing"
-[ -d ~/.marr/templates ] && echo "  ✅ Templates directory exists" || echo "  ❌ Templates missing"
-[ -d ~/.marr/helper-scripts ] && echo "  ✅ Helper scripts directory exists" || echo "  ❌ Helper scripts missing"
+# Test 5: Check ~/.claude/marr/ setup
+echo "Test 5: Checking ~/.claude/marr/ setup..."
+[ -d ~/.claude/marr ] && echo "  ✅ ~/.claude/marr/ exists" || echo "  ❌ ~/.claude/marr/ missing"
+[ -d ~/.claude/marr/templates ] && echo "  ✅ Templates directory exists" || echo "  ❌ Templates missing"
+[ -d ~/.claude/marr/prompts ] && echo "  ✅ Prompts directory exists" || echo "  ❌ Prompts missing"
+[ -f ~/.claude/CLAUDE.md ] && echo "  ✅ ~/.claude/CLAUDE.md exists" || echo "  ❌ ~/.claude/CLAUDE.md missing"
+grep -q "@~/.claude/marr/CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && echo "  ✅ MARR import line present" || echo "  ❌ MARR import line missing"
 echo ""
 
 # Test 6: Install scripts command
@@ -119,5 +121,5 @@ echo "Test artifacts created in: $TEST_DIR"
 echo ""
 echo "To clean up:"
 echo "  npm uninstall -g @virtualian/marr"
-echo "  rm -rf ~/.marr ~/bin/gh-* ~/marr-test-*"
+echo "  rm -rf ~/.claude/marr ~/bin/gh-* ~/marr-test-*"
 echo ""

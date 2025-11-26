@@ -14,6 +14,7 @@ import { dirname, join } from 'path';
 import { initCommand } from './commands/init.js';
 import { validateCommand } from './commands/validate.js';
 import { installScriptsCommand } from './commands/install-scripts.js';
+import { cleanCommand } from './commands/clean.js';
 
 // Get package.json for version
 const __filename = fileURLToPath(import.meta.url);
@@ -35,6 +36,7 @@ program
 initCommand(program);
 validateCommand(program);
 installScriptsCommand(program);
+cleanCommand(program);
 
 // Parse arguments
 program.parse(process.argv);
