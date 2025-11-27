@@ -270,6 +270,9 @@ async function initializeProject(targetDir: string, dryRun: boolean, force: bool
     logger.info(`Would create: ${promptsPath}/prj-testing-standard.md`);
     logger.info(`Would create: ${promptsPath}/prj-mcp-usage-standard.md`);
     logger.info(`Would create: ${promptsPath}/prj-documentation-standard.md`);
+    logger.info(`Would create: ${promptsPath}/README.md`);
+    logger.info(`Would create: ${join(targetDir, 'docs')}/README.md`);
+    logger.info(`Would create: ${join(targetDir, 'plans')}/README.md`);
     return;
   }
 
@@ -290,6 +293,9 @@ async function initializeProject(targetDir: string, dryRun: boolean, force: bool
 
   // Copy project-level prompts
   copyProjectPrompts(targetDir);
+
+  // Copy README files to docs/ and plans/
+  copyFolderReadmes(targetDir);
 
   logger.blank();
   logger.success('Project configuration created!');
@@ -388,6 +394,7 @@ function copyProjectPrompts(targetDir: string): void {
     'prj-testing-standard.md',
     'prj-mcp-usage-standard.md',
     'prj-documentation-standard.md',
+    'README.md',
   ];
 
   for (const file of promptFiles) {
@@ -399,6 +406,25 @@ function copyProjectPrompts(targetDir: string): void {
       logger.success(`Created: prompts/${file}`);
     } else {
       logger.warning(`Template not found: ${file}`);
+    }
+  }
+}
+
+/**
+ * Copy README files to docs/ and plans/ directories
+ */
+function copyFolderReadmes(targetDir: string): void {
+  const templatesDir = marrSetup.getTemplatesDir();
+
+  const folders = ['docs', 'plans'];
+
+  for (const folder of folders) {
+    const srcPath = join(templatesDir, 'project', folder, 'README.md');
+    const destPath = join(targetDir, folder, 'README.md');
+
+    if (fileOps.exists(srcPath)) {
+      fileOps.copyFile(srcPath, destPath);
+      logger.success(`Created: ${folder}/README.md`);
     }
   }
 }
