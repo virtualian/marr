@@ -349,7 +349,14 @@ function createProjectClaudeMd(targetDir: string): void {
 When starting work in this repository:
 - Review the project structure
 - Check for any project-specific configuration files
-- Read \`prompts/\` for project-specific standards
+
+## Standards Compliance
+
+This project follows the standards defined in:
+- @prompts/prj-git-workflow-standard.md
+- @prompts/prj-testing-standard.md
+- @prompts/prj-mcp-usage-standard.md
+- @prompts/prj-documentation-standard.md
 
 ## Development Notes
 
