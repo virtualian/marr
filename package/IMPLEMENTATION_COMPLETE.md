@@ -77,14 +77,19 @@ package/
 │       ├── file-ops.ts       # File operations
 │       └── marr-setup.ts     # First-run setup
 ├── templates/
-│   ├── project/common/       # 4 project prompts
-│   ├── user/                 # User-level prompts
+│   ├── project/              # Project-level files
+│   │   ├── common/           # 4 standard prompts (prj-*.md)
+│   │   ├── docs/             # Documentation folder template
+│   │   └── plans/            # Plans folder template
+│   ├── user/                 # User-level (README only)
 │   └── helper-scripts/       # 2 GitHub scripts
 ├── dist/                     # Compiled JavaScript
 ├── package.json
 ├── tsconfig.json
 └── README.md
 ```
+
+**Design Note**: Standards (git workflow, testing, etc.) live at **project level only**. User-level contains only personal preferences. This keeps projects self-contained and allows per-project customization.
 
 ## Testing
 

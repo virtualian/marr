@@ -139,8 +139,6 @@ async function initializeUser(dryRun: boolean, force: boolean): Promise<void> {
   if (dryRun) {
     logger.info('Would create: ~/.claude/marr/');
     logger.info('Would create: ~/.claude/marr/CLAUDE.md');
-    logger.info('Would create: ~/.claude/marr/prompts/');
-    logger.info('Would create: ~/.claude/marr/templates/');
     logger.info('Would add: MARR import to ~/.claude/CLAUDE.md');
     await installHelperScripts(binDir, true);
     return;

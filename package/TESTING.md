@@ -125,8 +125,7 @@ Test 3: marr init --user
 
 Test 4: Checking user-level setup...
   ✅ ~/.claude/marr/ exists
-  ✅ Templates directory exists
-  ✅ Prompts directory exists
+  ✅ ~/.claude/marr/CLAUDE.md exists
   ✅ ~/.claude/CLAUDE.md exists
   ✅ MARR import line present
   ✅ gh-add-subissue.sh installed
@@ -211,7 +210,7 @@ ls -la prompts/
 
 # Check user-level setup
 ls -la ~/.claude/marr/
-ls -la ~/.claude/marr/templates/
+cat ~/.claude/marr/CLAUDE.md
 ls -la ~/bin/gh-*.sh
 ```
 
@@ -362,11 +361,12 @@ ls -la ~/.claude/marr/
 
 ### User-Level Setup (`marr init --user`)
 - ✅ `~/.claude/marr/` directory created
-- ✅ Templates copied to `~/.claude/marr/templates/`
-- ✅ Prompts copied to `~/.claude/marr/prompts/`
+- ✅ `~/.claude/marr/CLAUDE.md` created with personal preferences
 - ✅ MARR import added to `~/.claude/CLAUDE.md`
 - ✅ Helper scripts installed to `~/bin/`
 - ✅ Scripts are executable
+
+**Note**: Standards (git workflow, testing, etc.) are NOT installed at user level. They live at project level only.
 
 ### Project-Level Setup (`marr init --project`)
 - ✅ Creates CLAUDE.md with project name from directory

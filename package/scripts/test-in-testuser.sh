@@ -93,13 +93,13 @@ echo ""
 # Test 4: Check user-level setup
 echo "Test 4: Checking user-level setup..."
 [ -d ~/.claude/marr ] && echo "  ✅ ~/.claude/marr/ exists" || echo "  ❌ ~/.claude/marr/ missing"
-[ -d ~/.claude/marr/templates ] && echo "  ✅ Templates directory exists" || echo "  ❌ Templates missing"
-[ -d ~/.claude/marr/prompts ] && echo "  ✅ Prompts directory exists" || echo "  ❌ Prompts missing"
+[ -f ~/.claude/marr/CLAUDE.md ] && echo "  ✅ ~/.claude/marr/CLAUDE.md exists" || echo "  ❌ ~/.claude/marr/CLAUDE.md missing"
 [ -f ~/.claude/CLAUDE.md ] && echo "  ✅ ~/.claude/CLAUDE.md exists" || echo "  ❌ ~/.claude/CLAUDE.md missing"
 grep -q "@~/.claude/marr/CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && echo "  ✅ MARR import line present" || echo "  ❌ MARR import line missing"
 [ -f ~/bin/gh-add-subissue.sh ] && echo "  ✅ gh-add-subissue.sh installed" || echo "  ❌ gh-add-subissue.sh missing"
 [ -f ~/bin/gh-list-subissues.sh ] && echo "  ✅ gh-list-subissues.sh installed" || echo "  ❌ gh-list-subissues.sh missing"
 [ -x ~/bin/gh-add-subissue.sh ] && echo "  ✅ Scripts are executable" || echo "  ❌ Scripts not executable"
+# Note: Standards (prompts, templates) are NOT at user level - they live at project level only
 echo ""
 
 # Test 5: marr init --project (project-level setup)

@@ -80,17 +80,14 @@ marr init --project --force
 ~/.claude/
 ├── CLAUDE.md                   # Updated with MARR import
 └── marr/
-    ├── CLAUDE.md               # MARR user configuration
-    ├── prompts/                # User-level standards
-    │   ├── user-git-workflow-standard.md
-    │   ├── user-testing-standard.md
-    │   └── user-mcp-usage-standard.md
-    └── templates/              # Templates for new projects
+    └── CLAUDE.md               # Personal preferences
 
 ~/bin/
 ├── gh-add-subissue.sh          # GitHub helper script
-└── gh-list-subissues.sh        # GitHub helper script
+└── gh-list-subissue.sh         # GitHub helper script
 ```
+
+Note: Standards (git workflow, testing, MCP usage) live at **project level** only. This keeps projects self-contained and allows per-project customization.
 
 **What `--project` creates:**
 ```
@@ -174,28 +171,25 @@ marr clean --all
 ### Two-Layer Configuration
 
 **User Level** (`~/.claude/marr/`):
-- Universal standards (git workflow, testing, MCP usage)
 - Personal preferences and working style
+- Communication preferences
+- Approval requirements (commits, pushes, PRs)
 - Helper scripts for GitHub sub-issues
-- Templates for all projects
 
 **Project Level** (`./CLAUDE.md` and `./prompts/`):
 - Project-specific technical requirements
 - Team conventions
-- Domain-specific standards
+- All standards (git workflow, testing, MCP usage, documentation)
 
 ### Standard Prompt Files
 
-**User-Level** (apply to all projects):
-- `user-git-workflow-standard.md` - Branch management, commit conventions
-- `user-testing-standard.md` - Testing philosophy and principles
-- `user-mcp-usage-standard.md` - MCP tool usage patterns
-
 **Project-Level** (apply to specific project):
-- `prj-git-workflow-standard.md` - Project git rules
-- `prj-testing-standard.md` - Project testing approach
-- `prj-mcp-usage-standard.md` - Project MCP usage
-- `prj-documentation-standard.md` - Project documentation organization
+- `prj-git-workflow-standard.md` - Branch management, commit conventions
+- `prj-testing-standard.md` - Testing philosophy and principles
+- `prj-mcp-usage-standard.md` - MCP tool usage patterns
+- `prj-documentation-standard.md` - Documentation organization
+
+Standards live at project level only, keeping projects self-contained and allowing per-project customization.
 
 ### Helper Scripts
 
@@ -359,8 +353,11 @@ package/
 │       ├── file-ops.ts       # File operations
 │       └── marr-setup.ts     # First-run setup
 ├── templates/                # Bundled templates
-│   ├── project/common/       # Project-level prompts
-│   ├── user/                 # User-level prompts
+│   ├── project/              # Project-level files
+│   │   ├── common/           # Standard prompt files (prj-*.md)
+│   │   ├── docs/             # Documentation folder template
+│   │   └── plans/            # Plans folder template
+│   ├── user/                 # User-level (README only)
 │   └── helper-scripts/       # GitHub scripts
 ├── dist/                     # Compiled JavaScript (gitignored)
 ├── package.json

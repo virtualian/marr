@@ -1,36 +1,32 @@
-# User-Level Prompt Templates
+# User-Level Configuration
 
-These prompt files define **universal standards** that apply across all your projects. They are installed to `~/.claude/marr/prompts/` during `marr init --user`.
+This directory contains templates for user-level MARR configuration.
 
-## Files
+## What Goes at User Level
 
-| File | Purpose |
-|------|---------|
-| `user-git-workflow-standard.md` | Git branching, commits, PRs, issue management |
-| `user-testing-standard.md` | Testing philosophy and principles |
-| `user-mcp-usage-standard.md` | MCP tool usage patterns |
-| `user-documentation-standard.md` | Documentation organization (Diataxis framework) |
-| `user-standard-for-standards.md` | Meta-standard for writing prompt files |
+User-level configuration (`~/.claude/marr/`) contains **personal preferences** that apply across all your projects:
 
-## Naming Convention
+- Communication style preferences
+- Approval requirements (commits, pushes, PRs)
+- Working habits
+- Tool usage preferences
 
-User-level prompts use the `user-` prefix to distinguish them from project-level prompts (`prj-`).
+## What Doesn't Go at User Level
 
-## How They Work
+**Standards and prompts belong at project level**, not user level:
 
-1. `marr init --user` copies these to `~/.claude/marr/prompts/`
-2. `~/.claude/marr/CLAUDE.md` references them with `@~/.claude/marr/prompts/user-*.md`
-3. Claude Code loads them for every project via the import chain
+- Git workflow standards → `./prompts/prj-git-workflow-standard.md`
+- Testing standards → `./prompts/prj-testing-standard.md`
+- MCP usage standards → `./prompts/prj-mcp-usage-standard.md`
+- Documentation standards → `./prompts/prj-documentation-standard.md`
 
-## Customization
+This keeps projects self-contained and allows per-project customization.
 
-After installation, you can edit the files in `~/.claude/marr/prompts/` to match your personal preferences. Your edits persist across MARR updates.
+## Structure After `marr init --user`
 
-To reset to defaults, run `marr clean --user` then `marr init --user`.
+```
+~/.claude/marr/
+└── CLAUDE.md    # Personal preferences
+```
 
-## Relationship to Project-Level Prompts
-
-- **User-level** = universal standards (same across all projects)
-- **Project-level** = project-specific details (varies per project)
-
-User preferences are preserved when project standards override technical details.
+Helper scripts are installed to `~/bin/`, not here.
