@@ -76,7 +76,7 @@ marr init --project --standards none
 marr init --standards list
 ```
 
-Available standards: `git`, `testing`, `mcp`, `docs`
+Available standards: `git`, `testing`, `mcp`, `docs`, `prompts`
 
 **Examples:**
 ```bash
