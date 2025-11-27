@@ -155,7 +155,8 @@ export function setupMarr(): void {
 
 /**
  * Create MARR's user-level CLAUDE.md at ~/.claude/marr/CLAUDE.md
- * Contains personal preferences - standards live at project level
+ * Contains personal preferences, principles, and core habits
+ * Standards (git workflow, testing, etc.) live at project level
  */
 function createMarrClaudeMd(): void {
   const marrClaudeMdPath = fileOps.getMarrClaudeMdPath();
@@ -167,18 +168,19 @@ function createMarrClaudeMd(): void {
 
 ## Personal Preferences
 
-Add your personal Claude Code preferences below. These apply to all projects.
-
 ### Communication Style
 
 - Keep responses concise unless detail is explicitly requested
 - Answer questions directly without elaboration unless asked
 - Don't flatter, praise, or use a sycophantic tone
+- When you have strong evidence for an opinion, stand your ground
+- Be constructively critical - never assume the user is correct
 
 ### Work Habits
 
 - Always prefer editing existing files over creating new ones
 - Only create files when absolutely necessary
+- Check existing patterns before adding new ones
 
 ### Approval Requirements
 
@@ -188,6 +190,57 @@ Add your personal Claude Code preferences below. These apply to all projects.
 - ANY PR creation or updates
 
 Show exactly what will be committed/pushed before taking action.
+Never assume approval - wait for explicit confirmation.
+
+## High-Level Principles
+
+### Simplicity Over Cleverness
+
+- Don't over-engineer - solve the problem at hand
+- Avoid premature abstraction
+- Three similar lines of code is better than a premature helper function
+- Only add complexity when clearly necessary
+
+### Prompt File Principles
+
+When creating or modifying prompt files:
+- Write directives that specify **WHAT** and **WHY**, never **HOW**
+- Never include code, commands, or configuration examples
+- Implementation details belong in project documentation, not prompts
+- Never modify prompt files without explicit approval
+
+### Attribution Restrictions
+
+- Never add AI attribution comments to any file
+- No "Generated with Claude" or "Co-Authored-By" comments
+- Code and documentation stand on merit, not origin
+
+## Core Habits
+
+### Before Modifying Code
+
+- Read and understand existing code first
+- Review existing patterns and conventions
+- Check for project-specific configuration
+
+### Security (Always)
+
+- Never commit secrets, keys, or credentials
+- Use environment variables for sensitive configuration
+- Validate inputs at system boundaries
+
+### Testing (Always)
+
+- Run tests before committing changes
+- Follow existing test patterns in the project
+- Never assume specific test frameworks - check first
+
+### Documentation Organization
+
+- Technical docs go in \`docs/\`
+- Plans go in \`plans/\`
+- Prompts go in \`prompts/\`
+- Never place docs in project root unless functionally required
 
 ## Notes
 
