@@ -18,9 +18,18 @@ interface InitOptions {
   user: boolean;
   project: string | boolean;
   all: string | boolean;
+  standards: string;
   dryRun: boolean;
   force: boolean;
 }
+
+/** Available project standards */
+const AVAILABLE_STANDARDS = [
+  { name: 'git', file: 'prj-git-workflow-standard.md', description: 'Git workflow and branch management' },
+  { name: 'testing', file: 'prj-testing-standard.md', description: 'Testing philosophy and practices' },
+  { name: 'mcp', file: 'prj-mcp-usage-standard.md', description: 'MCP tool usage patterns' },
+  { name: 'docs', file: 'prj-documentation-standard.md', description: 'Documentation organization' },
+];
 
 export function initCommand(program: Command): void {
   program
@@ -29,6 +38,7 @@ export function initCommand(program: Command): void {
     .option('-u, --user', 'Set up user-level config (~/.claude/marr/, helper scripts)')
     .option('-p, --project [path]', 'Set up project-level config (./CLAUDE.md, ./prompts/)')
     .option('-a, --all [path]', 'Set up both user and project config')
+    .option('-s, --standards <value>', 'Standards to install: all, list, or comma-separated names (git,testing,mcp,docs)')
     .option('-n, --dry-run', 'Show what would be created without actually creating')
     .option('-f, --force', 'Skip confirmation prompts')
     .action(async (options: InitOptions) => {
@@ -42,7 +52,21 @@ export function initCommand(program: Command): void {
 }
 
 async function executeInit(options: InitOptions): Promise<void> {
-  const { user, project, all, dryRun, force } = options;
+  const { user, project, all, standards, dryRun, force } = options;
+
+  // Handle --standards list (show available and exit)
+  if (standards === 'list') {
+    logger.section('Available Standards');
+    logger.blank();
+    for (const std of AVAILABLE_STANDARDS) {
+      logger.log(`  ${std.name.padEnd(10)} ${std.description}`);
+    }
+    logger.blank();
+    logger.info('Usage: marr init --project --standards git,testing,mcp,docs');
+    logger.info('   or: marr init --project --standards all');
+    logger.blank();
+    return;
+  }
 
   // No flags provided - show help
   if (!user && !project && !all) {
@@ -51,17 +75,20 @@ async function executeInit(options: InitOptions): Promise<void> {
     logger.info('Usage: marr init [options]');
     logger.blank();
     logger.log('Options:');
-    logger.log('  -u, --user           Set up user-level config (~/.claude/marr/, helper scripts)');
-    logger.log('  -p, --project [path] Set up project-level config (./CLAUDE.md, ./prompts/)');
-    logger.log('  -a, --all [path]     Set up both user and project config');
-    logger.log('  -n, --dry-run        Show what would be created without actually creating');
-    logger.log('  -f, --force          Skip confirmation prompts');
+    logger.log('  -u, --user              Set up user-level config (~/.claude/marr/, helper scripts)');
+    logger.log('  -p, --project [path]    Set up project-level config (./CLAUDE.md, ./prompts/)');
+    logger.log('  -a, --all [path]        Set up both user and project config');
+    logger.log('  -s, --standards <value> Standards: all, list, or names (git,testing,mcp,docs)');
+    logger.log('  -n, --dry-run           Show what would be created without actually creating');
+    logger.log('  -f, --force             Skip confirmation prompts');
     logger.blank();
     logger.info('Examples:');
-    logger.log('  marr init --user               # One-time user setup');
-    logger.log('  marr init --project            # Initialize current directory');
-    logger.log('  marr init --project /path/to   # Initialize specific directory');
-    logger.log('  marr init --all                # Both user + current project');
+    logger.log('  marr init --user                    # One-time user setup');
+    logger.log('  marr init --project                 # Initialize with interactive selection');
+    logger.log('  marr init --project --standards all # Initialize with all standards');
+    logger.log('  marr init --project -s git,testing  # Initialize with specific standards');
+    logger.log('  marr init --project -s list         # Show available standards');
+    logger.log('  marr init --all                     # Both user + current project');
     logger.blank();
     return;
   }
@@ -93,7 +120,7 @@ async function executeInit(options: InitOptions): Promise<void> {
 
   // Run project init if requested
   if (initProject && projectPath) {
-    await initializeProject(projectPath, dryRun, force);
+    await initializeProject(projectPath, standards, dryRun, force);
   }
 
   // Summary
@@ -236,7 +263,7 @@ function checkPath(binDir: string): void {
  * - Creates ./CLAUDE.md from template
  * - Creates ./prompts/ with project-level standards
  */
-async function initializeProject(targetDir: string, dryRun: boolean, force: boolean): Promise<void> {
+async function initializeProject(targetDir: string, standards: string | undefined, dryRun: boolean, force: boolean): Promise<void> {
   logger.blank();
   logger.info('Project-level setup...');
   logger.info(`Target: ${targetDir}`);
@@ -261,13 +288,40 @@ async function initializeProject(targetDir: string, dryRun: boolean, force: bool
     return;
   }
 
+  // Determine which standards to install
+  let selectedStandards: typeof AVAILABLE_STANDARDS;
+
+  if (standards === 'all') {
+    selectedStandards = AVAILABLE_STANDARDS;
+  } else if (standards === 'none' || standards === '') {
+    // Explicit "none" or empty string means no standards
+    selectedStandards = [];
+  } else if (standards) {
+    // Parse comma-separated list
+    const requestedNames = standards.split(',').map(s => s.trim().toLowerCase()).filter(s => s);
+    selectedStandards = AVAILABLE_STANDARDS.filter(std => requestedNames.includes(std.name));
+
+    // Warn about unknown standards
+    const knownNames = AVAILABLE_STANDARDS.map(s => s.name);
+    const unknownNames = requestedNames.filter(name => !knownNames.includes(name));
+    if (unknownNames.length > 0) {
+      logger.warning(`Unknown standards ignored: ${unknownNames.join(', ')}`);
+      logger.info(`Available: ${knownNames.join(', ')}`);
+    }
+  } else if (!dryRun) {
+    // Interactive selection
+    selectedStandards = await selectStandards();
+  } else {
+    // Dry run without --standards shows all (for preview purposes)
+    selectedStandards = AVAILABLE_STANDARDS;
+  }
+
   if (dryRun) {
     logger.info(`Would create: ${claudeMdPath}`);
     logger.info(`Would create: ${promptsPath}/`);
-    logger.info(`Would create: ${promptsPath}/prj-git-workflow-standard.md`);
-    logger.info(`Would create: ${promptsPath}/prj-testing-standard.md`);
-    logger.info(`Would create: ${promptsPath}/prj-mcp-usage-standard.md`);
-    logger.info(`Would create: ${promptsPath}/prj-documentation-standard.md`);
+    for (const std of selectedStandards) {
+      logger.info(`Would create: ${promptsPath}/${std.file}`);
+    }
     logger.info(`Would create: ${promptsPath}/README.md`);
     logger.info(`Would create: ${join(targetDir, 'docs')}/README.md`);
     logger.info(`Would create: ${join(targetDir, 'plans')}/README.md`);
@@ -287,10 +341,10 @@ async function initializeProject(targetDir: string, dryRun: boolean, force: bool
   }
 
   // Create CLAUDE.md from template
-  createProjectClaudeMd(targetDir);
+  createProjectClaudeMd(targetDir, selectedStandards);
 
-  // Copy project-level prompts
-  copyProjectPrompts(targetDir);
+  // Copy selected project-level prompts
+  copyProjectPrompts(targetDir, selectedStandards);
 
   // Copy README files to docs/ and plans/
   copyFolderReadmes(targetDir);
@@ -300,7 +354,9 @@ async function initializeProject(targetDir: string, dryRun: boolean, force: bool
   logger.blank();
   logger.info('Next steps:');
   logger.log('  1. Review CLAUDE.md and customize for your project');
-  logger.log('  2. Review prompts/ and adjust standards as needed');
+  if (selectedStandards.length > 0) {
+    logger.log('  2. Review prompts/ and adjust standards as needed');
+  }
   logger.log('  3. Run: marr validate');
 }
 
@@ -322,13 +378,74 @@ async function confirmPath(targetDir: string): Promise<boolean> {
 }
 
 /**
+ * Interactive prompt for selecting which standards to install
+ */
+async function selectStandards(): Promise<typeof AVAILABLE_STANDARDS> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const question = (prompt: string): Promise<string> => {
+    return new Promise((resolve) => {
+      rl.question(prompt, (answer) => {
+        resolve(answer);
+      });
+    });
+  };
+
+  logger.info('Select standards to install (Enter to skip, "all" for all):');
+  logger.blank();
+
+  const selected: typeof AVAILABLE_STANDARDS = [];
+
+  for (const std of AVAILABLE_STANDARDS) {
+    const answer = await question(`  Install ${std.name}? (${std.description}) [y/N/all] `);
+    const normalized = answer.toLowerCase().trim();
+
+    if (normalized === 'all') {
+      rl.close();
+      logger.blank();
+      return AVAILABLE_STANDARDS;
+    }
+
+    if (normalized === 'y' || normalized === 'yes') {
+      selected.push(std);
+    }
+  }
+
+  rl.close();
+  logger.blank();
+
+  if (selected.length === 0) {
+    logger.info('No standards selected. Project will have CLAUDE.md only.');
+  } else {
+    logger.info(`Selected: ${selected.map(s => s.name).join(', ')}`);
+  }
+
+  return selected;
+}
+
+/**
  * Create project CLAUDE.md from template
  */
-function createProjectClaudeMd(targetDir: string): void {
+function createProjectClaudeMd(targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
   const destPath = join(targetDir, 'CLAUDE.md');
 
   // Get project name from directory
   const projectName = targetDir.split('/').pop() || 'Project';
+
+  // Build standards compliance section based on selected standards
+  let standardsSection = '';
+  if (selectedStandards.length > 0) {
+    const standardRefs = selectedStandards.map(std => `- @prompts/${std.file}`).join('\n');
+    standardsSection = `## Standards Compliance
+
+This project follows the standards defined in:
+${standardRefs}
+
+`;
+  }
 
   // Simple template - no fancy multi-template system
   const content = `# ${projectName}
@@ -354,15 +471,7 @@ When starting work in this repository:
 - Review the project structure
 - Check for any project-specific configuration files
 
-## Standards Compliance
-
-This project follows the standards defined in:
-- @prompts/prj-git-workflow-standard.md
-- @prompts/prj-testing-standard.md
-- @prompts/prj-mcp-usage-standard.md
-- @prompts/prj-documentation-standard.md
-
-## Development Notes
+${standardsSection}## Development Notes
 
 Add project-specific notes, conventions, or important reminders here.
 
@@ -382,29 +491,30 @@ Document common development tasks, commands, or workflows.
 /**
  * Copy project-level prompts to ./prompts/
  */
-function copyProjectPrompts(targetDir: string): void {
+function copyProjectPrompts(targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
   const templatesDir = marrSetup.getTemplatesDir();
   const promptsSource = join(templatesDir, 'project/common');
   const promptsDest = join(targetDir, 'prompts');
 
-  const promptFiles = [
-    'prj-git-workflow-standard.md',
-    'prj-testing-standard.md',
-    'prj-mcp-usage-standard.md',
-    'prj-documentation-standard.md',
-    'README.md',
-  ];
-
-  for (const file of promptFiles) {
-    const srcPath = join(promptsSource, file);
-    const destPath = join(promptsDest, file);
+  // Copy selected standard files
+  for (const std of selectedStandards) {
+    const srcPath = join(promptsSource, std.file);
+    const destPath = join(promptsDest, std.file);
 
     if (fileOps.exists(srcPath)) {
       fileOps.copyFile(srcPath, destPath);
-      logger.success(`Created: prompts/${file}`);
+      logger.success(`Created: prompts/${std.file}`);
     } else {
-      logger.warning(`Template not found: ${file}`);
+      logger.warning(`Template not found: ${std.file}`);
     }
+  }
+
+  // Always copy README.md
+  const readmeSrc = join(promptsSource, 'README.md');
+  const readmeDest = join(promptsDest, 'README.md');
+  if (fileOps.exists(readmeSrc)) {
+    fileOps.copyFile(readmeSrc, readmeDest);
+    logger.success('Created: prompts/README.md');
   }
 }
 

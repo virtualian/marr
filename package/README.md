@@ -51,16 +51,43 @@ marr init [options]
 - `-u, --user` - Set up user-level config (~/.claude/marr/, helper scripts in ~/bin/)
 - `-p, --project [path]` - Set up project-level config (./CLAUDE.md, ./prompts/)
 - `-a, --all [path]` - Set up both user and project config
+- `-s, --standards <value>` - Standards to install: `all`, `list`, `none`, or comma-separated names
 - `-n, --dry-run` - Show what would be created without actually creating
 - `-f, --force` - Skip confirmation prompts
+
+**Standards Selection:**
+
+By default, `--project` prompts you to select which standards to install. Use `--standards` to skip the prompt:
+
+```bash
+# Interactive selection (default)
+marr init --project
+
+# Install all standards
+marr init --project --standards all
+
+# Install specific standards
+marr init --project --standards git,testing
+
+# Install no standards (CLAUDE.md only)
+marr init --project --standards none
+
+# List available standards
+marr init --standards list
+```
+
+Available standards: `git`, `testing`, `mcp`, `docs`
 
 **Examples:**
 ```bash
 # One-time user setup (run once per machine)
 marr init --user
 
-# Initialize current directory as MARR project
+# Initialize current directory (interactive standard selection)
 marr init --project
+
+# Initialize with all standards (no prompts)
+marr init --project --standards all --force
 
 # Initialize specific directory
 marr init --project /path/to/project
