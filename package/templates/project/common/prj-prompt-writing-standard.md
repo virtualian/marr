@@ -1,10 +1,10 @@
-# Standards and Prompts Standard
+# Prompt Writing Standard
 
-> **AI Agent Instructions**: This document defines how to create and maintain standards and prompt files. Follow these rules when writing any directive document.
+> **AI Agent Instructions**: This document defines how to create and modify prompt files in this project. Follow these rules when writing or updating any file in `prompts/`.
 >
 > **Scope**: Project-level standard (applies to this project only)
 >
-> **Rationale**: Consistent, well-written standards ensure AI agents behave predictably and correctly.
+> **Rationale**: Well-written prompts ensure AI agents behave predictably and correctly.
 
 ---
 
@@ -155,4 +155,4 @@ A well-written standard:
 
 ---
 
-**This standard ensures all project standards and prompts are consistent, enforceable, and effective at guiding AI agent behavior.**
+**This standard ensures all project prompts are consistent, enforceable, and effective at guiding AI agent behavior.**

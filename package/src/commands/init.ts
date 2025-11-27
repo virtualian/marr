@@ -29,7 +29,7 @@ const AVAILABLE_STANDARDS = [
   { name: 'testing', file: 'prj-testing-standard.md', description: 'Testing philosophy and practices' },
   { name: 'mcp', file: 'prj-mcp-usage-standard.md', description: 'MCP tool usage patterns' },
   { name: 'docs', file: 'prj-documentation-standard.md', description: 'Documentation organization' },
-  { name: 'prompts', file: 'prj-standards-and-prompts-standard.md', description: 'How to write standards and prompts' },
+  { name: 'prompts', file: 'prj-prompt-writing-standard.md', description: 'How to write and modify prompts' },
 ];
 
 export function initCommand(program: Command): void {
