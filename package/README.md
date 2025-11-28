@@ -119,7 +119,7 @@ Note: Standards (git workflow, testing, MCP usage) live at **project level** onl
 **What `--project` creates:**
 ```
 your-project/
-├── CLAUDE.md                   # Project configuration
+├── CLAUDE.md                   # Project configuration (references @prompts/)
 ├── prompts/
 │   ├── prj-git-workflow-standard.md
 │   ├── prj-testing-standard.md
@@ -128,6 +128,8 @@ your-project/
 ├── docs/                       # Documentation
 └── plans/                      # Implementation plans
 ```
+
+Note: CLAUDE.md references `@prompts/` as a folder, so new standards added to `prompts/` are automatically discovered.
 
 ### `marr validate`
 
@@ -281,6 +283,52 @@ marr validate
 
 ## Troubleshooting
 
+### Permission denied during npm install -g
+
+**Problem:** EACCES permission error when running `npm install -g @virtualian/marr`.
+
+```
+npm ERR! EACCES: permission denied, access '/usr/local/lib/node_modules'
+```
+
+**Solutions (pick one):**
+
+**Option 1: Use npx (no global install needed)**
+```bash
+# Run MARR without installing globally
+npx @virtualian/marr init --user
+npx @virtualian/marr init --project
+npx @virtualian/marr validate
+```
+
+**Option 2: Use nvm (recommended for developers)**
+```bash
+# Install nvm (manages Node versions, installs to user directory)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Restart terminal, then:
+nvm install node
+npm install -g @virtualian/marr  # Now works without sudo
+```
+
+**Option 3: Change npm's default directory**
+```bash
+# Create a directory for global packages
+mkdir ~/.npm-global
+
+# Configure npm to use it
+npm config set prefix '~/.npm-global'
+
+# Add to PATH (add to ~/.zshrc or ~/.bashrc)
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
+source ~/.zshrc
+
+# Now install normally
+npm install -g @virtualian/marr
+```
+
+**Note:** Avoid `sudo npm install -g` — it creates permission issues for future packages.
+
 ### Command not found: marr
 
 **Problem:** Shell can't find the `marr` command after installation.
@@ -363,6 +411,24 @@ npm run build
 # Test locally
 npm link
 marr --version
+```
+
+### Releasing
+
+Use the release script from the repo root (handles monorepo structure):
+
+```bash
+# From repo root (not package/)
+cd /path/to/marr
+
+# Bump version, build, commit, and tag
+./scripts/release.sh patch   # 2.0.0 -> 2.0.1
+./scripts/release.sh minor   # 2.0.0 -> 2.1.0
+./scripts/release.sh major   # 2.0.0 -> 3.0.0
+
+# Then push and publish
+git push origin main --tags
+cd package && npm publish --access public
 ```
 
 ### Project Structure

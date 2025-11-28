@@ -223,11 +223,23 @@ export function cleanCommand(program: Command): void {
   program
     .command('clean')
     .description('Remove MARR configuration files')
-    .option('-u, --user', 'Clean user-level config (~/.claude/marr/)')
-    .option('-p, --project', 'Clean project-level config (./CLAUDE.md, ./prompts/)')
-    .option('-a, --all', 'Clean both user and project config')
-    .option('-n, --dry-run', 'Show what would be removed without actually removing')
+    .option('-u, --user', 'Remove user-level config (~/.claude/marr/, helper scripts)')
+    .option('-p, --project', 'Remove project-level config (./CLAUDE.md, ./prompts/)')
+    .option('-a, --all', 'Remove both user and project config')
+    .option('-n, --dry-run', 'Preview what would be removed without deleting')
     .option('-f, --force', 'Skip confirmation prompts')
+    .addHelpText('after', `
+What gets removed:
+  --user      ~/.claude/marr/, import line in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
+  --project   ./CLAUDE.md, ./prompts/ directory
+
+Examples:
+  $ marr clean --project              Remove MARR from current project
+  $ marr clean --user                 Remove user-level MARR config
+  $ marr clean --all                  Remove everything
+  $ marr clean --project --dry-run    Preview what would be removed
+
+Note: Without flags, defaults to --user (user-level cleanup only).`)
     .action((options: CleanOptions) => {
       executeClean(options);
     });

@@ -47,11 +47,7 @@ Show user exactly what will be committed/pushed before taking action.
 
 ## Standards Compliance
 
-This project follows the standards defined in:
-- @prompts/prj-git-workflow-standard.md
-- @prompts/prj-testing-standard.md
-- @prompts/prj-mcp-usage-standard.md
-- @prompts/prj-documentation-standard.md
+This project follows the standards defined in @prompts/
 
 ## Documentation Organization
 

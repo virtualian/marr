@@ -29,7 +29,16 @@ program
   .name('marr')
   .description('MARR - Making Agents Really Reliable\nAI agent configuration system for consistent project context and standards')
   .version(packageJson.version, '-v, --version', 'Show version number')
-  .helpOption('-h, --help', 'Show help information');
+  .helpOption('-h, --help', 'Show help information')
+  .addHelpText('after', `
+Examples:
+  $ marr init --user              Set up user-level config (run once per machine)
+  $ marr init --project           Initialize current project with MARR
+  $ marr init --all               Set up both user and project config
+  $ marr validate                 Check configuration is valid
+  $ marr clean --project          Remove project MARR config
+
+Run 'marr <command> --help' for detailed help on each command.`);
 
 // Register commands
 initCommand(program);

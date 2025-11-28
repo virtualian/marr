@@ -39,9 +39,30 @@ export function initCommand(program: Command): void {
     .option('-u, --user', 'Set up user-level config (~/.claude/marr/, helper scripts)')
     .option('-p, --project [path]', 'Set up project-level config (./CLAUDE.md, ./prompts/)')
     .option('-a, --all [path]', 'Set up both user and project config')
-    .option('-s, --standards <value>', 'Standards to install: all, list, or comma-separated names (git,testing,mcp,docs)')
-    .option('-n, --dry-run', 'Show what would be created without actually creating')
-    .option('-f, --force', 'Skip confirmation prompts')
+    .option('-s, --standards <value>', 'Standards: all, none, list, or names (git,testing,mcp,docs,prompts)')
+    .option('-n, --dry-run', 'Preview what would be created without creating')
+    .option('-f, --force', 'Overwrite existing files, skip confirmations')
+    .addHelpText('after', `
+What gets created:
+  --user      ~/.claude/marr/CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
+  --project   ./CLAUDE.md, ./prompts/*.md, ./docs/, ./plans/
+
+Standards available (use with --project):
+  git       Git workflow and branch management
+  testing   Testing philosophy and practices
+  mcp       MCP tool usage patterns
+  docs      Documentation organization
+  prompts   How to write and modify prompts
+
+Examples:
+  $ marr init --user                       First-time setup (run once per machine)
+  $ marr init --project                    Interactive standard selection
+  $ marr init --project --standards all    Install all standards
+  $ marr init --project -s git,testing     Install specific standards only
+  $ marr init --project -s none            CLAUDE.md only, no standards
+  $ marr init --all                        Both user + project setup
+  $ marr init --project --dry-run          Preview what would be created
+  $ marr init --project --force            Overwrite existing config`)
     .action(async (options: InitOptions) => {
       try {
         await executeInit(options);
@@ -233,30 +254,64 @@ async function installHelperScripts(binDir: string, dryRun: boolean): Promise<vo
 }
 
 /**
- * Check if ~/bin is in PATH and warn if not
+ * Check if ~/bin is in PATH and provide clear instructions if not
  */
 function checkPath(binDir: string): void {
   const pathEnv = process.env.PATH || '';
-  const isInPath = pathEnv.split(':').some(p => p === binDir);
+  // Check both expanded path and $HOME/bin pattern
+  const homeDir = fileOps.getHomeDir();
+  const isInPath = pathEnv.split(':').some(p =>
+    p === binDir || p === `${homeDir}/bin` || p === '$HOME/bin'
+  );
 
-  if (!isInPath) {
-    logger.blank();
-    logger.warning('~/bin/ is not in your PATH');
-    logger.info('Add it to your shell configuration:');
-    logger.blank();
-
-    const shell = process.env.SHELL || '';
-
-    if (shell.includes('zsh')) {
-      logger.log('  echo \'export PATH="$HOME/bin:$PATH"\' >> ~/.zshrc');
-      logger.log('  source ~/.zshrc');
-    } else if (shell.includes('bash')) {
-      logger.log('  echo \'export PATH="$HOME/bin:$PATH"\' >> ~/.bashrc');
-      logger.log('  source ~/.bashrc');
-    } else {
-      logger.log('  export PATH="$HOME/bin:$PATH"');
-    }
+  if (isInPath) {
+    logger.success('~/bin is in your PATH - helper scripts are ready to use');
+    return;
   }
+
+  logger.blank();
+  logger.warning('~/bin is NOT in your PATH');
+  logger.info('Helper scripts installed but won\'t be found until you add ~/bin to PATH.');
+  logger.blank();
+
+  const shell = process.env.SHELL || '';
+  let shellConfig = '~/.profile';  // fallback
+  let shellName = 'shell';
+
+  if (shell.includes('zsh')) {
+    shellConfig = '~/.zshrc';
+    shellName = 'zsh';
+  } else if (shell.includes('bash')) {
+    // macOS uses .bash_profile, Linux uses .bashrc
+    shellConfig = process.platform === 'darwin' ? '~/.bash_profile' : '~/.bashrc';
+    shellName = 'bash';
+  } else if (shell.includes('fish')) {
+    shellConfig = '~/.config/fish/config.fish';
+    shellName = 'fish';
+  }
+
+  logger.info(`Add to your ${shellName} config (${shellConfig}):`);
+  logger.blank();
+
+  if (shell.includes('fish')) {
+    logger.log(`  echo 'set -gx PATH $HOME/bin $PATH' >> ${shellConfig}`);
+  } else {
+    logger.log(`  echo 'export PATH="$HOME/bin:$PATH"' >> ${shellConfig}`);
+  }
+
+  logger.blank();
+  logger.info('Then restart your terminal or run:');
+
+  if (shell.includes('fish')) {
+    logger.log(`  source ${shellConfig}`);
+  } else {
+    logger.log(`  source ${shellConfig}`);
+  }
+
+  logger.blank();
+  logger.info('After that, these commands will work:');
+  logger.log('  gh-add-subissue.sh <parent> <sub>');
+  logger.log('  gh-list-subissues.sh <parent>');
 }
 
 /**
@@ -436,14 +491,13 @@ function createProjectClaudeMd(targetDir: string, selectedStandards: typeof AVAI
   // Get project name from directory
   const projectName = targetDir.split('/').pop() || 'Project';
 
-  // Build standards compliance section based on selected standards
+  // Build standards compliance section - reference folder instead of individual files
+  // This allows new standards to be auto-discovered without updating CLAUDE.md
   let standardsSection = '';
   if (selectedStandards.length > 0) {
-    const standardRefs = selectedStandards.map(std => `- @prompts/${std.file}`).join('\n');
     standardsSection = `## Standards Compliance
 
-This project follows the standards defined in:
-${standardRefs}
+This project follows the standards defined in @prompts/
 
 `;
   }
