@@ -158,6 +158,11 @@ function validatePromptNaming(result: ValidationResult): void {
       continue;
     }
 
+    // Skip README files
+    if (filename === 'README.md') {
+      continue;
+    }
+
     // Check naming convention
     if (!filename.startsWith('prj-') && !filename.startsWith('user-')) {
       result.warnings.push(`Prompt file doesn't follow naming convention: ${filename}`);

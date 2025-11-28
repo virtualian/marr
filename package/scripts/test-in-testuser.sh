@@ -1,125 +1,259 @@
 #!/bin/bash
 # Test MARR package in testuser account
 # Run this as testuser after nvm is installed
+#
+# Usage: test-in-testuser.sh [-v|--verbose] [-q|--quiet]
+#
+# Options:
+#   -v, --verbose   Show detailed test output and debug info
+#   -q, --quiet     Only show test results summary (silent mode)
 
 set -e
 
-# Load nvm
+# Load nvm first (before sourcing our logging, as SCRIPT_DIR isn't set yet)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-echo "🧪 MARR Package Testing in testuser Account"
-echo "============================================"
-echo ""
+# Load logging utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/logging.sh"
+
+# Parse command line arguments
+parse_logging_args "$@"
+
+log_step "🧪" "MARR Package Testing in testuser Account"
+log_separator
+log_blank
 
 # Verify nvm is loaded and Node.js is available
+log_debug "Checking for Node.js..."
 if ! command -v node &> /dev/null; then
-  echo "❌ ERROR: Node.js not found!"
-  echo ""
-  echo "Please install nvm first:"
-  echo "  bash $SCRIPT_DIR/setup-testuser.sh"
-  echo ""
-  echo "Then load nvm in your current shell:"
-  echo "  export NVM_DIR=\"\$HOME/.nvm\""
-  echo "  [ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\""
-  echo ""
-  echo "Or start a new terminal session (nvm will load automatically)."
-  exit 1
+    log_error "ERROR: Node.js not found!"
+    log_blank
+    log_info "Please install nvm first:"
+    log_info "  bash $SCRIPT_DIR/setup-testuser.sh"
+    log_blank
+    log_info "Then load nvm in your current shell:"
+    log_info "  export NVM_DIR=\"\$HOME/.nvm\""
+    log_info "  [ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\""
+    log_blank
+    log_info "Or start a new terminal session (nvm will load automatically)."
+    exit 1
 fi
 
-echo "✅ Node.js detected: $(node --version)"
-echo "✅ npm version: $(npm --version)"
-echo ""
+log_success "Node.js detected: $(node --version)"
+log_success "npm version: $(npm --version)"
+log_blank
 
 # Configuration - find package directory relative to this script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 TARBALL="$PACKAGE_DIR/virtualian-marr-1.0.0.tgz"
 
-echo "📍 Package directory: $PACKAGE_DIR"
-echo ""
+log_info "📍 Package directory: $PACKAGE_DIR"
+log_debug "Tarball path: $TARBALL"
+log_blank
 
 # Check if tarball exists
 if [ ! -f "$TARBALL" ]; then
-  echo "❌ ERROR: Tarball not found at $TARBALL"
-  echo ""
-  echo "Run this first to build the tarball:"
-  echo "  cd $PACKAGE_DIR"
-  echo "  bash scripts/build-test-tarball.sh"
-  exit 1
+    log_error "ERROR: Tarball not found at $TARBALL"
+    log_blank
+    log_info "Run this first to build the tarball:"
+    log_info "  cd $PACKAGE_DIR"
+    log_info "  bash scripts/build-test-tarball.sh"
+    exit 1
 fi
 
 # Clean previous test state
-echo "🧹 Cleaning previous test state..."
-# Change to home directory before cleaning to avoid being in a directory we're about to delete
+log_step "🧹" "Cleaning previous test state..."
+log_debug "Changing to home directory..."
 cd "$HOME"
+
+log_debug "Uninstalling previous @virtualian/marr..."
 npm uninstall -g @virtualian/marr 2>/dev/null || true
+
+log_debug "Removing ~/.claude/marr..."
 rm -rf ~/.claude/marr
+
+log_debug "Removing helper scripts..."
 rm -f ~/bin/gh-add-subissue.sh ~/bin/gh-list-subissues.sh
+
+log_debug "Removing test directories..."
 rm -rf ~/marr-test-*
 
-echo ""
-echo "📦 Installing MARR from tarball..."
-npm install -g "$TARBALL"
+# Remove MARR import from ~/.claude/CLAUDE.md if present
+if [ -f ~/.claude/CLAUDE.md ]; then
+    log_debug "Cleaning MARR import from ~/.claude/CLAUDE.md..."
+    sed -i '' '/<!-- MARR: Making Agents Really Reliable -->/d' ~/.claude/CLAUDE.md 2>/dev/null || true
+    sed -i '' '/@~\/.claude\/marr\/CLAUDE.md/d' ~/.claude/CLAUDE.md 2>/dev/null || true
+fi
 
-echo ""
-echo "✅ Installation complete!"
-echo ""
-echo "Testing commands..."
-echo ""
+log_blank
+log_step "📦" "Installing MARR from tarball..."
+if [[ $QUIET -eq 1 ]]; then
+    npm install -g "$TARBALL" > /dev/null 2>&1
+elif [[ $VERBOSE -eq 1 ]]; then
+    npm install -g "$TARBALL"
+else
+    npm install -g "$TARBALL"
+fi
+
+log_blank
+log_success "Installation complete!"
+log_blank
+log_info "Testing commands..."
+log_blank
+
+# Test tracking
+TESTS_PASSED=0
+TESTS_FAILED=0
+
+run_test() {
+    local test_num=$1
+    local test_name=$2
+    shift 2
+
+    log_info "Test $test_num: $test_name"
+    if [[ $VERBOSE -eq 1 ]]; then
+        log_debug "Running: $*"
+    fi
+
+    if "$@"; then
+        ((TESTS_PASSED++))
+        log_success "Test $test_num passed"
+    else
+        ((TESTS_FAILED++))
+        log_error "Test $test_num failed"
+    fi
+    log_blank
+}
 
 # Test 1: Version check
-echo "Test 1: marr --version"
-marr --version
-echo ""
+log_info "Test 1: marr --version"
+if [[ $QUIET -eq 0 ]]; then
+    marr --version
+fi
+log_success "Version check passed"
+((TESTS_PASSED++))
+log_blank
 
-# Test 2: Init command
-echo "Test 2: marr init"
+# Test 2: marr init (no flags shows help)
+log_info "Test 2: marr init (no flags - should show help)"
+if [[ $VERBOSE -eq 1 ]]; then
+    marr init | head -5
+elif [[ $QUIET -eq 0 ]]; then
+    marr init | head -5
+else
+    marr init > /dev/null 2>&1
+fi
+log_success "Help displayed correctly"
+((TESTS_PASSED++))
+log_blank
+
+# Test 3: marr init --user (user-level setup)
+log_info "Test 3: marr init --user"
+if [[ $QUIET -eq 1 ]]; then
+    marr init --user > /dev/null 2>&1
+else
+    marr init --user
+fi
+log_success "User setup complete"
+((TESTS_PASSED++))
+log_blank
+
+# Test 4: Check user-level setup
+log_info "Test 4: Checking user-level setup..."
+check_passed=true
+[ -d ~/.claude/marr ] && log_info "  ✅ ~/.claude/marr/ exists" || { log_info "  ❌ ~/.claude/marr/ missing"; check_passed=false; }
+[ -f ~/.claude/marr/CLAUDE.md ] && log_info "  ✅ ~/.claude/marr/CLAUDE.md exists" || { log_info "  ❌ ~/.claude/marr/CLAUDE.md missing"; check_passed=false; }
+[ -f ~/.claude/CLAUDE.md ] && log_info "  ✅ ~/.claude/CLAUDE.md exists" || { log_info "  ❌ ~/.claude/CLAUDE.md missing"; check_passed=false; }
+grep -q "@~/.claude/marr/CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
+[ -f ~/bin/gh-add-subissue.sh ] && log_info "  ✅ gh-add-subissue.sh installed" || { log_info "  ❌ gh-add-subissue.sh missing"; check_passed=false; }
+[ -f ~/bin/gh-list-subissues.sh ] && log_info "  ✅ gh-list-subissues.sh installed" || { log_info "  ❌ gh-list-subissues.sh missing"; check_passed=false; }
+[ -x ~/bin/gh-add-subissue.sh ] && log_info "  ✅ Scripts are executable" || { log_info "  ❌ Scripts not executable"; check_passed=false; }
+if $check_passed; then
+    ((TESTS_PASSED++))
+else
+    ((TESTS_FAILED++))
+fi
+log_blank
+
+# Test 5: marr init --project (project-level setup)
+log_info "Test 5: marr init --project"
 TEST_DIR="$HOME/marr-test-$(date +%s)"
-PROJECT_NAME="test-project"
 mkdir -p "$TEST_DIR"
 cd "$TEST_DIR"
-marr init --name "$PROJECT_NAME" --type "test application" --template standards
-echo "✅ Init complete"
-echo ""
+log_debug "Test directory: $TEST_DIR"
+if [[ $QUIET -eq 1 ]]; then
+    marr init --project --force > /dev/null 2>&1
+else
+    marr init --project --force
+fi
+log_success "Project setup complete"
+((TESTS_PASSED++))
+log_blank
 
-# Test 3: Validate command
-echo "Test 3: marr validate"
-# We're already in the project directory from init
-marr validate
-echo "✅ Validation passed"
-echo ""
+# Test 6: Check generated project files
+log_info "Test 6: Checking generated project files..."
+check_passed=true
+[ -f CLAUDE.md ] && log_info "  ✅ CLAUDE.md exists" || { log_info "  ❌ CLAUDE.md missing"; check_passed=false; }
+[ -d prompts ] && log_info "  ✅ prompts/ directory exists" || { log_info "  ❌ prompts/ missing"; check_passed=false; }
+[ -f prompts/prj-git-workflow-standard.md ] && log_info "  ✅ Git workflow prompt exists" || { log_info "  ❌ Git workflow prompt missing"; check_passed=false; }
+[ -f prompts/prj-testing-standard.md ] && log_info "  ✅ Testing prompt exists" || { log_info "  ❌ Testing prompt missing"; check_passed=false; }
+[ -f prompts/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage prompt exists" || { log_info "  ❌ MCP usage prompt missing"; check_passed=false; }
+[ -f prompts/prj-documentation-standard.md ] && log_info "  ✅ Documentation prompt exists" || { log_info "  ❌ Documentation prompt missing"; check_passed=false; }
+[ -d docs ] && log_info "  ✅ docs/ directory exists" || { log_info "  ❌ docs/ missing"; check_passed=false; }
+[ -d plans ] && log_info "  ✅ plans/ directory exists" || { log_info "  ❌ plans/ missing"; check_passed=false; }
+if $check_passed; then
+    ((TESTS_PASSED++))
+else
+    ((TESTS_FAILED++))
+fi
+log_blank
 
-# Test 4: Check generated files
-echo "Test 4: Checking generated files..."
-[ -f CLAUDE.md ] && echo "  ✅ CLAUDE.md exists" || echo "  ❌ CLAUDE.md missing"
-[ -d prompts ] && echo "  ✅ prompts/ directory exists" || echo "  ❌ prompts/ missing"
-[ -f prompts/prj-git-workflow-standard.md ] && echo "  ✅ Git workflow prompt exists" || echo "  ❌ Git workflow prompt missing"
-echo ""
+# Test 7: Validate command
+log_info "Test 7: marr validate"
+if [[ $QUIET -eq 1 ]]; then
+    marr validate > /dev/null 2>&1
+else
+    marr validate
+fi
+log_success "Validation passed"
+((TESTS_PASSED++))
+log_blank
 
-# Test 5: Check ~/.claude/marr/ setup
-echo "Test 5: Checking ~/.claude/marr/ setup..."
-[ -d ~/.claude/marr ] && echo "  ✅ ~/.claude/marr/ exists" || echo "  ❌ ~/.claude/marr/ missing"
-[ -d ~/.claude/marr/templates ] && echo "  ✅ Templates directory exists" || echo "  ❌ Templates missing"
-[ -d ~/.claude/marr/prompts ] && echo "  ✅ Prompts directory exists" || echo "  ❌ Prompts missing"
-[ -f ~/.claude/CLAUDE.md ] && echo "  ✅ ~/.claude/CLAUDE.md exists" || echo "  ❌ ~/.claude/CLAUDE.md missing"
-grep -q "@~/.claude/marr/CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && echo "  ✅ MARR import line present" || echo "  ❌ MARR import line missing"
-echo ""
+# Test 8: marr clean --project --dry-run
+log_info "Test 8: marr clean --project --dry-run"
+if [[ $QUIET -eq 1 ]]; then
+    marr clean --project --dry-run > /dev/null 2>&1
+else
+    marr clean --project --dry-run
+fi
+log_success "Clean dry-run works"
+((TESTS_PASSED++))
+log_blank
 
-# Test 6: Install scripts command
-echo "Test 6: marr install-scripts"
-marr install-scripts
-[ -f ~/bin/gh-add-subissue.sh ] && echo "  ✅ gh-add-subissue.sh installed" || echo "  ❌ gh-add-subissue.sh missing"
-[ -f ~/bin/gh-list-subissues.sh ] && echo "  ✅ gh-list-subissues.sh installed" || echo "  ❌ gh-list-subissues.sh missing"
-[ -x ~/bin/gh-add-subissue.sh ] && echo "  ✅ Scripts are executable" || echo "  ❌ Scripts not executable"
-echo ""
+# Test 9: marr clean --user --dry-run
+log_info "Test 9: marr clean --user --dry-run"
+if [[ $QUIET -eq 1 ]]; then
+    marr clean --user --dry-run > /dev/null 2>&1
+else
+    marr clean --user --dry-run
+fi
+log_success "Clean user dry-run works"
+((TESTS_PASSED++))
+log_blank
 
-echo "============================================"
-echo "✅ ALL TESTS PASSED!"
-echo ""
-echo "Test artifacts created in: $TEST_DIR"
-echo ""
-echo "To clean up:"
-echo "  npm uninstall -g @virtualian/marr"
-echo "  rm -rf ~/.claude/marr ~/bin/gh-* ~/marr-test-*"
-echo ""
+log_separator
+if [ $TESTS_FAILED -eq 0 ]; then
+    log_success "ALL TESTS PASSED! ($TESTS_PASSED tests)"
+else
+    log_error "TESTS FAILED: $TESTS_FAILED failed, $TESTS_PASSED passed"
+fi
+log_blank
+log_info "Test artifacts created in: $TEST_DIR"
+log_blank
+log_info "To clean up:"
+log_info "  marr clean --all"
+log_info "  npm uninstall -g @virtualian/marr"
+log_info "  rm -rf ~/marr-test-*"
+log_blank

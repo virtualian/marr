@@ -5,10 +5,10 @@
 This guide explains how to test the MARR package in a clean macOS user account before publishing to npm. Testing in an isolated user account ensures we validate:
 
 - Complete first-run experience (including `~/.claude/marr/` setup)
-- Template installation and substitution
-- All three commands (`init`, `validate`, `install-scripts`)
-- User-level and project-level prompt file creation
-- Helper script installation
+- User-level setup (`marr init --user`)
+- Project-level setup (`marr init --project`)
+- Helper script installation (automatic with `--user`)
+- Cleanup functionality (`marr clean`)
 
 ## Prerequisites
 
@@ -88,18 +88,23 @@ bash /Users/ianmarr/projects/marr/package/scripts/test-in-testuser.sh
 The test script will:
 1. ✅ Install MARR from tarball
 2. ✅ Test `marr --version`
-3. ✅ Test `marr init` with all template substitutions
-4. ✅ Test `marr validate`
-5. ✅ Verify generated files (CLAUDE.md, prompts/)
-6. ✅ Verify `~/.claude/marr/` setup (templates, scripts)
-7. ✅ Test `marr install-scripts`
-8. ✅ Verify helper scripts installed and executable
+3. ✅ Test `marr init` (no flags - shows help)
+4. ✅ Test `marr init --user` (user-level setup)
+5. ✅ Verify user setup (`~/.claude/marr/`, helper scripts)
+6. ✅ Test `marr init --project` (project-level setup)
+7. ✅ Verify project files (CLAUDE.md, prompts/)
+8. ✅ Test `marr validate`
+9. ✅ Test `marr clean --project --dry-run`
+10. ✅ Test `marr clean --user --dry-run`
 
 ### Expected Output
 
 ```
 🧪 MARR Package Testing in testuser Account
 ============================================
+
+✅ Node.js detected: v18.x.x
+✅ npm version: x.x.x
 
 🧹 Cleaning previous test state...
 📦 Installing MARR from tarball...
@@ -110,26 +115,44 @@ Testing commands...
 Test 1: marr --version
 1.0.0
 
-Test 2: marr init
-✅ Init complete
+Test 2: marr init (no flags - should show help)
+MARR Initialization
+...
+✅ Help displayed correctly
 
-Test 3: marr validate
-✅ Validation passed
+Test 3: marr init --user
+✅ User setup complete
 
-Test 4: Checking generated files...
-  ✅ CLAUDE.md exists
-  ✅ prompts/ directory exists
-  ✅ Git workflow prompt exists
-
-Test 5: Checking ~/.claude/marr/ setup...
+Test 4: Checking user-level setup...
   ✅ ~/.claude/marr/ exists
-  ✅ Templates directory exists
-  ✅ Helper scripts directory exists
-
-Test 6: marr install-scripts
+  ✅ ~/.claude/marr/CLAUDE.md exists
+  ✅ ~/.claude/CLAUDE.md exists
+  ✅ MARR import line present
   ✅ gh-add-subissue.sh installed
   ✅ gh-list-subissues.sh installed
   ✅ Scripts are executable
+
+Test 5: marr init --project
+✅ Project setup complete
+
+Test 6: Checking generated project files...
+  ✅ CLAUDE.md exists
+  ✅ prompts/ directory exists
+  ✅ Git workflow prompt exists
+  ✅ Testing prompt exists
+  ✅ MCP usage prompt exists
+  ✅ Documentation prompt exists
+  ✅ docs/ directory exists
+  ✅ plans/ directory exists
+
+Test 7: marr validate
+✅ Validation passed
+
+Test 8: marr clean --project --dry-run
+✅ Clean dry-run works
+
+Test 9: marr clean --user --dry-run
+✅ Clean user dry-run works
 
 ============================================
 ✅ ALL TESTS PASSED!
@@ -160,17 +183,22 @@ npm install -g /Users/ianmarr/projects/marr/package/virtualian-marr-1.0.0.tgz
 # Test version
 marr --version
 
-# Test init
-mkdir ~/test-project
-cd ~/test-project
-marr init --name my-test --type "test app" --template standards
+# Test help (no flags)
+marr init
+
+# Test user setup
+marr init --user
+
+# Test project setup
+mkdir ~/test-project && cd ~/test-project
+marr init --project --force
 
 # Test validate
 marr validate
 
-# Test install-scripts
-marr install-scripts
-ls -la ~/bin/gh-*
+# Test cleanup (dry-run first)
+marr clean --project --dry-run
+marr clean --user --dry-run
 ```
 
 ### Step 4: Verify Generated Files
@@ -179,12 +207,11 @@ ls -la ~/bin/gh-*
 # Check project files
 cat CLAUDE.md
 ls -la prompts/
-cat prompts/prj-git-workflow-standard.md
 
 # Check user-level setup
 ls -la ~/.claude/marr/
-ls -la ~/.claude/marr/templates/
-ls -la ~/.claude/marr/helper-scripts/
+cat ~/.claude/marr/CLAUDE.md
+ls -la ~/bin/gh-*.sh
 ```
 
 ---
@@ -201,8 +228,20 @@ bash /path/to/marr/package/scripts/cleanup-testuser.sh
 This removes:
 - npm package (`@virtualian/marr`)
 - `~/.claude/marr/` directory
+- MARR import from `~/.claude/CLAUDE.md`
 - Helper scripts in `~/bin/`
 - Test project directories
+
+### Using MARR Clean Command
+
+```bash
+# Clean everything with MARR itself
+marr clean --all
+
+# Then uninstall
+npm uninstall -g @virtualian/marr
+rm -rf ~/marr-test-*
+```
 
 ### Full Clean (including Node.js)
 
@@ -255,7 +294,8 @@ npm uninstall -g @virtualian/marr
 npm install -g /path/to/marr/package/virtualian-marr-1.0.0.tgz
 
 # Test your changes
-marr init --name test-$(date +%s)
+marr init --user --dry-run
+marr init --project --dry-run --force
 ```
 
 ---
@@ -302,11 +342,11 @@ bash scripts/build-test-tarball.sh
 ### Problem: `~/.claude/marr/` not created
 
 **Cause**: First-run setup failed
-**Solution**: Check marr-setup.ts logs
+**Solution**: Check logs and try again
 
 ```bash
-# Try running init with more verbosity
-marr init --name test --template basic
+# Try running with verbose output
+marr init --user
 ls -la ~/.claude/marr/
 ```
 
@@ -319,16 +359,20 @@ ls -la ~/.claude/marr/
 - ✅ Binary command available in PATH
 - ✅ Version command works
 
-### First-Run Setup
+### User-Level Setup (`marr init --user`)
 - ✅ `~/.claude/marr/` directory created
-- ✅ Templates copied to `~/.claude/marr/templates/`
-- ✅ Helper scripts copied to `~/.claude/marr/helper-scripts/`
+- ✅ `~/.claude/marr/CLAUDE.md` created with personal preferences
+- ✅ MARR import added to `~/.claude/CLAUDE.md`
+- ✅ Helper scripts installed to `~/bin/`
+- ✅ Scripts are executable
 
-### Init Command
-- ✅ Creates CLAUDE.md with template substitutions
+**Note**: Standards (git workflow, testing, etc.) are NOT installed at user level. They live at project level only.
+
+### Project-Level Setup (`marr init --project`)
+- ✅ Creates CLAUDE.md with project name from directory
 - ✅ Creates prompts/ directory
 - ✅ Copies project-level prompt files
-- ✅ Template variables replaced ({{PROJECT_NAME}}, {{PROJECT_TYPE}})
+- ✅ Creates docs/ and plans/ directories
 - ✅ File permissions correct
 
 ### Validate Command
@@ -337,11 +381,11 @@ ls -la ~/.claude/marr/
 - ✅ Checks prompt file naming conventions
 - ✅ Validates prompt references
 
-### Install-Scripts Command
-- ✅ Creates ~/bin/ directory if needed
-- ✅ Copies helper scripts
-- ✅ Sets executable permissions
-- ✅ Provides PATH instructions if needed
+### Clean Command
+- ✅ `--user` removes `~/.claude/marr/`, import, and `~/bin/` scripts
+- ✅ `--project` removes `./CLAUDE.md` and `./prompts/`
+- ✅ `--dry-run` shows what would be removed
+- ✅ `--all` removes everything
 
 ---
 
@@ -349,10 +393,10 @@ ls -la ~/.claude/marr/
 
 1. **Test before every publish** - Always run full test suite before publishing to npm
 2. **Test in clean environment** - Use testuser account, not your dev account
-3. **Test all templates** - Try each template type (basic, standards, dev-guide, status)
+3. **Test both --user and --project** - They are separate workflows
 4. **Verify first-run** - Clean `~/.claude/marr/` and test fresh installation experience
 5. **Check permissions** - Ensure generated files have correct permissions
-6. **Test error cases** - Try invalid inputs, missing files, etc.
+6. **Test error cases** - Try existing config, missing files, etc.
 
 ---
 
@@ -371,10 +415,8 @@ ls -la ~/.claude/marr/
 1. Run full test suite in testuser
 2. Verify all tests pass
 3. Clean up testuser state
-4. Change binary to `marr` in package.json
-5. Publish to npm
-6. Restore binary to `marr-dev`
-7. Test published version in testuser
+4. Publish to npm
+5. Test published version in testuser
 
 ---
 

@@ -23,7 +23,7 @@ const MARR_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
 const MARR_IMPORT_BLOCK = `${MARR_IMPORT_COMMENT}\n${MARR_IMPORT_LINE}\n`;
 
 /**
- * Get path to bundled templates directory
+ * Get path to bundled templates directory (in npm package)
  */
 export function getTemplatesDir(): string {
   // In built package: dist/utils/marr-setup.js -> templates/
@@ -122,7 +122,10 @@ export function removeMarrImport(): boolean {
 
 /**
  * Initialize ~/.claude/marr/ infrastructure
- * Creates directory structure, copies templates, and adds import to CLAUDE.md
+ * Creates CLAUDE.md with personal preferences and adds import to ~/.claude/CLAUDE.md
+ *
+ * Note: Templates stay in the npm package - they're read directly when creating projects.
+ * Only personal configuration lives in ~/.claude/marr/
  */
 export function setupMarr(): void {
   const marrRoot = fileOps.getMarrRoot();
@@ -136,127 +139,119 @@ export function setupMarr(): void {
     return;
   }
 
-  logger.section('First-Run MARR Setup');
-  logger.info('Creating ~/.claude/marr/ infrastructure...');
+  logger.info('Creating ~/.claude/marr/ configuration...');
 
-  // Create directory structure
-  const dirs = [
-    marrRoot,
-    join(marrRoot, 'prompts'),
-    join(marrRoot, 'templates'),
-    join(marrRoot, 'templates/claude-md'),
-    join(marrRoot, 'templates/prompts'),
-    join(marrRoot, 'helper-scripts'),
-  ];
+  // Create minimal directory structure
+  fileOps.ensureDir(marrRoot);
 
-  for (const dir of dirs) {
-    fileOps.ensureDir(dir);
-  }
-
-  // Copy templates from package to ~/.claude/marr/
-  const templatesSource = getTemplatesDir();
-  const templatesDest = join(marrRoot, 'templates');
-
-  copyTemplates(templatesSource, templatesDest);
-
-  // Copy user-level prompts to ~/.claude/marr/prompts/
-  copyUserPrompts();
-
-  // Create MARR's CLAUDE.md
+  // Create MARR's CLAUDE.md with personal preferences
   createMarrClaudeMd();
 
   // Add import to user's ~/.claude/CLAUDE.md
   addMarrImport();
 
-  logger.success('MARR infrastructure created at ~/.claude/marr/');
-  logger.info('Claude Code will now load MARR configuration via import.');
-  logger.blank();
-}
-
-/**
- * Copy user-level prompt templates to ~/.claude/marr/prompts/
- */
-function copyUserPrompts(): void {
-  const templatesDir = getTemplatesDir();
-  const userPromptsSource = join(templatesDir, 'user-prompts');
-  const userPromptsDest = join(fileOps.getMarrRoot(), 'prompts');
-
-  if (!fileOps.exists(userPromptsSource)) {
-    logger.debug('No user prompts to copy');
-    return;
-  }
-
-  const files = fileOps.listFiles(userPromptsSource, false);
-
-  for (const srcFile of files) {
-    const filename = srcFile.split('/').pop() || '';
-    const destFile = join(userPromptsDest, filename);
-
-    try {
-      fileOps.copyFile(srcFile, destFile);
-    } catch (err) {
-      logger.warning(`Failed to copy user prompt: ${filename}`);
-    }
-  }
+  logger.success('Created: ~/.claude/marr/CLAUDE.md');
 }
 
 /**
  * Create MARR's user-level CLAUDE.md at ~/.claude/marr/CLAUDE.md
+ * Contains personal preferences, principles, and core habits
+ * Standards (git workflow, testing, etc.) live at project level
  */
 function createMarrClaudeMd(): void {
   const marrClaudeMdPath = fileOps.getMarrClaudeMdPath();
 
-  // Check for template
-  const templatePath = join(getTemplatesDir(), 'user-claude-md', 'CLAUDE.md');
-
-  if (fileOps.exists(templatePath)) {
-    fileOps.copyFile(templatePath, marrClaudeMdPath);
-    return;
-  }
-
-  // Fallback: create minimal CLAUDE.md
   const content = `# MARR User Configuration
 
 > This file is managed by MARR (Making Agents Really Reliable).
 > Claude Code loads this via import from ~/.claude/CLAUDE.md
 
-## User-Level Standards
-
-Import user-level prompts:
-
-@~/.claude/marr/prompts/user-git-workflow-standard.md
-@~/.claude/marr/prompts/user-testing-standard.md
-@~/.claude/marr/prompts/user-mcp-usage-standard.md
-
 ## Personal Preferences
 
-Add your personal Claude Code preferences below.
+### Communication Style
+
+- Keep responses concise unless detail is explicitly requested
+- Answer questions directly without elaboration unless asked
+- Don't flatter, praise, or use a sycophantic tone
+- When you have strong evidence for an opinion, stand your ground
+- Be constructively critical - never assume the user is correct
+
+### Work Habits
+
+- Always prefer editing existing files over creating new ones
+- Only create files when absolutely necessary
+- Check existing patterns before adding new ones
+
+### Approval Requirements
+
+**ALWAYS get explicit user approval before:**
+- ANY git commits
+- ANY git pushes
+- ANY PR creation or updates
+
+Show exactly what will be committed/pushed before taking action.
+Never assume approval - wait for explicit confirmation.
+
+## High-Level Principles
+
+### Simplicity Over Cleverness
+
+- Don't over-engineer - solve the problem at hand
+- Avoid premature abstraction
+- Three similar lines of code is better than a premature helper function
+- Only add complexity when clearly necessary
+
+### Prompt File Principles
+
+When creating or modifying prompt files:
+- Write directives that specify **WHAT** and **WHY**, never **HOW**
+- Never include code, commands, or configuration examples
+- Implementation details belong in project documentation, not prompts
+- Never modify prompt files without explicit approval
+
+### Attribution Restrictions
+
+- Never add AI attribution comments to any file
+- No "Generated with Claude" or "Co-Authored-By" comments
+- Code and documentation stand on merit, not origin
+
+## Core Habits
+
+### Before Modifying Code
+
+- Read and understand existing code first
+- Review existing patterns and conventions
+- Check for project-specific configuration
+
+### Security (Always)
+
+- Never commit secrets, keys, or credentials
+- Use environment variables for sensitive configuration
+- Validate inputs at system boundaries
+
+### Testing (Always)
+
+- Run tests before committing changes
+- Follow existing test patterns in the project
+- Never assume specific test frameworks - check first
+
+### Documentation Organization
+
+- Technical docs go in \`docs/\`
+- Plans go in \`plans/\`
+- Prompts go in \`prompts/\`
+- Never place docs in project root unless functionally required
+
+## Notes
+
+Standards (git workflow, testing, MCP usage, documentation) live at the **project level**
+in each project's \`prompts/\` directory. This keeps projects self-contained and allows
+per-project customization.
+
+Run \`marr init --project\` to set up a new project with standard prompts.
 `;
 
   fileOps.writeFile(marrClaudeMdPath, content);
-}
-
-/**
- * Copy templates recursively
- */
-function copyTemplates(src: string, dest: string): void {
-  if (!fileOps.exists(src)) {
-    logger.warning(`Templates source not found: ${src}`);
-    return;
-  }
-
-  const files = fileOps.listFiles(src, true);
-
-  for (const srcFile of files) {
-    const relativePath = srcFile.substring(src.length + 1);
-    const destFile = join(dest, relativePath);
-
-    try {
-      fileOps.copyFile(srcFile, destFile);
-    } catch (err) {
-      logger.warning(`Failed to copy template: ${relativePath}`);
-    }
-  }
 }
 
 /**
