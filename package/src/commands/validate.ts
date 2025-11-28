@@ -20,7 +20,21 @@ export function validateCommand(program: Command): void {
   program
     .command('validate')
     .description('Validate MARR configuration in current project')
-    .option('--strict', 'Fail on warnings')
+    .option('--strict', 'Treat warnings as errors (exit code 1)')
+    .addHelpText('after', `
+What it checks:
+  • CLAUDE.md exists and has required sections
+  • prompts/ directory exists with standard files
+  • Prompt files follow naming convention (prj-*, user-*)
+  • All @prompts/ references in CLAUDE.md are valid
+
+Examples:
+  $ marr validate              Standard validation (warnings allowed)
+  $ marr validate --strict     Fail if any warnings found
+
+Exit codes:
+  0  Validation passed
+  1  Validation failed (errors, or warnings in strict mode)`)
     .action((options: ValidateOptions) => {
       const result = validateProject(options);
       displayResults(result, options);
@@ -183,15 +197,19 @@ function validatePromptReferences(result: ValidationResult): void {
   const claudeMdPath = join(process.cwd(), 'CLAUDE.md');
   const content = fileOps.readFile(claudeMdPath);
 
-  // Find @prompts/ references
+  // Check for folder reference (preferred pattern)
+  const hasFolderRef = content.includes('@prompts/') &&
+    (content.match(/@prompts\/\s/) || content.match(/@prompts\/$/m) || content.includes('@prompts/\n'));
+
+  // Find individual @prompts/*.md references
   const promptRefs = content.match(/@prompts\/[\w-]+\.md/g) || [];
 
-  if (promptRefs.length === 0) {
+  if (!hasFolderRef && promptRefs.length === 0) {
     result.warnings.push('No prompt references found in CLAUDE.md');
-    result.warnings.push('  Consider using @prompts/prj-*.md references');
+    result.warnings.push('  Consider using @prompts/ folder reference');
   }
 
-  // Validate each reference
+  // Validate individual file references if present
   for (const ref of promptRefs) {
     const filename = ref.substring('@prompts/'.length);
     const promptPath = join(process.cwd(), 'prompts', filename);
@@ -202,8 +220,10 @@ function validatePromptReferences(result: ValidationResult): void {
     }
   }
 
-  if (promptRefs.length > 0) {
-    logger.success('Prompt references validated');
+  if (hasFolderRef) {
+    logger.success('Prompt folder reference validated (@prompts/)');
+  } else if (promptRefs.length > 0) {
+    logger.success('Prompt file references validated');
   }
 }
 

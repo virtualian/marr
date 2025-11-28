@@ -29,8 +29,9 @@ Project-level prompts use the `prj-` prefix to distinguish them from user-level 
 ## How They Work
 
 1. `marr init --project` copies `common/` files to `./prompts/`
-2. Project `CLAUDE.md` references them with `@prompts/prj-*.md`
-3. Claude Code loads them when working in that project
+2. Project `CLAUDE.md` references them with `@prompts/` (folder reference)
+3. Claude Code loads all prompts in the folder when working in that project
+4. New standards added to `prompts/` are automatically discovered
 
 ## Customization
 
