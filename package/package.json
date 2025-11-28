@@ -1,6 +1,6 @@
 {
   "name": "@virtualian/marr",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "MARR (Making Agents Really Reliable) - AI agent configuration system for consistent project context and standards",
   "type": "module",
   "bin": {
