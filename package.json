@@ -30,8 +30,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/virtualian/marr.git",
-    "directory": "package"
+    "url": "https://github.com/virtualian/marr.git"
   },
   "bugs": {
     "url": "https://github.com/virtualian/marr/issues"
@@ -53,7 +52,7 @@
   },
   "files": [
     "dist/",
-    "templates/",
+    "resources/",
     "README.md",
     "LICENSE"
   ]

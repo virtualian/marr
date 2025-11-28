@@ -41,11 +41,22 @@ tmp/
 temp/
 *.tmp
 
-# Node modules (if this repo adds tooling)
+# Node modules
 node_modules/
+
+# Build output
+dist/
 
 # Environment files
 .env
 .env.local
 .env.*.local
+
+# Test coverage
+coverage/
+
+# Build artifacts (test tarballs)
+*.tgz
+
+# Session recaps
 recap/

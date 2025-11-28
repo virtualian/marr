@@ -211,9 +211,9 @@ async function installHelperScripts(binDir: string, dryRun: boolean): Promise<vo
     fileOps.ensureDir(binDir);
   }
 
-  // Get scripts from bundled templates
-  const templatesDir = marrSetup.getTemplatesDir();
-  const scriptsSource = join(templatesDir, 'helper-scripts');
+  // Get scripts from bundled resources
+  const resourcesDir = marrSetup.getResourcesDir();
+  const scriptsSource = join(resourcesDir, 'helper-scripts');
 
   const scripts = [
     'gh-add-subissue.sh',
@@ -547,8 +547,8 @@ Document common development tasks, commands, or workflows.
  * Copy project-level prompts to ./prompts/
  */
 function copyProjectPrompts(targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
-  const templatesDir = marrSetup.getTemplatesDir();
-  const promptsSource = join(templatesDir, 'project/common');
+  const resourcesDir = marrSetup.getResourcesDir();
+  const promptsSource = join(resourcesDir, 'project/common');
   const promptsDest = join(targetDir, 'prompts');
 
   // Copy selected standard files
@@ -560,7 +560,7 @@ function copyProjectPrompts(targetDir: string, selectedStandards: typeof AVAILAB
       fileOps.copyFile(srcPath, destPath);
       logger.success(`Created: prompts/${std.file}`);
     } else {
-      logger.warning(`Template not found: ${std.file}`);
+      logger.warning(`Resource not found: ${std.file}`);
     }
   }
 
@@ -577,12 +577,12 @@ function copyProjectPrompts(targetDir: string, selectedStandards: typeof AVAILAB
  * Copy README files to docs/ and plans/ directories
  */
 function copyFolderReadmes(targetDir: string): void {
-  const templatesDir = marrSetup.getTemplatesDir();
+  const resourcesDir = marrSetup.getResourcesDir();
 
   const folders = ['docs', 'plans'];
 
   for (const folder of folders) {
-    const srcPath = join(templatesDir, 'project', folder, 'README.md');
+    const srcPath = join(resourcesDir, 'project', folder, 'README.md');
     const destPath = join(targetDir, folder, 'README.md');
 
     if (fileOps.exists(srcPath)) {
