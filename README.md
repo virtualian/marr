@@ -439,7 +439,10 @@ marr/
 │   ├── project/              # Project-level standards
 │   ├── user/                 # User-level config
 │   └── helper-scripts/       # GitHub helper scripts
-├── scripts/                  # Build and test scripts
+├── tests/                    # Test infrastructure
+│   ├── testuser/             # Isolated user account tests
+│   └── lib/                  # Test utilities
+├── scripts/                  # Build and release scripts
 ├── docs/                     # Documentation
 ├── examples/                 # Configuration examples
 ├── package.json
@@ -454,12 +457,12 @@ See [docs/dev/TESTING.md](./docs/dev/TESTING.md) for comprehensive testing docum
 **Quick Test Cycle:**
 
 ```bash
-# Build test tarball
-./scripts/build-test-tarball.sh
+# Build and create test tarball
+npm run build
 
 # Test in isolated user account
 sudo su - testuser
-bash /path/to/marr/scripts/test-in-testuser.sh
+bash /path/to/marr/tests/testuser/test-in-testuser.sh
 ```
 
 ## License
