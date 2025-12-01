@@ -44,7 +44,7 @@ export function initCommand(program: Command): void {
     .option('-f, --force', 'Overwrite existing files, skip confirmations')
     .addHelpText('after', `
 What gets created:
-  --user      ~/.claude/marr/CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
+  --user      ~/.claude/marr/MARR-USER-CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
   --project   ./CLAUDE.md, ./.marr/*.md, ./docs/, ./plans/
 
 Standards available (use with --project):
@@ -187,7 +187,7 @@ async function initializeUser(dryRun: boolean, force: boolean): Promise<void> {
 
   if (dryRun) {
     logger.info('Would create: ~/.claude/marr/');
-    logger.info('Would create: ~/.claude/marr/CLAUDE.md');
+    logger.info('Would create: ~/.claude/marr/MARR-USER-CLAUDE.md');
     logger.info('Would add: MARR import to ~/.claude/CLAUDE.md');
     await installHelperScripts(binDir, true);
     return;

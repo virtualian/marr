@@ -165,9 +165,9 @@ log_blank
 log_info "Test 4: Checking user-level setup..."
 check_passed=true
 [ -d ~/.claude/marr ] && log_info "  ✅ ~/.claude/marr/ exists" || { log_info "  ❌ ~/.claude/marr/ missing"; check_passed=false; }
-[ -f ~/.claude/marr/CLAUDE.md ] && log_info "  ✅ ~/.claude/marr/CLAUDE.md exists" || { log_info "  ❌ ~/.claude/marr/CLAUDE.md missing"; check_passed=false; }
+[ -f ~/.claude/marr/MARR-USER-CLAUDE.md ] && log_info "  ✅ ~/.claude/marr/MARR-USER-CLAUDE.md exists" || { log_info "  ❌ ~/.claude/marr/MARR-USER-CLAUDE.md missing"; check_passed=false; }
 [ -f ~/.claude/CLAUDE.md ] && log_info "  ✅ ~/.claude/CLAUDE.md exists" || { log_info "  ❌ ~/.claude/CLAUDE.md missing"; check_passed=false; }
-grep -q "@~/.claude/marr/CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
+grep -q "@~/.claude/marr/MARR-USER-CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
 [ -f ~/bin/gh-add-subissue.sh ] && log_info "  ✅ gh-add-subissue.sh installed" || { log_info "  ❌ gh-add-subissue.sh missing"; check_passed=false; }
 [ -f ~/bin/gh-list-subissues.sh ] && log_info "  ✅ gh-list-subissues.sh installed" || { log_info "  ❌ gh-list-subissues.sh missing"; check_passed=false; }
 [ -x ~/bin/gh-add-subissue.sh ] && log_info "  ✅ Scripts are executable" || { log_info "  ❌ Scripts not executable"; check_passed=false; }

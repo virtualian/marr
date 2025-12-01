@@ -164,7 +164,7 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 **CR1: Two-Layer Configuration Model**
 - User-level standards in `~/.claude/marr/` (universal preferences)
 - Project-level standards in `./CLAUDE.md` and `./.marr/` (project-specific)
-- Claude Code integration via import mechanism (`@~/.claude/marr/CLAUDE.md`)
+- Claude Code integration via import mechanism (`@~/.claude/marr/MARR-USER-CLAUDE.md`)
 - Clear precedence: Project technical requirements override user preferences
 - **Rationale:** Separates personal from project-specific standards; integrates with Claude Code's native import system
 
@@ -278,13 +278,9 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 ```
 ~/.claude/
 ├── CLAUDE.md              ← User's file (MARR adds import line)
-│   └── @~/.claude/marr/CLAUDE.md   ← Import injected by MARR
+│   └── @~/.claude/marr/MARR-USER-CLAUDE.md   ← Import injected by MARR
 └── marr/                  ← MARR's managed directory
-    ├── CLAUDE.md          ← MARR's user-level config
-    └── prompts/           ← MARR's user-level standards
-        ├── user-git-workflow-standard.md
-        ├── user-testing-standard.md
-        └── user-mcp-usage-standard.md
+    └── MARR-USER-CLAUDE.md   ← MARR's user-level config
 
 ~/bin/                     ← Helper scripts (installed by marr init --user)
 ├── gh-add-subissue.sh

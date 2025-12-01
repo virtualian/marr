@@ -48,10 +48,10 @@ export function getUserClaudeMdPath(): string {
 }
 
 /**
- * Get path to MARR's user-level CLAUDE.md file
+ * Get path to MARR's user-level config file
  */
 export function getMarrClaudeMdPath(): string {
-  return join(getMarrRoot(), 'CLAUDE.md');
+  return join(getMarrRoot(), 'MARR-USER-CLAUDE.md');
 }
 
 /**

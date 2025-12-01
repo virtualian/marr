@@ -125,7 +125,7 @@ Test 3: marr init --user
 
 Test 4: Checking user-level setup...
   ✅ ~/.claude/marr/ exists
-  ✅ ~/.claude/marr/CLAUDE.md exists
+  ✅ ~/.claude/marr/MARR-USER-CLAUDE.md exists
   ✅ ~/.claude/CLAUDE.md exists
   ✅ MARR import line present
   ✅ gh-add-subissue.sh installed
@@ -210,7 +210,7 @@ ls -la .marr/
 
 # Check user-level setup
 ls -la ~/.claude/marr/
-cat ~/.claude/marr/CLAUDE.md
+cat ~/.claude/marr/MARR-USER-CLAUDE.md
 ls -la ~/bin/gh-*.sh
 ```
 
@@ -361,7 +361,7 @@ ls -la ~/.claude/marr/
 
 ### User-Level Setup (`marr init --user`)
 - ✅ `~/.claude/marr/` directory created
-- ✅ `~/.claude/marr/CLAUDE.md` created with personal preferences
+- ✅ `~/.claude/marr/MARR-USER-CLAUDE.md` created with personal preferences
 - ✅ MARR import added to `~/.claude/CLAUDE.md`
 - ✅ Helper scripts installed to `~/bin/`
 - ✅ Scripts are executable

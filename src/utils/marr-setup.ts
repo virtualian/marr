@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /** Import line that MARR adds to ~/.claude/CLAUDE.md */
-const MARR_IMPORT_LINE = '@~/.claude/marr/CLAUDE.md';
+const MARR_IMPORT_LINE = '@~/.claude/marr/MARR-USER-CLAUDE.md';
 
 /** Comment marker to identify MARR's import */
 const MARR_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
@@ -150,11 +150,11 @@ export function setupMarr(): void {
   // Add import to user's ~/.claude/CLAUDE.md
   addMarrImport();
 
-  logger.success('Created: ~/.claude/marr/CLAUDE.md');
+  logger.success('Created: ~/.claude/marr/MARR-USER-CLAUDE.md');
 }
 
 /**
- * Create MARR's user-level CLAUDE.md at ~/.claude/marr/CLAUDE.md
+ * Create MARR's user-level config at ~/.claude/marr/MARR-USER-CLAUDE.md
  * Contains personal preferences, principles, and core habits
  * Standards (git workflow, testing, etc.) live at project level
  */

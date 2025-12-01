@@ -107,7 +107,7 @@ marr init --project --force
 ~/.claude/
 ├── CLAUDE.md                   # Updated with MARR import
 └── marr/
-    └── CLAUDE.md               # Personal preferences
+    └── MARR-USER-CLAUDE.md     # Personal preferences
 
 ~/bin/
 ├── gh-add-subissue.sh          # GitHub helper script
