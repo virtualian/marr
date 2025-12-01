@@ -21,7 +21,7 @@ This keeps projects self-contained and allows per-project customization.
 
 ```
 ~/.claude/marr/
-└── CLAUDE.md    # Personal preferences
+└── MARR-USER-CLAUDE.md    # Personal preferences
 ```
 
 Helper scripts are installed to `~/bin/`, not here.
