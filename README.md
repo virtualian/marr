@@ -1,18 +1,24 @@
-# @virtualian/marr
+# 
 
-**MARR (Making Agents Really Reliable)** - AI agent configuration system for consistent project context and standards.
+# **M**aking **A**gents **R**eally **R**eliable (**MARR**)
+
+
 
 [![npm version](https://img.shields.io/npm/v/@virtualian/marr.svg)](https://www.npmjs.com/package/@virtualian/marr)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
 ## What is MARR?
 
-MARR provides a two-layer configuration system for AI agents (Claude Code first):
+MARR is an AI agent configuration system for consistent project context and standards. It provides a two-layer configuration system for AI agents (Claude Code first):
 
-1. **User-level configuration** (`~/.claude/marr/`) - Personal preferences and universal standards
-2. **Project-level configuration** (`./CLAUDE.md` imports `./.claude/marr/MARR-PROJECT-CLAUDE.md`) - Project-specific technical requirements
+1. **User-level configuration** (`~/.claude/marr/`) - contains personal preferences and universal standards
+2. **Project-level configuration** (`./CLAUDE.md` or `.claude/CLAUDE.md` imports `./.claude/marr/MARR-PROJECT-CLAUDE.md`) - contains project-specific standards requirements
 
-**Key principle**: All repositories use the same comprehensive standards (git workflow, testing, MCP usage) regardless of project type or technology stack.
+All repositories where MARR is installed use the same MARR personal preferences and standards appropriate to project type or technology stack. MARR includes a personal preferences file and a set of optional standards. 
+
+MARR files can be edited and new standards created. These can be synchronised across other MARR-enabled projects. 
+
+Updated and new files can be contributed via GitHub issues and Pull Requests and may be included in future versions by default.
 
 ## Installation
 
@@ -66,17 +72,9 @@ marr init --project
 # Install all standards
 marr init --project --standards all
 
-# Install specific standards
-marr init --project --standards git,testing
-
-# Install no standards (CLAUDE.md only)
-marr init --project --standards none
-
 # List available standards
 marr init --standards list
 ```
-
-Available standards: `git`, `testing`, `mcp`, `docs`, `prompts`
 
 **Examples:**
 ```bash
