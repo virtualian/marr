@@ -23,13 +23,13 @@ interface InitOptions {
   force: boolean;
 }
 
-/** Available project standards */
+/** Available project standards with trigger conditions */
 const AVAILABLE_STANDARDS = [
-  { name: 'git', file: 'prj-git-workflow-standard.md', description: 'Git workflow and branch management' },
-  { name: 'testing', file: 'prj-testing-standard.md', description: 'Testing philosophy and practices' },
-  { name: 'mcp', file: 'prj-mcp-usage-standard.md', description: 'MCP tool usage patterns' },
-  { name: 'docs', file: 'prj-documentation-standard.md', description: 'Documentation organization' },
-  { name: 'prompts', file: 'prj-prompt-writing-standard.md', description: 'How to write and modify prompts' },
+  { name: 'git', file: 'prj-git-workflow-standard.md', description: 'Git workflow and branch management', trigger: 'Read before any git commit, push, or PR operation' },
+  { name: 'testing', file: 'prj-testing-standard.md', description: 'Testing philosophy and practices', trigger: 'Read before running or writing tests' },
+  { name: 'mcp', file: 'prj-mcp-usage-standard.md', description: 'MCP tool usage patterns', trigger: 'Read before using MCP tools' },
+  { name: 'docs', file: 'prj-documentation-standard.md', description: 'Documentation organization', trigger: 'Read before creating or modifying documentation' },
+  { name: 'prompts', file: 'prj-prompt-writing-standard.md', description: 'How to write and modify prompts', trigger: 'Read before modifying prompt or standard files' },
 ];
 
 export function initCommand(program: Command): void {
@@ -514,11 +514,16 @@ const MARR_PROJECT_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable --
 function createMarrProjectClaudeMd(marrPath: string, _targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
   const destPath = join(marrPath, 'MARR-PROJECT-CLAUDE.md');
 
-  // Build standards import (must be near top of file for Claude Code to load)
-  let standardsImport = '';
+  // Build standards section with trigger conditions (not @ imports)
+  let standardsSection = '';
   if (selectedStandards.length > 0) {
-    standardsImport = `
-@.claude/marr/standards/
+    const standardLines = selectedStandards.map(std =>
+      `- **${std.description}** (\`.claude/marr/standards/${std.file}\`): ${std.trigger}`
+    ).join('\n');
+    standardsSection = `
+## Standards
+
+${standardLines}
 `;
   }
 
@@ -534,7 +539,7 @@ function createMarrProjectClaudeMd(marrPath: string, _targetDir: string, selecte
 > - Project config: This file (project-specific standards and context)
 >
 > **Precedence:** Project overrides user for technical standards; user preferences preserved.
-${standardsImport}
+${standardsSection}
 ## Project Overview
 
 Add project description, tech stack, and key architecture notes here.

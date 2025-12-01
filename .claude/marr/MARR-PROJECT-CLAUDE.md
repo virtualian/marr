@@ -6,7 +6,12 @@
 > This file provides project-level configuration.
 > It is imported by `./CLAUDE.md` at the project root.
 
-@.claude/marr/standards/
+## Standards
+
+- **Git Workflow** (`.claude/marr/standards/prj-git-workflow-standard.md`): Read before any git commit, push, or PR operation
+- **Testing** (`.claude/marr/standards/prj-testing-standard.md`): Read before running or writing tests
+- **Documentation** (`.claude/marr/standards/prj-documentation-standard.md`): Read before creating or modifying documentation
+- **MCP Usage** (`.claude/marr/standards/prj-mcp-usage-standard.md`): Read before using MCP tools
 
 ## Project Overview
 
