@@ -1,6 +1,10 @@
-# marr
+# MARR Project Configuration
 
-> Project-specific configuration for MARR (Making Agents Really Reliable)
+> **MARR (Making Agents Really Reliable)** - A Claude Code configuration system.
+> See: https://github.com/virtualian/marr#readme
+>
+> This file provides project-level configuration.
+> It is imported by `./CLAUDE.md` at the project root.
 
 @.claude/marr/standards/
 

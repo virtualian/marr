@@ -163,7 +163,10 @@ function createMarrClaudeMd(): void {
 
   const content = `# MARR User Configuration
 
-> This file is managed by MARR (Making Agents Really Reliable).
+> **MARR (Making Agents Really Reliable)** - A Claude Code configuration system.
+> See: https://github.com/virtualian/marr#readme
+>
+> This file provides user-level preferences applied across all projects.
 > Claude Code loads this via import from ~/.claude/CLAUDE.md
 
 ## Personal Preferences
