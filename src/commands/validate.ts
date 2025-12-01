@@ -23,10 +23,10 @@ export function validateCommand(program: Command): void {
     .option('--strict', 'Treat warnings as errors (exit code 1)')
     .addHelpText('after', `
 What it checks:
-  • MARR-PROJECT-CLAUDE.md exists and has required sections
-  • .claude/marr/ directory exists with standard files
-  • Prompt files follow naming convention (prj-*, user-*)
-  • All @.claude/marr/ references in MARR-PROJECT-CLAUDE.md are valid
+  • .claude/marr/MARR-PROJECT-CLAUDE.md exists and has required sections
+  • .claude/marr/standards/ directory exists with standard files
+  • Prompt files follow naming convention (prj-*)
+  • CLAUDE.md has MARR import line
 
 Examples:
   $ marr validate              Standard validation (warnings allowed)
@@ -66,55 +66,51 @@ function validateProject(_options: ValidateOptions): ValidationResult {
     return result;
   }
 
-  // Validate CLAUDE.md structure
-  validateClaudeMd(result);
+  // Validate MARR-PROJECT-CLAUDE.md structure
+  validateMarrProjectClaudeMd(result);
 
-  // Validate .marr directory
-  validateMarrDirectory(result);
+  // Validate standards directory
+  validateStandardsDirectory(result);
 
-  // Validate prompt file naming
-  validatePromptNaming(result);
+  // Validate standard file naming
+  validateStandardNaming(result);
 
-  // Validate prompt references
-  validatePromptReferences(result);
+  // Validate root CLAUDE.md has import
+  validateRootClaudeMd(result);
 
   return result;
 }
 
 function validateMarrProject(result: ValidationResult): void {
-  const claudeMdPath = join(process.cwd(), 'MARR-PROJECT-CLAUDE.md');
+  const marrDir = join(process.cwd(), '.claude', 'marr');
+  const marrProjectClaudeMdPath = join(marrDir, 'MARR-PROJECT-CLAUDE.md');
 
-  if (!fileOps.exists(claudeMdPath)) {
-    result.errors.push('MARR-PROJECT-CLAUDE.md not found in current directory');
+  if (!fileOps.exists(marrDir)) {
+    result.errors.push('.claude/marr/ directory not found');
     result.errors.push('This does not appear to be a MARR-initialized project');
+    result.errors.push('Run: marr init --project');
     return;
   }
 
-  logger.success('MARR-PROJECT-CLAUDE.md exists');
+  if (!fileOps.exists(marrProjectClaudeMdPath)) {
+    result.errors.push('.claude/marr/MARR-PROJECT-CLAUDE.md not found');
+    result.errors.push('Run: marr init --project --force');
+    return;
+  }
+
+  logger.success('.claude/marr/MARR-PROJECT-CLAUDE.md exists');
 }
 
-function validateClaudeMd(result: ValidationResult): void {
-  const claudeMdPath = join(process.cwd(), 'MARR-PROJECT-CLAUDE.md');
-  const content = fileOps.readFile(claudeMdPath);
+function validateMarrProjectClaudeMd(result: ValidationResult): void {
+  const marrProjectClaudeMdPath = join(process.cwd(), '.claude', 'marr', 'MARR-PROJECT-CLAUDE.md');
+  const content = fileOps.readFile(marrProjectClaudeMdPath);
 
   // Check for required sections
-  const requiredSections = [
-    'Project Overview',
-    'Project-level configuration',
-  ];
-
-  for (const section of requiredSections) {
-    if (!content.includes(section)) {
-      result.warnings.push(`CLAUDE.md missing recommended section: "${section}"`);
-    }
+  if (!content.includes('Project Overview')) {
+    result.warnings.push('MARR-PROJECT-CLAUDE.md missing "Project Overview" section');
   }
 
-  // Check for Layer 2 marker
-  if (!content.includes('Layer 2 of 2')) {
-    result.warnings.push('CLAUDE.md missing "Layer 2 of 2" configuration marker');
-  }
-
-  // Check for project name
+  // Check for project name heading
   const lines = content.split('\n');
   const firstHeading = lines.find(line => line.startsWith('# '));
   if (!firstHeading) {
@@ -124,45 +120,46 @@ function validateClaudeMd(result: ValidationResult): void {
   logger.success('MARR-PROJECT-CLAUDE.md structure validated');
 }
 
-function validateMarrDirectory(result: ValidationResult): void {
-  const marrDir = join(process.cwd(), '.claude', 'marr');
+function validateStandardsDirectory(result: ValidationResult): void {
+  const standardsDir = join(process.cwd(), '.claude', 'marr', 'standards');
 
-  if (!fileOps.exists(marrDir)) {
-    result.errors.push('.claude/marr/ directory not found');
+  if (!fileOps.exists(standardsDir)) {
+    result.warnings.push('.claude/marr/standards/ directory not found');
+    result.warnings.push('  No project standards installed. Run: marr init --project --standards all');
     return;
   }
 
-  if (!fileOps.isDirectory(marrDir)) {
-    result.errors.push('.claude/marr/ exists but is not a directory');
+  if (!fileOps.isDirectory(standardsDir)) {
+    result.errors.push('.claude/marr/standards exists but is not a directory');
     return;
   }
 
-  // Check for required prompt files
-  const requiredPrompts = [
+  // Check for recommended standard files
+  const recommendedStandards = [
     'prj-git-workflow-standard.md',
     'prj-testing-standard.md',
     'prj-mcp-usage-standard.md',
     'prj-documentation-standard.md',
   ];
 
-  for (const prompt of requiredPrompts) {
-    const promptPath = join(marrDir, prompt);
-    if (!fileOps.exists(promptPath)) {
-      result.warnings.push(`Missing recommended prompt: ${prompt}`);
+  for (const standard of recommendedStandards) {
+    const standardPath = join(standardsDir, standard);
+    if (!fileOps.exists(standardPath)) {
+      result.warnings.push(`Missing recommended standard: standards/${standard}`);
     }
   }
 
-  logger.success('.claude/marr/ directory validated');
+  logger.success('.claude/marr/standards/ directory validated');
 }
 
-function validatePromptNaming(result: ValidationResult): void {
-  const marrDir = join(process.cwd(), '.claude', 'marr');
+function validateStandardNaming(result: ValidationResult): void {
+  const standardsDir = join(process.cwd(), '.claude', 'marr', 'standards');
 
-  if (!fileOps.exists(marrDir)) {
-    return; // Already reported error
+  if (!fileOps.exists(standardsDir)) {
+    return; // Already reported warning
   }
 
-  const files = fileOps.listFiles(marrDir, false);
+  const files = fileOps.listFiles(standardsDir, false);
 
   for (const file of files) {
     const filename = file.substring(file.lastIndexOf('/') + 1);
@@ -178,52 +175,47 @@ function validatePromptNaming(result: ValidationResult): void {
     }
 
     // Check naming convention
-    if (!filename.startsWith('prj-') && !filename.startsWith('user-')) {
-      result.warnings.push(`Prompt file doesn't follow naming convention: ${filename}`);
-      result.warnings.push('  Expected: prj-* or user-*');
-    }
-
-    // Warn about user-level prompts in project .claude/marr/
-    if (filename.startsWith('user-')) {
-      result.warnings.push(`User-level prompt found in project .claude/marr/: ${filename}`);
-      result.warnings.push('  User-level prompts should be in ~/.claude/marr/');
+    if (!filename.startsWith('prj-')) {
+      result.warnings.push(`Standard file doesn't follow naming convention: ${filename}`);
+      result.warnings.push('  Expected: prj-*');
     }
   }
 
-  logger.success('Prompt file naming validated');
+  logger.success('Standard file naming validated');
 }
 
-function validatePromptReferences(result: ValidationResult): void {
-  const claudeMdPath = join(process.cwd(), 'MARR-PROJECT-CLAUDE.md');
+function validateRootClaudeMd(result: ValidationResult): void {
+  const rootClaudeMdPath = join(process.cwd(), 'CLAUDE.md');
+  const dotClaudeClaudeMdPath = join(process.cwd(), '.claude', 'CLAUDE.md');
+  const importLine = '@.claude/marr/MARR-PROJECT-CLAUDE.md';
+
+  // Check both possible CLAUDE.md locations
+  let claudeMdPath: string | null = null;
+  let location = '';
+
+  if (fileOps.exists(rootClaudeMdPath)) {
+    claudeMdPath = rootClaudeMdPath;
+    location = 'CLAUDE.md';
+  } else if (fileOps.exists(dotClaudeClaudeMdPath)) {
+    claudeMdPath = dotClaudeClaudeMdPath;
+    location = '.claude/CLAUDE.md';
+  }
+
+  if (!claudeMdPath) {
+    result.warnings.push('CLAUDE.md not found (checked ./CLAUDE.md and ./.claude/CLAUDE.md)');
+    result.warnings.push('  Claude Code may not discover MARR configuration');
+    result.warnings.push('  Run: marr init --project --force');
+    return;
+  }
+
   const content = fileOps.readFile(claudeMdPath);
 
-  // Check for folder reference (preferred pattern)
-  const hasFolderRef = content.includes('@.claude/marr/') &&
-    (content.match(/@\.marr\/\s/) || content.match(/@\.marr\/$/m) || content.includes('@.claude/marr/\n'));
-
-  // Find individual @.claude/marr/*.md references
-  const promptRefs = content.match(/@\.marr\/[\w-]+\.md/g) || [];
-
-  if (!hasFolderRef && promptRefs.length === 0) {
-    result.warnings.push('No prompt references found in MARR-PROJECT-CLAUDE.md');
-    result.warnings.push('  Consider using @.claude/marr/ folder reference');
-  }
-
-  // Validate individual file references if present
-  for (const ref of promptRefs) {
-    const filename = ref.substring('@.claude/marr/'.length);
-    const promptPath = join(process.cwd(), '.claude', 'marr', filename);
-
-    if (!fileOps.exists(promptPath)) {
-      result.errors.push(`Broken prompt reference: ${ref}`);
-      result.errors.push(`  File not found: .claude/marr/${filename}`);
-    }
-  }
-
-  if (hasFolderRef) {
-    logger.success('Prompt folder reference validated (@.claude/marr/)');
-  } else if (promptRefs.length > 0) {
-    logger.success('Prompt file references validated');
+  if (!content.includes(importLine)) {
+    result.warnings.push(`${location} missing MARR import line`);
+    result.warnings.push(`  Expected: ${importLine}`);
+    result.warnings.push('  Run: marr init --project --force');
+  } else {
+    logger.success(`${location} has MARR import`);
   }
 }
 

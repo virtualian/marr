@@ -5,11 +5,14 @@
 > This is the Project-level configuration (Layer 2 of 2):
 >
 > - User file: `~/.claude/CLAUDE.md` - contains User preferences & default standards
-> - This file: `./MARR-PROJECT-CLAUDE.md` (at project root) contains Project-specific technical overrides
+> - This file: `./CLAUDE.md` (at project root) contains Project-specific technical overrides
 >
 > **Precedence**
 >
-> Project `./MARR-PROJECT-CLAUDE.md` overrides technical standards but preserves personal preferences.
+> Project `./CLAUDE.md` overrides technical standards but preserves personal preferences.
+
+<!-- MARR: Making Agents Really Reliable -->
+@.claude/marr/MARR-PROJECT-CLAUDE.md
 
 ## Project Overview
 
@@ -27,7 +30,7 @@
 ## Startup Imperatives
 
 When starting work in this repository:
-- Read all standards in ./.claude/marr/
+- Read all standards in ./prompts/
 
 ## Project-Specific Reminders
 
@@ -47,14 +50,14 @@ Show user exactly what will be committed/pushed before taking action.
 
 ## Standards Compliance
 
-This project follows the standards defined in @.claude/marr/
+This project follows the standards defined in @.claude/marr/standards/
 
 ## Documentation Organization
 
 - `docs/` - Functional specification and technical documentation
 - `examples/` - Real-world configuration examples from active projects
 - `plans/` - Implementation plans for building the system
-- `.claude/marr/` - Project-level standard prompt files
+- `.claude/marr/standards/` - Project-level standard files
 
 ## Development
 
@@ -65,4 +68,4 @@ This repository is currently in the scaffold/planning phase:
 
 ## Meta-Note
 
-This MARR-PROJECT-CLAUDE.md was created following the unified standards approach defined in this repo's own functional specification. It serves as a reference implementation.
+This CLAUDE.md was created following the unified standards approach defined in this repo's own functional specification. It serves as a reference implementation.

@@ -1,4 +1,4 @@
-# Project Prompts
+# Project Standards
 
 This directory contains **project-specific standards** that Claude Code follows when working in this repository.
 
@@ -10,18 +10,16 @@ This directory contains **project-specific standards** that Claude Code follows 
 | `prj-testing-standard.md` | Testing approach for this project |
 | `prj-mcp-usage-standard.md` | MCP tool usage for this project |
 | `prj-documentation-standard.md` | Documentation organization for this project |
+| `prj-prompt-writing-standard.md` | How to write and modify prompts |
 
 ## How It Works
 
-The project `CLAUDE.md` references these files:
+The project `MARR-PROJECT-CLAUDE.md` references this folder:
 ```markdown
-@.claude/marr/prj-git-workflow-standard.md
-@.claude/marr/prj-testing-standard.md
-@.claude/marr/prj-mcp-usage-standard.md
-@.claude/marr/prj-documentation-standard.md
+@.claude/marr/standards/
 ```
 
-Claude Code loads them when starting work in this project.
+Claude Code auto-discovers and loads all `.md` files when starting work in this project.
 
 ## Customization
 
@@ -43,6 +41,6 @@ These project standards **extend or override** the user-level standards in `~/.c
 ## Validation
 
 Run `marr validate` to check that:
-- All required prompt files exist
+- All required standard files exist
 - Naming conventions are followed
 - CLAUDE.md references are valid
