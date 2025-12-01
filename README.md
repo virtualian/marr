@@ -124,11 +124,7 @@ your-project/
     └── marr/
         ├── MARR-PROJECT-CLAUDE.md  # Project-specific AI agent configuration
         ├── README.md               # Explains the MARR structure
-        └── standards/              # Project-level standards (if installed)
-            ├── prj-git-workflow-standard.md
-            ├── prj-testing-standard.md
-            ├── prj-mcp-usage-standard.md
-            ├── prj-documentation-standard.md
+        └── standards/              # Project-level standards (prj-*.md files)
             └── README.md
 ```
 
@@ -216,10 +212,8 @@ marr clean --all
 ### Standard Prompt Files
 
 **Project-Level** (apply to specific project):
-- `prj-git-workflow-standard.md` - Branch management, commit conventions
-- `prj-testing-standard.md` - Testing philosophy and principles
-- `prj-mcp-usage-standard.md` - MCP tool usage patterns
-- `prj-documentation-standard.md` - Documentation organization
+
+Standards use the `prj-*.md` naming pattern and cover core development concerns: git workflow, testing, MCP usage, documentation, and prompt writing.
 
 Standards live at project level only, keeping projects self-contained and allowing per-project customization.
 

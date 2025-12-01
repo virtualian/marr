@@ -2,15 +2,15 @@
 
 This directory contains **project-specific standards** that Claude Code follows when working in this repository.
 
-## Files
+## Contents
 
-| File | Purpose |
-|------|---------|
-| `prj-git-workflow-standard.md` | Git branching, commits, PRs for this project |
-| `prj-testing-standard.md` | Testing approach for this project |
-| `prj-mcp-usage-standard.md` | MCP tool usage for this project |
-| `prj-documentation-standard.md` | Documentation organization for this project |
-| `prj-prompt-writing-standard.md` | How to write and modify prompts |
+All files follow the `prj-*.md` naming pattern and cover core development concerns:
+
+- Git workflow (branching, commits, PRs)
+- Testing philosophy and approach
+- MCP tool usage patterns
+- Documentation organization
+- Prompt writing guidelines
 
 ## How It Works
 

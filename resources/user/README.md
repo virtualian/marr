@@ -13,12 +13,7 @@ User-level configuration (`~/.claude/marr/`) contains **personal preferences** t
 
 ## What Doesn't Go at User Level
 
-**Standards and prompts belong at project level**, not user level:
-
-- Git workflow standards → `./.claude/marr/prj-git-workflow-standard.md`
-- Testing standards → `./.claude/marr/prj-testing-standard.md`
-- MCP usage standards → `./.claude/marr/prj-mcp-usage-standard.md`
-- Documentation standards → `./.claude/marr/prj-documentation-standard.md`
+**Standards belong at project level**, not user level. All `prj-*.md` files live in the project's `.claude/marr/standards/` directory, covering git workflow, testing, MCP usage, documentation, and prompts.
 
 This keeps projects self-contained and allows per-project customization.
 

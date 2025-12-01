@@ -6,23 +6,18 @@ These standard files define **project-specific standards** that are copied to ea
 
 ```
 project/
-└── common/           # Standard files for all projects
-    ├── prj-git-workflow-standard.md
-    ├── prj-testing-standard.md
-    ├── prj-mcp-usage-standard.md
-    ├── prj-documentation-standard.md
-    └── prj-prompt-writing-standard.md
+└── common/           # Standard files (prj-*.md) for all projects
 ```
 
-## Files
+## Standard Categories
 
-| File | Purpose |
-|------|---------|
-| `prj-git-workflow-standard.md` | Project-specific git rules |
-| `prj-testing-standard.md` | Project-specific testing approach |
-| `prj-mcp-usage-standard.md` | Project-specific MCP usage |
-| `prj-documentation-standard.md` | Project documentation organization |
-| `prj-prompt-writing-standard.md` | How to write effective prompts |
+Standards cover core development concerns:
+
+- **Git workflow** - Branching, commits, PRs
+- **Testing** - Testing philosophy and approach
+- **MCP usage** - Model Context Protocol tool patterns
+- **Documentation** - Project documentation organization
+- **Prompt writing** - How to write effective AI prompts
 
 ## Naming Convention
 
