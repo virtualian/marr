@@ -3,7 +3,7 @@
  *
  * Two modes:
  * - --user: Set up user-level config (~/.claude/marr/, import, helper scripts)
- * - --project: Set up project-level config (./CLAUDE.md, ./.marr/)
+ * - --project: Set up project-level config (./MARR-PROJECT-CLAUDE.md, ./.marr/)
  * - --all: Both user + project
  */
 
@@ -37,7 +37,7 @@ export function initCommand(program: Command): void {
     .command('init')
     .description('Initialize MARR configuration')
     .option('-u, --user', 'Set up user-level config (~/.claude/marr/, helper scripts)')
-    .option('-p, --project [path]', 'Set up project-level config (./CLAUDE.md, ./.marr/)')
+    .option('-p, --project [path]', 'Set up project-level config (./MARR-PROJECT-CLAUDE.md, ./.marr/)')
     .option('-a, --all [path]', 'Set up both user and project config')
     .option('-s, --standards <value>', 'Standards: all, none, list, or names (git,testing,mcp,docs,prompts)')
     .option('-n, --dry-run', 'Preview what would be created without creating')
@@ -45,7 +45,7 @@ export function initCommand(program: Command): void {
     .addHelpText('after', `
 What gets created:
   --user      ~/.claude/marr/MARR-USER-CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
-  --project   ./CLAUDE.md, ./.marr/*.md, ./docs/, ./plans/
+  --project   ./MARR-PROJECT-CLAUDE.md, ./.marr/*.md, ./docs/, ./plans/
 
 Standards available (use with --project):
   git       Git workflow and branch management
@@ -98,7 +98,7 @@ async function executeInit(options: InitOptions): Promise<void> {
     logger.blank();
     logger.log('Options:');
     logger.log('  -u, --user              Set up user-level config (~/.claude/marr/, helper scripts)');
-    logger.log('  -p, --project [path]    Set up project-level config (./CLAUDE.md, ./.marr/)');
+    logger.log('  -p, --project [path]    Set up project-level config (./MARR-PROJECT-CLAUDE.md, ./.marr/)');
     logger.log('  -a, --all [path]        Set up both user and project config');
     logger.log('  -s, --standards <value> Standards: all, list, or names (git,testing,mcp,docs)');
     logger.log('  -n, --dry-run           Show what would be created without actually creating');
@@ -316,7 +316,7 @@ function checkPath(binDir: string): void {
 
 /**
  * Initialize project-level configuration
- * - Creates ./CLAUDE.md from template
+ * - Creates ./MARR-PROJECT-CLAUDE.md from template
  * - Creates ./.marr/ with project-level standards
  */
 async function initializeProject(targetDir: string, standards: string | undefined, dryRun: boolean, force: boolean): Promise<void> {
@@ -334,12 +334,12 @@ async function initializeProject(targetDir: string, standards: string | undefine
     }
   }
 
-  const claudeMdPath = join(targetDir, 'CLAUDE.md');
+  const claudeMdPath = join(targetDir, 'MARR-PROJECT-CLAUDE.md');
   const marrPath = join(targetDir, '.marr');
 
   // Check if config already exists
   if (fileOps.exists(claudeMdPath) && !force) {
-    logger.warning(`CLAUDE.md already exists at ${targetDir}`);
+    logger.warning(`MARR-PROJECT-CLAUDE.md already exists at ${targetDir}`);
     logger.info('Use --force to overwrite existing configuration');
     return;
   }
@@ -409,7 +409,7 @@ async function initializeProject(targetDir: string, standards: string | undefine
   logger.success('Project configuration created!');
   logger.blank();
   logger.info('Next steps:');
-  logger.log('  1. Review CLAUDE.md and customize for your project');
+  logger.log('  1. Review MARR-PROJECT-CLAUDE.md and customize for your project');
   if (selectedStandards.length > 0) {
     logger.log('  2. Review .marr/ and adjust standards as needed');
   }
@@ -474,7 +474,7 @@ async function selectStandards(): Promise<typeof AVAILABLE_STANDARDS> {
   logger.blank();
 
   if (selected.length === 0) {
-    logger.info('No standards selected. Project will have CLAUDE.md only.');
+    logger.info('No standards selected. Project will have MARR-PROJECT-CLAUDE.md only.');
   } else {
     logger.info(`Selected: ${selected.map(s => s.name).join(', ')}`);
   }
@@ -483,10 +483,10 @@ async function selectStandards(): Promise<typeof AVAILABLE_STANDARDS> {
 }
 
 /**
- * Create project CLAUDE.md from template
+ * Create project MARR-PROJECT-CLAUDE.md from template
  */
 function createProjectClaudeMd(targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
-  const destPath = join(targetDir, 'CLAUDE.md');
+  const destPath = join(targetDir, 'MARR-PROJECT-CLAUDE.md');
 
   // Get project name from directory
   const projectName = targetDir.split('/').pop() || 'Project';
@@ -510,11 +510,11 @@ This project follows the standards defined in @.marr/
 > This is the Project-level configuration (Layer 2 of 2):
 >
 > - User file: \`~/.claude/CLAUDE.md\` - contains User preferences & default standards
-> - This file: \`./CLAUDE.md\` (at project root) contains Project-specific information
+> - This file: \`./MARR-PROJECT-CLAUDE.md\` (at project root) contains Project-specific information
 >
 > **Precedence**
 >
-> Project \`./CLAUDE.md\` overrides technical standards but preserves personal preferences.
+> Project \`./MARR-PROJECT-CLAUDE.md\` overrides technical standards but preserves personal preferences.
 
 ## Project Overview
 
@@ -540,7 +540,7 @@ Document common development tasks, commands, or workflows.
 `;
 
   fileOps.writeFile(destPath, content);
-  logger.success('Created: CLAUDE.md');
+  logger.success('Created: MARR-PROJECT-CLAUDE.md');
 }
 
 /**

@@ -5,11 +5,11 @@
 > This is the Project-level configuration (Layer 2 of 2):
 >
 > - User file: `~/.claude/CLAUDE.md` - contains User preferences & default standards
-> - This file: `./CLAUDE.md` (at project root) contains Project-specific technical overrides
+> - This file: `./MARR-PROJECT-CLAUDE.md` (at project root) contains Project-specific technical overrides
 >
 > **Precedence**
 >
-> Project `./CLAUDE.md` overrides technical standards but preserves personal preferences.
+> Project `./MARR-PROJECT-CLAUDE.md` overrides technical standards but preserves personal preferences.
 
 ## Project Overview
 
@@ -65,4 +65,4 @@ This repository is currently in the scaffold/planning phase:
 
 ## Meta-Note
 
-This CLAUDE.md was created following the unified standards approach defined in this repo's own functional specification. It serves as a reference implementation.
+This MARR-PROJECT-CLAUDE.md was created following the unified standards approach defined in this repo's own functional specification. It serves as a reference implementation.

@@ -196,12 +196,12 @@ log_blank
 # Test 6: Check generated project files
 log_info "Test 6: Checking generated project files..."
 check_passed=true
-[ -f CLAUDE.md ] && log_info "  ✅ CLAUDE.md exists" || { log_info "  ❌ CLAUDE.md missing"; check_passed=false; }
-[ -d prompts ] && log_info "  ✅ prompts/ directory exists" || { log_info "  ❌ prompts/ missing"; check_passed=false; }
-[ -f prompts/prj-git-workflow-standard.md ] && log_info "  ✅ Git workflow prompt exists" || { log_info "  ❌ Git workflow prompt missing"; check_passed=false; }
-[ -f prompts/prj-testing-standard.md ] && log_info "  ✅ Testing prompt exists" || { log_info "  ❌ Testing prompt missing"; check_passed=false; }
-[ -f prompts/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage prompt exists" || { log_info "  ❌ MCP usage prompt missing"; check_passed=false; }
-[ -f prompts/prj-documentation-standard.md ] && log_info "  ✅ Documentation prompt exists" || { log_info "  ❌ Documentation prompt missing"; check_passed=false; }
+[ -f MARR-PROJECT-CLAUDE.md ] && log_info "  ✅ MARR-PROJECT-CLAUDE.md exists" || { log_info "  ❌ MARR-PROJECT-CLAUDE.md missing"; check_passed=false; }
+[ -d .marr ] && log_info "  ✅ .marr/ directory exists" || { log_info "  ❌ .marr/ missing"; check_passed=false; }
+[ -f .marr/prj-git-workflow-standard.md ] && log_info "  ✅ Git workflow prompt exists" || { log_info "  ❌ Git workflow prompt missing"; check_passed=false; }
+[ -f .marr/prj-testing-standard.md ] && log_info "  ✅ Testing prompt exists" || { log_info "  ❌ Testing prompt missing"; check_passed=false; }
+[ -f .marr/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage prompt exists" || { log_info "  ❌ MCP usage prompt missing"; check_passed=false; }
+[ -f .marr/prj-documentation-standard.md ] && log_info "  ✅ Documentation prompt exists" || { log_info "  ❌ Documentation prompt missing"; check_passed=false; }
 [ -d docs ] && log_info "  ✅ docs/ directory exists" || { log_info "  ❌ docs/ missing"; check_passed=false; }
 [ -d plans ] && log_info "  ✅ plans/ directory exists" || { log_info "  ❌ plans/ missing"; check_passed=false; }
 if $check_passed; then
