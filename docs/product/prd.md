@@ -12,7 +12,7 @@
 **MARR** (Making Agents Really Reliable) is a configuration system that provides AI coding agents with consistent project context and standards across all repositories. The system uses a two-layer approach:
 
 - **User-level** (`~/.claude/marr/`) - Personal preferences and universal standards, integrated with Claude Code via import mechanism
-- **Project-level** (`./CLAUDE.md` + `./prompts/`) - Project-specific requirements and standards
+- **Project-level** (`./CLAUDE.md` + `./.marr/`) - Project-specific requirements and standards
 
 MARR is installed via npm (`npm install -g @virtualian/marr`) and configured with a simple CLI.
 
@@ -124,7 +124,7 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 1. Navigate to project directory
 2. Run: `marr init --project`
 3. System confirms target directory
-4. System creates `./CLAUDE.md` and `./prompts/` with project standards
+4. System creates `./CLAUDE.md` and `./.marr/` with project standards
 5. Developer customizes project-specific details
 6. AI agent immediately understands project standards
 
@@ -163,7 +163,7 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 
 **CR1: Two-Layer Configuration Model**
 - User-level standards in `~/.claude/marr/` (universal preferences)
-- Project-level standards in `./CLAUDE.md` and `./prompts/` (project-specific)
+- Project-level standards in `./CLAUDE.md` and `./.marr/` (project-specific)
 - Claude Code integration via import mechanism (`@~/.claude/marr/CLAUDE.md`)
 - Clear precedence: Project technical requirements override user preferences
 - **Rationale:** Separates personal from project-specific standards; integrates with Claude Code's native import system
@@ -197,7 +197,7 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 
 **CR6: Naming and Discovery**
 - Consistent naming conventions (`user-*`, `prj-*`)
-- Clear reference syntax (`@prompts/`, `@~/.claude/marr/prompts/`)
+- Clear reference syntax (`@.marr/`, `@~/.claude/marr/`)
 - Self-documenting file structure
 - **Rationale:** Discoverability and consistency
 
@@ -256,7 +256,7 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 └─────────────────────────────────────────┘
                  ↓ inherits
 ┌─────────────────────────────────────────┐
-│  Project Level (./CLAUDE.md, ./prompts/)│
+│  Project Level (./CLAUDE.md, ./.marr/)  │
 │  - Project-specific requirements        │
 │  - Domain standards (UI/UX, docs, etc.) │
 │  - Technical constraints                │
@@ -320,7 +320,7 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 ```
 project-root/
 ├── CLAUDE.md                    # Project configuration
-├── prompts/                     # Project-level standards
+├── .marr/                       # Project-level standards
 │   ├── prj-git-workflow-standard.md
 │   ├── prj-testing-standard.md
 │   ├── prj-mcp-usage-standard.md

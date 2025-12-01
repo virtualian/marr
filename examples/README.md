@@ -46,7 +46,7 @@ Contains personal preferences and standards that apply across ALL projects:
 
 Full two-layer configuration system:
 - Project CLAUDE.md references prompt files
-- Project-specific standards in `./prompts/`
+- Project-specific standards in `./.marr/`
 - May include domain-specific standards (UI/UX, documentation, etc.)
 
 ### Project-Level: Simplified
@@ -85,7 +85,7 @@ All prompt files follow WHAT/WHY structure (never HOW):
 ### Naming Conventions
 - User prompts: `user-{standard-name}.md`
 - Project prompts: `prj-{standard-name}.md` or `prompt-{standard-name}.md`
-- Reference syntax: `@prompts/filename.md` or `@~/.claude/prompts/filename.md`
+- Reference syntax: `@.marr/filename.md` or `@~/.claude/marr/filename.md`
 
 ## Target State (Per Functional Spec)
 

@@ -1,6 +1,6 @@
 # Project-Level Prompt Templates
 
-These prompt files define **project-specific standards** that are copied to each project's `prompts/` directory during `marr init --project`.
+These prompt files define **project-specific standards** that are copied to each project's `.marr/` directory during `marr init --project`.
 
 ## Structure
 
@@ -28,14 +28,14 @@ Project-level prompts use the `prj-` prefix to distinguish them from user-level 
 
 ## How They Work
 
-1. `marr init --project` copies `common/` files to `./prompts/`
-2. Project `CLAUDE.md` references them with `@prompts/` (folder reference)
+1. `marr init --project` copies `common/` files to `./.marr/`
+2. Project `CLAUDE.md` references them with `@.marr/` (folder reference)
 3. Claude Code loads all prompts in the folder when working in that project
-4. New standards added to `prompts/` are automatically discovered
+4. New standards added to `.marr/` are automatically discovered
 
 ## Customization
 
-After initialization, edit the files in your project's `prompts/` directory to match project requirements. Changes are version-controlled with your project.
+After initialization, edit the files in your project's `.marr/` directory to match project requirements. Changes are version-controlled with your project.
 
 ## Relationship to User-Level Prompts
 

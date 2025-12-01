@@ -3,7 +3,7 @@
  *
  * Two modes:
  * - --user: Set up user-level config (~/.claude/marr/, import, helper scripts)
- * - --project: Set up project-level config (./CLAUDE.md, ./prompts/)
+ * - --project: Set up project-level config (./CLAUDE.md, ./.marr/)
  * - --all: Both user + project
  */
 
@@ -37,7 +37,7 @@ export function initCommand(program: Command): void {
     .command('init')
     .description('Initialize MARR configuration')
     .option('-u, --user', 'Set up user-level config (~/.claude/marr/, helper scripts)')
-    .option('-p, --project [path]', 'Set up project-level config (./CLAUDE.md, ./prompts/)')
+    .option('-p, --project [path]', 'Set up project-level config (./CLAUDE.md, ./.marr/)')
     .option('-a, --all [path]', 'Set up both user and project config')
     .option('-s, --standards <value>', 'Standards: all, none, list, or names (git,testing,mcp,docs,prompts)')
     .option('-n, --dry-run', 'Preview what would be created without creating')
@@ -45,7 +45,7 @@ export function initCommand(program: Command): void {
     .addHelpText('after', `
 What gets created:
   --user      ~/.claude/marr/CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
-  --project   ./CLAUDE.md, ./prompts/*.md, ./docs/, ./plans/
+  --project   ./CLAUDE.md, ./.marr/*.md, ./docs/, ./plans/
 
 Standards available (use with --project):
   git       Git workflow and branch management
@@ -98,7 +98,7 @@ async function executeInit(options: InitOptions): Promise<void> {
     logger.blank();
     logger.log('Options:');
     logger.log('  -u, --user              Set up user-level config (~/.claude/marr/, helper scripts)');
-    logger.log('  -p, --project [path]    Set up project-level config (./CLAUDE.md, ./prompts/)');
+    logger.log('  -p, --project [path]    Set up project-level config (./CLAUDE.md, ./.marr/)');
     logger.log('  -a, --all [path]        Set up both user and project config');
     logger.log('  -s, --standards <value> Standards: all, list, or names (git,testing,mcp,docs)');
     logger.log('  -n, --dry-run           Show what would be created without actually creating');
@@ -317,7 +317,7 @@ function checkPath(binDir: string): void {
 /**
  * Initialize project-level configuration
  * - Creates ./CLAUDE.md from template
- * - Creates ./prompts/ with project-level standards
+ * - Creates ./.marr/ with project-level standards
  */
 async function initializeProject(targetDir: string, standards: string | undefined, dryRun: boolean, force: boolean): Promise<void> {
   logger.blank();
@@ -335,7 +335,7 @@ async function initializeProject(targetDir: string, standards: string | undefine
   }
 
   const claudeMdPath = join(targetDir, 'CLAUDE.md');
-  const promptsPath = join(targetDir, 'prompts');
+  const marrPath = join(targetDir, '.marr');
 
   // Check if config already exists
   if (fileOps.exists(claudeMdPath) && !force) {
@@ -374,11 +374,11 @@ async function initializeProject(targetDir: string, standards: string | undefine
 
   if (dryRun) {
     logger.info(`Would create: ${claudeMdPath}`);
-    logger.info(`Would create: ${promptsPath}/`);
+    logger.info(`Would create: ${marrPath}/`);
     for (const std of selectedStandards) {
-      logger.info(`Would create: ${promptsPath}/${std.file}`);
+      logger.info(`Would create: ${marrPath}/${std.file}`);
     }
-    logger.info(`Would create: ${promptsPath}/README.md`);
+    logger.info(`Would create: ${marrPath}/README.md`);
     logger.info(`Would create: ${join(targetDir, 'docs')}/README.md`);
     logger.info(`Would create: ${join(targetDir, 'plans')}/README.md`);
     return;
@@ -387,7 +387,7 @@ async function initializeProject(targetDir: string, standards: string | undefine
   // Create directories
   const dirs = [
     targetDir,
-    promptsPath,
+    marrPath,
     join(targetDir, 'docs'),
     join(targetDir, 'plans'),
   ];
@@ -411,7 +411,7 @@ async function initializeProject(targetDir: string, standards: string | undefine
   logger.info('Next steps:');
   logger.log('  1. Review CLAUDE.md and customize for your project');
   if (selectedStandards.length > 0) {
-    logger.log('  2. Review prompts/ and adjust standards as needed');
+    logger.log('  2. Review .marr/ and adjust standards as needed');
   }
   logger.log('  3. Run: marr validate');
 }
@@ -497,7 +497,7 @@ function createProjectClaudeMd(targetDir: string, selectedStandards: typeof AVAI
   if (selectedStandards.length > 0) {
     standardsSection = `## Standards Compliance
 
-This project follows the standards defined in @prompts/
+This project follows the standards defined in @.marr/
 
 `;
   }
@@ -544,21 +544,21 @@ Document common development tasks, commands, or workflows.
 }
 
 /**
- * Copy project-level prompts to ./prompts/
+ * Copy project-level prompts to ./.marr/
  */
 function copyProjectPrompts(targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
   const resourcesDir = marrSetup.getResourcesDir();
   const promptsSource = join(resourcesDir, 'project/common');
-  const promptsDest = join(targetDir, 'prompts');
+  const marrDest = join(targetDir, '.marr');
 
   // Copy selected standard files
   for (const std of selectedStandards) {
     const srcPath = join(promptsSource, std.file);
-    const destPath = join(promptsDest, std.file);
+    const destPath = join(marrDest, std.file);
 
     if (fileOps.exists(srcPath)) {
       fileOps.copyFile(srcPath, destPath);
-      logger.success(`Created: prompts/${std.file}`);
+      logger.success(`Created: .marr/${std.file}`);
     } else {
       logger.warning(`Resource not found: ${std.file}`);
     }
@@ -566,10 +566,10 @@ function copyProjectPrompts(targetDir: string, selectedStandards: typeof AVAILAB
 
   // Always copy README.md
   const readmeSrc = join(promptsSource, 'README.md');
-  const readmeDest = join(promptsDest, 'README.md');
+  const readmeDest = join(marrDest, 'README.md');
   if (fileOps.exists(readmeSrc)) {
     fileOps.copyFile(readmeSrc, readmeDest);
-    logger.success('Created: prompts/README.md');
+    logger.success('Created: .marr/README.md');
   }
 }
 

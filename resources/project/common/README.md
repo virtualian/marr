@@ -15,10 +15,10 @@ This directory contains **project-specific standards** that Claude Code follows 
 
 The project `CLAUDE.md` references these files:
 ```markdown
-@prompts/prj-git-workflow-standard.md
-@prompts/prj-testing-standard.md
-@prompts/prj-mcp-usage-standard.md
-@prompts/prj-documentation-standard.md
+@.marr/prj-git-workflow-standard.md
+@.marr/prj-testing-standard.md
+@.marr/prj-mcp-usage-standard.md
+@.marr/prj-documentation-standard.md
 ```
 
 Claude Code loads them when starting work in this project.
@@ -34,11 +34,11 @@ Edit these files to match your project's specific needs:
 ## Naming Convention
 
 - `prj-` prefix = project-level (this project only)
-- `user-` prefix = user-level (all projects, lives in `~/.claude/marr/prompts/`)
+- `user-` prefix = user-level (all projects, lives in `~/.claude/marr/`)
 
 ## Relationship to User-Level Standards
 
-These project standards **extend or override** the user-level standards in `~/.claude/marr/prompts/`. User personal preferences are preserved; only technical details can be overridden.
+These project standards **extend or override** the user-level standards in `~/.claude/marr/`. User personal preferences are preserved; only technical details can be overridden.
 
 ## Validation
 

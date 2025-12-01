@@ -239,13 +239,13 @@ When creating or modifying prompt files:
 
 - Technical docs go in \`docs/\`
 - Plans go in \`plans/\`
-- Prompts go in \`prompts/\`
+- Prompts go in \`.marr/\`
 - Never place docs in project root unless functionally required
 
 ## Notes
 
 Standards (git workflow, testing, MCP usage, documentation) live at the **project level**
-in each project's \`prompts/\` directory. This keeps projects self-contained and allows
+in each project's \`.marr/\` directory. This keeps projects self-contained and allows
 per-project customization.
 
 Run \`marr init --project\` to set up a new project with standard prompts.

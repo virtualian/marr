@@ -24,9 +24,9 @@ export function validateCommand(program: Command): void {
     .addHelpText('after', `
 What it checks:
   • CLAUDE.md exists and has required sections
-  • prompts/ directory exists with standard files
+  • .marr/ directory exists with standard files
   • Prompt files follow naming convention (prj-*, user-*)
-  • All @prompts/ references in CLAUDE.md are valid
+  • All @.marr/ references in CLAUDE.md are valid
 
 Examples:
   $ marr validate              Standard validation (warnings allowed)
@@ -69,8 +69,8 @@ function validateProject(_options: ValidateOptions): ValidationResult {
   // Validate CLAUDE.md structure
   validateClaudeMd(result);
 
-  // Validate prompts directory
-  validatePromptsDirectory(result);
+  // Validate .marr directory
+  validateMarrDirectory(result);
 
   // Validate prompt file naming
   validatePromptNaming(result);
@@ -124,16 +124,16 @@ function validateClaudeMd(result: ValidationResult): void {
   logger.success('CLAUDE.md structure validated');
 }
 
-function validatePromptsDirectory(result: ValidationResult): void {
-  const promptsDir = join(process.cwd(), 'prompts');
+function validateMarrDirectory(result: ValidationResult): void {
+  const marrDir = join(process.cwd(), '.marr');
 
-  if (!fileOps.exists(promptsDir)) {
-    result.errors.push('prompts/ directory not found');
+  if (!fileOps.exists(marrDir)) {
+    result.errors.push('.marr/ directory not found');
     return;
   }
 
-  if (!fileOps.isDirectory(promptsDir)) {
-    result.errors.push('prompts/ exists but is not a directory');
+  if (!fileOps.isDirectory(marrDir)) {
+    result.errors.push('.marr/ exists but is not a directory');
     return;
   }
 
@@ -146,23 +146,23 @@ function validatePromptsDirectory(result: ValidationResult): void {
   ];
 
   for (const prompt of requiredPrompts) {
-    const promptPath = join(promptsDir, prompt);
+    const promptPath = join(marrDir, prompt);
     if (!fileOps.exists(promptPath)) {
       result.warnings.push(`Missing recommended prompt: ${prompt}`);
     }
   }
 
-  logger.success('prompts/ directory validated');
+  logger.success('.marr/ directory validated');
 }
 
 function validatePromptNaming(result: ValidationResult): void {
-  const promptsDir = join(process.cwd(), 'prompts');
+  const marrDir = join(process.cwd(), '.marr');
 
-  if (!fileOps.exists(promptsDir)) {
+  if (!fileOps.exists(marrDir)) {
     return; // Already reported error
   }
 
-  const files = fileOps.listFiles(promptsDir, false);
+  const files = fileOps.listFiles(marrDir, false);
 
   for (const file of files) {
     const filename = file.substring(file.lastIndexOf('/') + 1);
@@ -183,10 +183,10 @@ function validatePromptNaming(result: ValidationResult): void {
       result.warnings.push('  Expected: prj-* or user-*');
     }
 
-    // Warn about user-level prompts in project prompts/
+    // Warn about user-level prompts in project .marr/
     if (filename.startsWith('user-')) {
-      result.warnings.push(`User-level prompt found in project prompts/: ${filename}`);
-      result.warnings.push('  User-level prompts should be in ~/.claude/marr/prompts/');
+      result.warnings.push(`User-level prompt found in project .marr/: ${filename}`);
+      result.warnings.push('  User-level prompts should be in ~/.claude/marr/');
     }
   }
 
@@ -198,30 +198,30 @@ function validatePromptReferences(result: ValidationResult): void {
   const content = fileOps.readFile(claudeMdPath);
 
   // Check for folder reference (preferred pattern)
-  const hasFolderRef = content.includes('@prompts/') &&
-    (content.match(/@prompts\/\s/) || content.match(/@prompts\/$/m) || content.includes('@prompts/\n'));
+  const hasFolderRef = content.includes('@.marr/') &&
+    (content.match(/@\.marr\/\s/) || content.match(/@\.marr\/$/m) || content.includes('@.marr/\n'));
 
-  // Find individual @prompts/*.md references
-  const promptRefs = content.match(/@prompts\/[\w-]+\.md/g) || [];
+  // Find individual @.marr/*.md references
+  const promptRefs = content.match(/@\.marr\/[\w-]+\.md/g) || [];
 
   if (!hasFolderRef && promptRefs.length === 0) {
     result.warnings.push('No prompt references found in CLAUDE.md');
-    result.warnings.push('  Consider using @prompts/ folder reference');
+    result.warnings.push('  Consider using @.marr/ folder reference');
   }
 
   // Validate individual file references if present
   for (const ref of promptRefs) {
-    const filename = ref.substring('@prompts/'.length);
-    const promptPath = join(process.cwd(), 'prompts', filename);
+    const filename = ref.substring('@.marr/'.length);
+    const promptPath = join(process.cwd(), '.marr', filename);
 
     if (!fileOps.exists(promptPath)) {
       result.errors.push(`Broken prompt reference: ${ref}`);
-      result.errors.push(`  File not found: prompts/${filename}`);
+      result.errors.push(`  File not found: .marr/${filename}`);
     }
   }
 
   if (hasFolderRef) {
-    logger.success('Prompt folder reference validated (@prompts/)');
+    logger.success('Prompt folder reference validated (@.marr/)');
   } else if (promptRefs.length > 0) {
     logger.success('Prompt file references validated');
   }
