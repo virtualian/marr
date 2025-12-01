@@ -23,11 +23,11 @@ const MARR_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
 const MARR_IMPORT_BLOCK = `${MARR_IMPORT_COMMENT}\n${MARR_IMPORT_LINE}\n`;
 
 /**
- * Get path to bundled templates directory (in npm package)
+ * Get path to bundled resources directory (in npm package)
  */
-export function getTemplatesDir(): string {
-  // In built package: dist/utils/marr-setup.js -> templates/
-  return join(__dirname, '../../templates');
+export function getResourcesDir(): string {
+  // In built package: dist/utils/marr-setup.js -> resources/
+  return join(__dirname, '../../resources');
 }
 
 /**

@@ -13,7 +13,8 @@ set +e
 
 # Load logging utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/lib/logging.sh"
+TESTS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$TESTS_DIR/lib/logging.sh"
 
 # Parse command line arguments
 parse_logging_args "$@"

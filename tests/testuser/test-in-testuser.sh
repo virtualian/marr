@@ -16,7 +16,8 @@ export NVM_DIR="$HOME/.nvm"
 
 # Load logging utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/lib/logging.sh"
+TESTS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$TESTS_DIR/lib/logging.sh"
 
 # Parse command line arguments
 parse_logging_args "$@"
@@ -45,21 +46,21 @@ log_success "Node.js detected: $(node --version)"
 log_success "npm version: $(npm --version)"
 log_blank
 
-# Configuration - find package directory relative to this script
-PACKAGE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-TARBALL="$PACKAGE_DIR/virtualian-marr-1.0.0.tgz"
+# Configuration - find tarball in tests directory
+PROJECT_ROOT="$(cd "$TESTS_DIR/.." && pwd)"
+TARBALL=$(ls -t "$TESTS_DIR"/virtualian-marr-*.tgz 2>/dev/null | head -1)
 
-log_info "📍 Package directory: $PACKAGE_DIR"
+log_info "📍 Project root: $PROJECT_ROOT"
 log_debug "Tarball path: $TARBALL"
 log_blank
 
 # Check if tarball exists
-if [ ! -f "$TARBALL" ]; then
-    log_error "ERROR: Tarball not found at $TARBALL"
+if [ -z "$TARBALL" ] || [ ! -f "$TARBALL" ]; then
+    log_error "ERROR: Tarball not found in $TESTS_DIR"
     log_blank
     log_info "Run this first to build the tarball:"
-    log_info "  cd $PACKAGE_DIR"
-    log_info "  bash scripts/build-test-tarball.sh"
+    log_info "  cd $PROJECT_ROOT"
+    log_info "  npm run build"
     exit 1
 fi
 

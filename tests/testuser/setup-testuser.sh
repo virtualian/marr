@@ -12,17 +12,18 @@ set -e
 
 # Find script location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PACKAGE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+TESTS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$TESTS_DIR/.." && pwd)"
 
 # Load logging utilities
-source "$SCRIPT_DIR/lib/logging.sh"
+source "$TESTS_DIR/lib/logging.sh"
 
 # Parse command line arguments
 parse_logging_args "$@"
 
 log_step "🔧" "Setting up testuser environment for MARR testing..."
 log_debug "Script directory: $SCRIPT_DIR"
-log_debug "Package directory: $PACKAGE_DIR"
+log_debug "Project root: $PROJECT_ROOT"
 
 # Install nvm if not already installed
 if [ ! -d "$HOME/.nvm" ]; then

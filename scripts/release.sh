@@ -1,11 +1,8 @@
 #!/bin/bash
 #
-# Release script for MARR package (monorepo structure)
+# Release script for MARR package
 #
 # Usage: ./scripts/release.sh [major|minor|patch]
-#
-# This script handles versioning in the package/ subdirectory and creates
-# proper git commits and tags at the repo root level.
 #
 
 set -e
@@ -17,7 +14,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Check we're at repo root
-if [ ! -f "CLAUDE.md" ] || [ ! -d "package" ]; then
+if [ ! -f "CLAUDE.md" ] || [ ! -f "package.json" ]; then
     echo -e "${RED}Error: Run this script from the repository root${NC}"
     echo "  cd /path/to/marr && ./scripts/release.sh patch"
     exit 1
@@ -39,7 +36,6 @@ if ! git diff --quiet HEAD; then
 fi
 
 # Get current version
-cd package
 CURRENT_VERSION=$(node -p "require('./package.json').version")
 echo -e "${YELLOW}Current version: $CURRENT_VERSION${NC}"
 
@@ -84,11 +80,8 @@ echo "Building..."
 npm run build
 echo -e "${GREEN}Build successful${NC}"
 
-# Go back to repo root for git operations
-cd ..
-
 # Stage and commit
-git add package/package.json
+git add package.json
 git commit -m "$NEW_VERSION"
 echo -e "${GREEN}Created commit: $NEW_VERSION${NC}"
 
@@ -103,6 +96,6 @@ echo ""
 echo "Next steps:"
 echo "  1. Review: git log --oneline -3"
 echo "  2. Push:   git push origin main --tags"
-echo "  3. Publish: cd package && npm publish --access public"
+echo "  3. Publish: npm publish --access public"
 echo ""
 echo "Or to undo: git reset --hard HEAD~1 && git tag -d v$NEW_VERSION"
