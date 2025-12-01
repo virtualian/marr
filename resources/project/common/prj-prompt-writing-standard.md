@@ -104,8 +104,8 @@ Prompts are directive documents that guide AI agent behavior. They follow the sa
 - Examples: `prj-git-workflow-standard.md`, `prj-testing-standard.md`
 
 **Location:**
-- All prompts live in `prompts/` directory
-- Referenced from `CLAUDE.md` using `@prompts/filename.md` syntax
+- All prompts live in `.claude/marr/` directory
+- Referenced from `CLAUDE.md` using `@.claude/marr/filename.md` syntax
 
 ---
 

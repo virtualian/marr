@@ -10,7 +10,7 @@
 MARR provides a two-layer configuration system for AI agents (Claude Code first):
 
 1. **User-level configuration** (`~/.claude/marr/`) - Personal preferences and universal standards
-2. **Project-level configuration** (`./CLAUDE.md` + `./prompts/`) - Project-specific technical requirements
+2. **Project-level configuration** (`./CLAUDE.md` imports `./.claude/marr/MARR-PROJECT-CLAUDE.md`) - Project-specific technical requirements
 
 **Key principle**: All repositories use the same comprehensive standards (git workflow, testing, MCP usage) regardless of project type or technology stack.
 
@@ -49,7 +49,7 @@ marr init [options]
 
 **Options:**
 - `-u, --user` - Set up user-level config (~/.claude/marr/, helper scripts in ~/bin/)
-- `-p, --project [path]` - Set up project-level config (./CLAUDE.md, ./prompts/)
+- `-p, --project [path]` - Set up project-level config (./MARR-PROJECT-CLAUDE.md, ./.claude/marr/)
 - `-a, --all [path]` - Set up both user and project config
 - `-s, --standards <value>` - Standards to install: `all`, `list`, `none`, or comma-separated names
 - `-n, --dry-run` - Show what would be created without actually creating
@@ -107,11 +107,11 @@ marr init --project --force
 ~/.claude/
 ├── CLAUDE.md                   # Updated with MARR import
 └── marr/
-    └── CLAUDE.md               # Personal preferences
+    └── MARR-USER-CLAUDE.md     # Personal preferences
 
 ~/bin/
-├── gh-add-subissue.sh          # GitHub helper script
-└── gh-list-subissue.sh         # GitHub helper script
+├── marr-gh-add-subissue.sh     # GitHub helper script
+└── marr-gh-list-subissues.sh   # GitHub helper script
 ```
 
 Note: Standards (git workflow, testing, MCP usage) live at **project level** only. This keeps projects self-contained and allows per-project customization.
@@ -119,17 +119,20 @@ Note: Standards (git workflow, testing, MCP usage) live at **project level** onl
 **What `--project` creates:**
 ```
 your-project/
-├── CLAUDE.md                   # Project configuration (references @prompts/)
-├── prompts/
-│   ├── prj-git-workflow-standard.md
-│   ├── prj-testing-standard.md
-│   ├── prj-mcp-usage-standard.md
-│   └── prj-documentation-standard.md
-├── docs/                       # Documentation
-└── plans/                      # Implementation plans
+├── CLAUDE.md                       # Project root config (imports MARR config)
+└── .claude/
+    └── marr/
+        ├── MARR-PROJECT-CLAUDE.md  # Project-specific AI agent configuration
+        ├── README.md               # Explains the MARR structure
+        └── standards/              # Project-level standards (if installed)
+            ├── prj-git-workflow-standard.md
+            ├── prj-testing-standard.md
+            ├── prj-mcp-usage-standard.md
+            ├── prj-documentation-standard.md
+            └── README.md
 ```
 
-Note: CLAUDE.md references `@prompts/` as a folder, so new standards added to `prompts/` are automatically discovered.
+Note: If `./CLAUDE.md` already exists, MARR adds an import line to it. MARR-PROJECT-CLAUDE.md references `@.claude/marr/standards/` for automatic standard discovery.
 
 ### `marr validate`
 
@@ -144,11 +147,11 @@ marr validate [options]
 - `--strict` - Fail on warnings (treat warnings as errors)
 
 **What it checks:**
-- CLAUDE.md exists and has required sections
-- prompts/ directory exists
+- .claude/marr/MARR-PROJECT-CLAUDE.md exists and has required sections
+- .claude/marr/standards/ directory exists
 - Required prompt files present
-- Naming conventions followed (user-*, prj-*)
-- Prompt references (@prompts/) are valid
+- Naming conventions followed (prj-*)
+- CLAUDE.md has MARR import line
 - No broken file references
 
 **Examples:**
@@ -175,7 +178,7 @@ marr clean [options]
 
 **Options:**
 - `-u, --user` - Clean user-level config (~/.claude/marr/, helper scripts)
-- `-p, --project` - Clean project-level config (./CLAUDE.md, ./prompts/)
+- `-p, --project` - Clean project-level config (./.claude/marr/, MARR import from ./CLAUDE.md)
 - `-a, --all` - Clean both user and project config
 - `-n, --dry-run` - Show what would be removed without actually removing
 - `-f, --force` - Skip confirmation prompts
@@ -205,10 +208,10 @@ marr clean --all
 - Approval requirements (commits, pushes, PRs)
 - Helper scripts for GitHub sub-issues
 
-**Project Level** (`./CLAUDE.md` and `./prompts/`):
+**Project Level** (`./CLAUDE.md` imports `./.claude/marr/MARR-PROJECT-CLAUDE.md`):
 - Project-specific technical requirements
 - Team conventions
-- All standards (git workflow, testing, MCP usage, documentation)
+- All standards (git workflow, testing, MCP usage, documentation) in `.claude/marr/standards/`
 
 ### Standard Prompt Files
 
@@ -226,10 +229,10 @@ GitHub helper scripts installed to `~/bin/`:
 
 ```bash
 # Link issue #47 as sub-issue of #45
-gh-add-subissue.sh 45 47
+marr-gh-add-subissue.sh 45 47
 
 # List all sub-issues of #45
-gh-list-subissues.sh 45
+marr-gh-list-subissues.sh 45
 ```
 
 **Requirements:**
@@ -350,14 +353,13 @@ export PATH="$(npm config get prefix)/bin:$PATH"
 **Problem:** Running `marr init --project` in a directory that already has CLAUDE.md.
 
 **Solution:**
-This is expected behavior - MARR won't overwrite existing configuration. Either:
-- Remove existing CLAUDE.md first
-- Use `--force` flag to overwrite
-- Initialize in a different directory
+This is expected behavior - MARR will add its import line to your existing CLAUDE.md without overwriting your content. If you want to recreate the MARR import:
+- Use `--force` flag to reset the import
+- Or manually add: `@.claude/marr/MARR-PROJECT-CLAUDE.md` after the first heading
 
 ### Helper scripts not working
 
-**Problem:** `gh-add-subissue.sh` command not found or permission denied.
+**Problem:** `marr-gh-add-subissue.sh` command not found or permission denied.
 
 **Solution:**
 ```bash

@@ -76,7 +76,7 @@ log_debug "Removing ~/.claude/marr..."
 rm -rf ~/.claude/marr
 
 log_debug "Removing helper scripts..."
-rm -f ~/bin/gh-add-subissue.sh ~/bin/gh-list-subissues.sh
+rm -f ~/bin/marr-gh-add-subissue.sh ~/bin/marr-gh-list-subissues.sh
 
 log_debug "Removing test directories..."
 rm -rf ~/marr-test-*
@@ -165,12 +165,12 @@ log_blank
 log_info "Test 4: Checking user-level setup..."
 check_passed=true
 [ -d ~/.claude/marr ] && log_info "  ✅ ~/.claude/marr/ exists" || { log_info "  ❌ ~/.claude/marr/ missing"; check_passed=false; }
-[ -f ~/.claude/marr/CLAUDE.md ] && log_info "  ✅ ~/.claude/marr/CLAUDE.md exists" || { log_info "  ❌ ~/.claude/marr/CLAUDE.md missing"; check_passed=false; }
+[ -f ~/.claude/marr/MARR-USER-CLAUDE.md ] && log_info "  ✅ ~/.claude/marr/MARR-USER-CLAUDE.md exists" || { log_info "  ❌ ~/.claude/marr/MARR-USER-CLAUDE.md missing"; check_passed=false; }
 [ -f ~/.claude/CLAUDE.md ] && log_info "  ✅ ~/.claude/CLAUDE.md exists" || { log_info "  ❌ ~/.claude/CLAUDE.md missing"; check_passed=false; }
-grep -q "@~/.claude/marr/CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
-[ -f ~/bin/gh-add-subissue.sh ] && log_info "  ✅ gh-add-subissue.sh installed" || { log_info "  ❌ gh-add-subissue.sh missing"; check_passed=false; }
-[ -f ~/bin/gh-list-subissues.sh ] && log_info "  ✅ gh-list-subissues.sh installed" || { log_info "  ❌ gh-list-subissues.sh missing"; check_passed=false; }
-[ -x ~/bin/gh-add-subissue.sh ] && log_info "  ✅ Scripts are executable" || { log_info "  ❌ Scripts not executable"; check_passed=false; }
+grep -q "@~/.claude/marr/MARR-USER-CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
+[ -f ~/bin/marr-gh-add-subissue.sh ] && log_info "  ✅ marr-gh-add-subissue.sh installed" || { log_info "  ❌ marr-gh-add-subissue.sh missing"; check_passed=false; }
+[ -f ~/bin/marr-gh-list-subissues.sh ] && log_info "  ✅ marr-gh-list-subissues.sh installed" || { log_info "  ❌ marr-gh-list-subissues.sh missing"; check_passed=false; }
+[ -x ~/bin/marr-gh-add-subissue.sh ] && log_info "  ✅ Scripts are executable" || { log_info "  ❌ Scripts not executable"; check_passed=false; }
 if $check_passed; then
     ((TESTS_PASSED++))
 else
@@ -197,13 +197,15 @@ log_blank
 log_info "Test 6: Checking generated project files..."
 check_passed=true
 [ -f CLAUDE.md ] && log_info "  ✅ CLAUDE.md exists" || { log_info "  ❌ CLAUDE.md missing"; check_passed=false; }
-[ -d prompts ] && log_info "  ✅ prompts/ directory exists" || { log_info "  ❌ prompts/ missing"; check_passed=false; }
-[ -f prompts/prj-git-workflow-standard.md ] && log_info "  ✅ Git workflow prompt exists" || { log_info "  ❌ Git workflow prompt missing"; check_passed=false; }
-[ -f prompts/prj-testing-standard.md ] && log_info "  ✅ Testing prompt exists" || { log_info "  ❌ Testing prompt missing"; check_passed=false; }
-[ -f prompts/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage prompt exists" || { log_info "  ❌ MCP usage prompt missing"; check_passed=false; }
-[ -f prompts/prj-documentation-standard.md ] && log_info "  ✅ Documentation prompt exists" || { log_info "  ❌ Documentation prompt missing"; check_passed=false; }
-[ -d docs ] && log_info "  ✅ docs/ directory exists" || { log_info "  ❌ docs/ missing"; check_passed=false; }
-[ -d plans ] && log_info "  ✅ plans/ directory exists" || { log_info "  ❌ plans/ missing"; check_passed=false; }
+grep -q "@.claude/marr/MARR-PROJECT-CLAUDE.md" CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present in CLAUDE.md" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
+[ -d .claude/marr ] && log_info "  ✅ .claude/marr/ directory exists" || { log_info "  ❌ .claude/marr/ missing"; check_passed=false; }
+[ -f .claude/marr/MARR-PROJECT-CLAUDE.md ] && log_info "  ✅ MARR-PROJECT-CLAUDE.md exists" || { log_info "  ❌ MARR-PROJECT-CLAUDE.md missing"; check_passed=false; }
+[ -f .claude/marr/README.md ] && log_info "  ✅ .claude/marr/README.md exists" || { log_info "  ❌ .claude/marr/README.md missing"; check_passed=false; }
+[ -d .claude/marr/standards ] && log_info "  ✅ .claude/marr/standards/ directory exists" || { log_info "  ❌ .claude/marr/standards/ missing"; check_passed=false; }
+[ -f .claude/marr/standards/prj-git-workflow-standard.md ] && log_info "  ✅ Git workflow standard exists" || { log_info "  ❌ Git workflow standard missing"; check_passed=false; }
+[ -f .claude/marr/standards/prj-testing-standard.md ] && log_info "  ✅ Testing standard exists" || { log_info "  ❌ Testing standard missing"; check_passed=false; }
+[ -f .claude/marr/standards/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage standard exists" || { log_info "  ❌ MCP usage standard missing"; check_passed=false; }
+[ -f .claude/marr/standards/prj-documentation-standard.md ] && log_info "  ✅ Documentation standard exists" || { log_info "  ❌ Documentation standard missing"; check_passed=false; }
 if $check_passed; then
     ((TESTS_PASSED++))
 else

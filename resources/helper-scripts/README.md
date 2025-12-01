@@ -4,19 +4,19 @@ This directory contains helper scripts for GitHub operations that are not yet av
 
 ## Available Scripts
 
-### gh-add-subissue.sh
+### marr-gh-add-subissue.sh
 
 **Purpose:** Link a GitHub issue as a sub-issue of a parent issue using GitHub's GraphQL API.
 
 **Usage:**
 ```bash
-gh-add-subissue.sh <parent-issue-number> <sub-issue-number>
+marr-gh-add-subissue.sh <parent-issue-number> <sub-issue-number>
 ```
 
 **Example:**
 ```bash
 # Link issue #47 as a sub-issue of #45
-gh-add-subissue.sh 45 47
+marr-gh-add-subissue.sh 45 47
 ```
 
 **What it does:**
@@ -27,19 +27,19 @@ gh-add-subissue.sh 45 47
 
 ---
 
-### gh-list-subissues.sh
+### marr-gh-list-subissues.sh
 
 **Purpose:** List all sub-issues of a parent GitHub issue.
 
 **Usage:**
 ```bash
-gh-list-subissues.sh <parent-issue-number>
+marr-gh-list-subissues.sh <parent-issue-number>
 ```
 
 **Example:**
 ```bash
 # List all sub-issues of issue #45
-gh-list-subissues.sh 45
+marr-gh-list-subissues.sh 45
 ```
 
 **What it does:**
@@ -84,7 +84,7 @@ mkdir -p ~/bin
 cp ~/.claude/marr/templates/helper-scripts/*.sh ~/bin/
 
 # Make executable (if not already)
-chmod +x ~/bin/gh-*.sh
+chmod +x ~/bin/marr-*.sh
 
 # Add ~/bin to PATH if not already (add to ~/.zshrc or ~/.bashrc)
 echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
@@ -113,8 +113,8 @@ This will:
 **Test installation:**
 ```bash
 # Should show usage information
-gh-add-subissue.sh
-gh-list-subissues.sh
+marr-gh-add-subissue.sh
+marr-gh-list-subissues.sh
 ```
 
 **Check PATH:**
@@ -189,18 +189,18 @@ Scripts are subject to GitHub's GraphQL API rate limits. For normal usage, this 
 # Main feature: issue #100
 # Sub-tasks: issues #101, #102, #103
 
-gh-add-subissue.sh 100 101
-gh-add-subissue.sh 100 102
-gh-add-subissue.sh 100 103
+marr-gh-add-subissue.sh 100 101
+marr-gh-add-subissue.sh 100 102
+marr-gh-add-subissue.sh 100 103
 
 # View all sub-issues
-gh-list-subissues.sh 100
+marr-gh-list-subissues.sh 100
 ```
 
 **Verify sub-issue relationship:**
 ```bash
 # List sub-issues to confirm they were added
-gh-list-subissues.sh 100
+marr-gh-list-subissues.sh 100
 ```
 
 ---

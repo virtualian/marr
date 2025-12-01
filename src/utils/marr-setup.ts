@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /** Import line that MARR adds to ~/.claude/CLAUDE.md */
-const MARR_IMPORT_LINE = '@~/.claude/marr/CLAUDE.md';
+const MARR_IMPORT_LINE = '@~/.claude/marr/MARR-USER-CLAUDE.md';
 
 /** Comment marker to identify MARR's import */
 const MARR_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
@@ -150,11 +150,11 @@ export function setupMarr(): void {
   // Add import to user's ~/.claude/CLAUDE.md
   addMarrImport();
 
-  logger.success('Created: ~/.claude/marr/CLAUDE.md');
+  logger.success('Created: ~/.claude/marr/MARR-USER-CLAUDE.md');
 }
 
 /**
- * Create MARR's user-level CLAUDE.md at ~/.claude/marr/CLAUDE.md
+ * Create MARR's user-level config at ~/.claude/marr/MARR-USER-CLAUDE.md
  * Contains personal preferences, principles, and core habits
  * Standards (git workflow, testing, etc.) live at project level
  */
@@ -206,7 +206,7 @@ Never assume approval - wait for explicit confirmation.
 When creating or modifying prompt files:
 - Write directives that specify **WHAT** and **WHY**, never **HOW**
 - Never include code, commands, or configuration examples
-- Implementation details belong in project documentation, not prompts
+- Implementation details belong in project documentation, not in prompt/standard files
 - Never modify prompt files without explicit approval
 
 ### Attribution Restrictions
@@ -237,18 +237,26 @@ When creating or modifying prompt files:
 
 ### Documentation Organization
 
-- Technical docs go in \`docs/\`
-- Plans go in \`plans/\`
-- Prompts go in \`prompts/\`
+**Follow project conventions first.** If a project has existing patterns for documentation
+and planning, use them. If not:
+
+- Technical docs: create \`docs/\` if needed
+- Implementation plans: create \`plans/\` if needed
+- MARR standards live in \`.claude/marr/standards/\`
 - Never place docs in project root unless functionally required
+
+**Before creating documentation directories:**
+1. Check if the project already has a documentation structure
+2. Check README or CONTRIBUTING for project conventions
+3. Only create \`docs/\` or \`plans/\` if no existing pattern exists
 
 ## Notes
 
 Standards (git workflow, testing, MCP usage, documentation) live at the **project level**
-in each project's \`prompts/\` directory. This keeps projects self-contained and allows
-per-project customization.
+in each project's \`.claude/marr/standards/\` directory. This keeps projects self-contained
+and allows per-project customization.
 
-Run \`marr init --project\` to set up a new project with standard prompts.
+Run \`marr init --project\` to set up a new project with standards.
 `;
 
   fileOps.writeFile(marrClaudeMdPath, content);

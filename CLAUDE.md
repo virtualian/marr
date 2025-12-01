@@ -11,6 +11,9 @@
 >
 > Project `./CLAUDE.md` overrides technical standards but preserves personal preferences.
 
+<!-- MARR: Making Agents Really Reliable -->
+@.claude/marr/MARR-PROJECT-CLAUDE.md
+
 ## Project Overview
 
 **MARR (Making Agents Really Reliable)** is a Claude Code Project Configuration System that provides:
@@ -47,14 +50,14 @@ Show user exactly what will be committed/pushed before taking action.
 
 ## Standards Compliance
 
-This project follows the standards defined in @prompts/
+This project follows the standards defined in @.claude/marr/standards/
 
 ## Documentation Organization
 
 - `docs/` - Functional specification and technical documentation
 - `examples/` - Real-world configuration examples from active projects
 - `plans/` - Implementation plans for building the system
-- `prompts/` - Project-level standard prompt files
+- `.claude/marr/standards/` - Project-level standard files
 
 ## Development
 

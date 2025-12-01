@@ -60,11 +60,11 @@ fi
 # Remove MARR import from ~/.claude/CLAUDE.md (if it exists)
 log_debug "Checking for MARR import in ~/.claude/CLAUDE.md..."
 if [ -f "$HOME/.claude/CLAUDE.md" ]; then
-    if grep -q "@~/.claude/marr/CLAUDE.md" "$HOME/.claude/CLAUDE.md"; then
+    if grep -q "@~/.claude/marr/MARR-USER-CLAUDE.md" "$HOME/.claude/CLAUDE.md"; then
         log_step "🗑️" "Removing MARR import from ~/.claude/CLAUDE.md..."
         # Remove the MARR import block
         sed -i '' '/<!-- MARR: Making Agents Really Reliable -->/d' "$HOME/.claude/CLAUDE.md"
-        sed -i '' '/@~\/.claude\/marr\/CLAUDE.md/d' "$HOME/.claude/CLAUDE.md"
+        sed -i '' '/@~\/.claude\/marr\/MARR-USER-CLAUDE.md/d' "$HOME/.claude/CLAUDE.md"
         CLEANED+=("MARR import from ~/.claude/CLAUDE.md")
     fi
 fi

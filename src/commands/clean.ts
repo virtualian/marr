@@ -12,8 +12,8 @@ import { removeMarrImport, isMarrSetup, hasMarrImport } from '../utils/marr-setu
 
 /** Helper scripts installed by MARR */
 const HELPER_SCRIPTS = [
-  'gh-add-subissue.sh',
-  'gh-list-subissues.sh',
+  'marr-gh-add-subissue.sh',
+  'marr-gh-list-subissues.sh',
 ];
 
 interface CleanOptions {
@@ -90,41 +90,63 @@ function cleanUser(dryRun: boolean): { removed: string[]; errors: string[] } {
   return { removed, errors };
 }
 
+/** MARR import line in project CLAUDE.md */
+const MARR_PROJECT_IMPORT_LINE = '@.claude/marr/MARR-PROJECT-CLAUDE.md';
+const MARR_PROJECT_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
+
 /**
- * Clean project-level MARR configuration (./CLAUDE.md and ./prompts/)
+ * Clean project-level MARR configuration (./.claude/marr/ and import from CLAUDE.md)
  */
 function cleanProject(dryRun: boolean): { removed: string[]; errors: string[] } {
   const removed: string[] = [];
   const errors: string[] = [];
 
   const cwd = process.cwd();
-  const claudeMdPath = join(cwd, 'CLAUDE.md');
-  const promptsPath = join(cwd, 'prompts');
+  const marrPath = join(cwd, '.claude', 'marr');
+  const rootClaudeMdPath = join(cwd, 'CLAUDE.md');
+  const dotClaudeClaudeMdPath = join(cwd, '.claude', 'CLAUDE.md');
 
-  // Remove ./CLAUDE.md if it exists
-  if (fileOps.exists(claudeMdPath)) {
+  // Remove ./.claude/marr/ directory if it exists
+  if (fileOps.exists(marrPath) && fileOps.isDirectory(marrPath)) {
     if (dryRun) {
-      removed.push('./CLAUDE.md');
+      removed.push('./.claude/marr/ directory');
     } else {
       try {
-        rmSync(claudeMdPath);
-        removed.push('./CLAUDE.md');
+        rmSync(marrPath, { recursive: true, force: true });
+        removed.push('./.claude/marr/ directory');
       } catch (err) {
-        errors.push(`Failed to remove ./CLAUDE.md: ${(err as Error).message}`);
+        errors.push(`Failed to remove ./.claude/marr/: ${(err as Error).message}`);
       }
     }
   }
 
-  // Remove ./prompts/ directory if it exists
-  if (fileOps.exists(promptsPath) && fileOps.isDirectory(promptsPath)) {
-    if (dryRun) {
-      removed.push('./prompts/ directory');
-    } else {
-      try {
-        rmSync(promptsPath, { recursive: true, force: true });
-        removed.push('./prompts/ directory');
-      } catch (err) {
-        errors.push(`Failed to remove ./prompts/: ${(err as Error).message}`);
+  // Remove MARR import from CLAUDE.md (check both locations)
+  const claudeMdPaths = [
+    { path: rootClaudeMdPath, label: './CLAUDE.md' },
+    { path: dotClaudeClaudeMdPath, label: './.claude/CLAUDE.md' },
+  ];
+
+  for (const { path: claudeMdPath, label } of claudeMdPaths) {
+    if (fileOps.exists(claudeMdPath)) {
+      const content = fileOps.readFile(claudeMdPath);
+      if (content.includes(MARR_PROJECT_IMPORT_LINE)) {
+        if (dryRun) {
+          removed.push(`MARR import from ${label}`);
+        } else {
+          try {
+            let newContent = content;
+            // Remove import block (comment + import line)
+            newContent = newContent.replace(MARR_PROJECT_IMPORT_COMMENT + '\n', '');
+            newContent = newContent.replace(MARR_PROJECT_IMPORT_LINE + '\n', '');
+            newContent = newContent.replace(MARR_PROJECT_IMPORT_LINE, '');
+            // Clean up extra blank lines
+            newContent = newContent.replace(/\n{3,}/g, '\n\n');
+            fileOps.writeFile(claudeMdPath, newContent);
+            removed.push(`MARR import from ${label}`);
+          } catch (err) {
+            errors.push(`Failed to remove MARR import from ${label}: ${(err as Error).message}`);
+          }
+        }
       }
     }
   }
@@ -144,8 +166,15 @@ function executeClean(options: CleanOptions): void {
 
   // Validate there's something to clean
   const userHasContent = isMarrSetup() || hasMarrImport() || hasHelperScripts();
-  const projectHasContent = fileOps.exists(join(process.cwd(), 'CLAUDE.md')) ||
-    fileOps.exists(join(process.cwd(), 'prompts'));
+
+  // Check for project content in both possible CLAUDE.md locations
+  const cwd = process.cwd();
+  const hasMarrDir = fileOps.exists(join(cwd, '.claude', 'marr'));
+  const rootClaudeMdHasImport = fileOps.exists(join(cwd, 'CLAUDE.md')) &&
+    fileOps.readFile(join(cwd, 'CLAUDE.md')).includes(MARR_PROJECT_IMPORT_LINE);
+  const dotClaudeClaudeMdHasImport = fileOps.exists(join(cwd, '.claude', 'CLAUDE.md')) &&
+    fileOps.readFile(join(cwd, '.claude', 'CLAUDE.md')).includes(MARR_PROJECT_IMPORT_LINE);
+  const projectHasContent = hasMarrDir || rootClaudeMdHasImport || dotClaudeClaudeMdHasImport;
 
   if (cleanUserConfig && !userHasContent && cleanProjectConfig && !projectHasContent) {
     logger.info('Nothing to clean - no MARR configuration found.');
@@ -224,14 +253,14 @@ export function cleanCommand(program: Command): void {
     .command('clean')
     .description('Remove MARR configuration files')
     .option('-u, --user', 'Remove user-level config (~/.claude/marr/, helper scripts)')
-    .option('-p, --project', 'Remove project-level config (./CLAUDE.md, ./prompts/)')
+    .option('-p, --project', 'Remove project-level config (./.claude/marr/, import from ./CLAUDE.md)')
     .option('-a, --all', 'Remove both user and project config')
     .option('-n, --dry-run', 'Preview what would be removed without deleting')
     .option('-f, --force', 'Skip confirmation prompts')
     .addHelpText('after', `
 What gets removed:
   --user      ~/.claude/marr/, import line in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
-  --project   ./CLAUDE.md, ./prompts/ directory
+  --project   ./.claude/marr/ directory, MARR import from ./CLAUDE.md
 
 Examples:
   $ marr clean --project              Remove MARR from current project

@@ -92,7 +92,7 @@ The test script will:
 4. ✅ Test `marr init --user` (user-level setup)
 5. ✅ Verify user setup (`~/.claude/marr/`, helper scripts)
 6. ✅ Test `marr init --project` (project-level setup)
-7. ✅ Verify project files (CLAUDE.md, prompts/)
+7. ✅ Verify project files (MARR-PROJECT-CLAUDE.md, .claude/marr/)
 8. ✅ Test `marr validate`
 9. ✅ Test `marr clean --project --dry-run`
 10. ✅ Test `marr clean --user --dry-run`
@@ -125,7 +125,7 @@ Test 3: marr init --user
 
 Test 4: Checking user-level setup...
   ✅ ~/.claude/marr/ exists
-  ✅ ~/.claude/marr/CLAUDE.md exists
+  ✅ ~/.claude/marr/MARR-USER-CLAUDE.md exists
   ✅ ~/.claude/CLAUDE.md exists
   ✅ MARR import line present
   ✅ gh-add-subissue.sh installed
@@ -136,8 +136,8 @@ Test 5: marr init --project
 ✅ Project setup complete
 
 Test 6: Checking generated project files...
-  ✅ CLAUDE.md exists
-  ✅ prompts/ directory exists
+  ✅ MARR-PROJECT-CLAUDE.md exists
+  ✅ .claude/marr/ directory exists
   ✅ Git workflow prompt exists
   ✅ Testing prompt exists
   ✅ MCP usage prompt exists
@@ -205,12 +205,12 @@ marr clean --user --dry-run
 
 ```bash
 # Check project files
-cat CLAUDE.md
-ls -la prompts/
+cat MARR-PROJECT-CLAUDE.md
+ls -la .claude/marr/
 
 # Check user-level setup
 ls -la ~/.claude/marr/
-cat ~/.claude/marr/CLAUDE.md
+cat ~/.claude/marr/MARR-USER-CLAUDE.md
 ls -la ~/bin/gh-*.sh
 ```
 
@@ -361,7 +361,7 @@ ls -la ~/.claude/marr/
 
 ### User-Level Setup (`marr init --user`)
 - ✅ `~/.claude/marr/` directory created
-- ✅ `~/.claude/marr/CLAUDE.md` created with personal preferences
+- ✅ `~/.claude/marr/MARR-USER-CLAUDE.md` created with personal preferences
 - ✅ MARR import added to `~/.claude/CLAUDE.md`
 - ✅ Helper scripts installed to `~/bin/`
 - ✅ Scripts are executable
@@ -369,21 +369,21 @@ ls -la ~/.claude/marr/
 **Note**: Standards (git workflow, testing, etc.) are NOT installed at user level. They live at project level only.
 
 ### Project-Level Setup (`marr init --project`)
-- ✅ Creates CLAUDE.md with project name from directory
-- ✅ Creates prompts/ directory
+- ✅ Creates MARR-PROJECT-CLAUDE.md with project name from directory
+- ✅ Creates .claude/marr/ directory
 - ✅ Copies project-level prompt files
 - ✅ Creates docs/ and plans/ directories
 - ✅ File permissions correct
 
 ### Validate Command
-- ✅ Validates CLAUDE.md exists
-- ✅ Validates prompts/ directory exists
+- ✅ Validates MARR-PROJECT-CLAUDE.md exists
+- ✅ Validates .claude/marr/ directory exists
 - ✅ Checks prompt file naming conventions
 - ✅ Validates prompt references
 
 ### Clean Command
 - ✅ `--user` removes `~/.claude/marr/`, import, and `~/bin/` scripts
-- ✅ `--project` removes `./CLAUDE.md` and `./prompts/`
+- ✅ `--project` removes `./MARR-PROJECT-CLAUDE.md` and `./.claude/marr/`
 - ✅ `--dry-run` shows what would be removed
 - ✅ `--all` removes everything
 

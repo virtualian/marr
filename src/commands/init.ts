@@ -3,7 +3,7 @@
  *
  * Two modes:
  * - --user: Set up user-level config (~/.claude/marr/, import, helper scripts)
- * - --project: Set up project-level config (./CLAUDE.md, ./prompts/)
+ * - --project: Set up project-level config (./.claude/marr/, import in ./CLAUDE.md)
  * - --all: Both user + project
  */
 
@@ -37,15 +37,15 @@ export function initCommand(program: Command): void {
     .command('init')
     .description('Initialize MARR configuration')
     .option('-u, --user', 'Set up user-level config (~/.claude/marr/, helper scripts)')
-    .option('-p, --project [path]', 'Set up project-level config (./CLAUDE.md, ./prompts/)')
+    .option('-p, --project [path]', 'Set up project-level config (./.claude/marr/, import in ./CLAUDE.md)')
     .option('-a, --all [path]', 'Set up both user and project config')
     .option('-s, --standards <value>', 'Standards: all, none, list, or names (git,testing,mcp,docs,prompts)')
     .option('-n, --dry-run', 'Preview what would be created without creating')
     .option('-f, --force', 'Overwrite existing files, skip confirmations')
     .addHelpText('after', `
 What gets created:
-  --user      ~/.claude/marr/CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
-  --project   ./CLAUDE.md, ./prompts/*.md, ./docs/, ./plans/
+  --user      ~/.claude/marr/MARR-USER-CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
+  --project   ./.claude/marr/MARR-PROJECT-CLAUDE.md, ./.claude/marr/standards/*.md, import in ./CLAUDE.md
 
 Standards available (use with --project):
   git       Git workflow and branch management
@@ -59,7 +59,7 @@ Examples:
   $ marr init --project                    Interactive standard selection
   $ marr init --project --standards all    Install all standards
   $ marr init --project -s git,testing     Install specific standards only
-  $ marr init --project -s none            CLAUDE.md only, no standards
+  $ marr init --project -s none            MARR-PROJECT-CLAUDE.md only, no standards
   $ marr init --all                        Both user + project setup
   $ marr init --project --dry-run          Preview what would be created
   $ marr init --project --force            Overwrite existing config`)
@@ -98,7 +98,7 @@ async function executeInit(options: InitOptions): Promise<void> {
     logger.blank();
     logger.log('Options:');
     logger.log('  -u, --user              Set up user-level config (~/.claude/marr/, helper scripts)');
-    logger.log('  -p, --project [path]    Set up project-level config (./CLAUDE.md, ./prompts/)');
+    logger.log('  -p, --project [path]    Set up project-level config (./.claude/marr/, import in ./CLAUDE.md)');
     logger.log('  -a, --all [path]        Set up both user and project config');
     logger.log('  -s, --standards <value> Standards: all, list, or names (git,testing,mcp,docs)');
     logger.log('  -n, --dry-run           Show what would be created without actually creating');
@@ -187,7 +187,7 @@ async function initializeUser(dryRun: boolean, force: boolean): Promise<void> {
 
   if (dryRun) {
     logger.info('Would create: ~/.claude/marr/');
-    logger.info('Would create: ~/.claude/marr/CLAUDE.md');
+    logger.info('Would create: ~/.claude/marr/MARR-USER-CLAUDE.md');
     logger.info('Would add: MARR import to ~/.claude/CLAUDE.md');
     await installHelperScripts(binDir, true);
     return;
@@ -216,8 +216,8 @@ async function installHelperScripts(binDir: string, dryRun: boolean): Promise<vo
   const scriptsSource = join(resourcesDir, 'helper-scripts');
 
   const scripts = [
-    'gh-add-subissue.sh',
-    'gh-list-subissues.sh',
+    'marr-gh-add-subissue.sh',
+    'marr-gh-list-subissues.sh',
   ];
 
   for (const script of scripts) {
@@ -310,14 +310,15 @@ function checkPath(binDir: string): void {
 
   logger.blank();
   logger.info('After that, these commands will work:');
-  logger.log('  gh-add-subissue.sh <parent> <sub>');
-  logger.log('  gh-list-subissues.sh <parent>');
+  logger.log('  marr-gh-add-subissue.sh <parent> <sub>');
+  logger.log('  marr-gh-list-subissues.sh <parent>');
 }
 
 /**
  * Initialize project-level configuration
- * - Creates ./CLAUDE.md from template
- * - Creates ./prompts/ with project-level standards
+ * - Creates ./.claude/marr/MARR-PROJECT-CLAUDE.md
+ * - Creates ./.claude/marr/prompts/ with project-level standards
+ * - Adds import line to ./CLAUDE.md (creates if needed)
  */
 async function initializeProject(targetDir: string, standards: string | undefined, dryRun: boolean, force: boolean): Promise<void> {
   logger.blank();
@@ -334,12 +335,27 @@ async function initializeProject(targetDir: string, standards: string | undefine
     }
   }
 
-  const claudeMdPath = join(targetDir, 'CLAUDE.md');
-  const promptsPath = join(targetDir, 'prompts');
+  const marrPath = join(targetDir, '.claude', 'marr');
+  const standardsPath = join(marrPath, 'standards');
+  const marrProjectClaudeMdPath = join(marrPath, 'MARR-PROJECT-CLAUDE.md');
 
-  // Check if config already exists
-  if (fileOps.exists(claudeMdPath) && !force) {
-    logger.warning(`CLAUDE.md already exists at ${targetDir}`);
+  // Detect which CLAUDE.md location the project uses (or default to root)
+  const rootClaudeMdPath = join(targetDir, 'CLAUDE.md');
+  const dotClaudeClaudeMdPath = join(targetDir, '.claude', 'CLAUDE.md');
+
+  // Priority: 1) ./CLAUDE.md if exists, 2) ./.claude/CLAUDE.md if exists, 3) create ./CLAUDE.md
+  let projectClaudeMdPath: string;
+  if (fileOps.exists(rootClaudeMdPath)) {
+    projectClaudeMdPath = rootClaudeMdPath;
+  } else if (fileOps.exists(dotClaudeClaudeMdPath)) {
+    projectClaudeMdPath = dotClaudeClaudeMdPath;
+  } else {
+    projectClaudeMdPath = rootClaudeMdPath; // Default: create at root (more discoverable)
+  }
+
+  // Check if MARR config already exists
+  if (fileOps.exists(marrProjectClaudeMdPath) && !force) {
+    logger.warning(`MARR-PROJECT-CLAUDE.md already exists at .claude/marr/`);
     logger.info('Use --force to overwrite existing configuration');
     return;
   }
@@ -373,45 +389,51 @@ async function initializeProject(targetDir: string, standards: string | undefine
   }
 
   if (dryRun) {
-    logger.info(`Would create: ${claudeMdPath}`);
-    logger.info(`Would create: ${promptsPath}/`);
-    for (const std of selectedStandards) {
-      logger.info(`Would create: ${promptsPath}/${std.file}`);
+    logger.info(`Would create: ${marrPath}/`);
+    logger.info(`Would create: ${marrProjectClaudeMdPath}`);
+    logger.info(`Would create: ${marrPath}/README.md`);
+    if (selectedStandards.length > 0) {
+      logger.info(`Would create: ${standardsPath}/`);
+      for (const std of selectedStandards) {
+        logger.info(`Would create: ${standardsPath}/${std.file}`);
+      }
+      logger.info(`Would create: ${standardsPath}/README.md`);
     }
-    logger.info(`Would create: ${promptsPath}/README.md`);
-    logger.info(`Would create: ${join(targetDir, 'docs')}/README.md`);
-    logger.info(`Would create: ${join(targetDir, 'plans')}/README.md`);
+    if (fileOps.exists(projectClaudeMdPath)) {
+      logger.info(`Would add: MARR import to ${projectClaudeMdPath}`);
+    } else {
+      logger.info(`Would create: ${projectClaudeMdPath} with MARR import`);
+    }
     return;
   }
 
   // Create directories
-  const dirs = [
-    targetDir,
-    promptsPath,
-    join(targetDir, 'docs'),
-    join(targetDir, 'plans'),
-  ];
-
-  for (const dir of dirs) {
-    fileOps.ensureDir(dir);
+  fileOps.ensureDir(marrPath);
+  if (selectedStandards.length > 0) {
+    fileOps.ensureDir(standardsPath);
   }
 
-  // Create CLAUDE.md from template
-  createProjectClaudeMd(targetDir, selectedStandards);
+  // Create MARR-PROJECT-CLAUDE.md
+  createMarrProjectClaudeMd(marrPath, targetDir, selectedStandards);
 
-  // Copy selected project-level prompts
-  copyProjectPrompts(targetDir, selectedStandards);
+  // Create .claude/marr/README.md
+  createMarrReadme(marrPath);
 
-  // Copy README files to docs/ and plans/
-  copyFolderReadmes(targetDir);
+  // Copy selected project-level standards
+  if (selectedStandards.length > 0) {
+    copyProjectStandards(standardsPath, selectedStandards);
+  }
+
+  // Handle project root CLAUDE.md
+  addProjectClaudeMdImport(projectClaudeMdPath, targetDir);
 
   logger.blank();
   logger.success('Project configuration created!');
   logger.blank();
   logger.info('Next steps:');
-  logger.log('  1. Review CLAUDE.md and customize for your project');
+  logger.log('  1. Review .claude/marr/MARR-PROJECT-CLAUDE.md and customize for your project');
   if (selectedStandards.length > 0) {
-    logger.log('  2. Review prompts/ and adjust standards as needed');
+    logger.log('  2. Review .claude/marr/standards/ and adjust as needed');
   }
   logger.log('  3. Run: marr validate');
 }
@@ -474,7 +496,7 @@ async function selectStandards(): Promise<typeof AVAILABLE_STANDARDS> {
   logger.blank();
 
   if (selected.length === 0) {
-    logger.info('No standards selected. Project will have CLAUDE.md only.');
+    logger.info('No standards selected. Project will have MARR-PROJECT-CLAUDE.md only.');
   } else {
     logger.info(`Selected: ${selected.map(s => s.name).join(', ')}`);
   }
@@ -482,40 +504,39 @@ async function selectStandards(): Promise<typeof AVAILABLE_STANDARDS> {
   return selected;
 }
 
+/** MARR import line for project CLAUDE.md */
+const MARR_PROJECT_IMPORT_LINE = '@.claude/marr/MARR-PROJECT-CLAUDE.md';
+const MARR_PROJECT_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
+
 /**
- * Create project CLAUDE.md from template
+ * Create MARR-PROJECT-CLAUDE.md inside .claude/marr/
  */
-function createProjectClaudeMd(targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
-  const destPath = join(targetDir, 'CLAUDE.md');
+function createMarrProjectClaudeMd(marrPath: string, targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
+  const destPath = join(marrPath, 'MARR-PROJECT-CLAUDE.md');
 
   // Get project name from directory
   const projectName = targetDir.split('/').pop() || 'Project';
 
-  // Build standards compliance section - reference folder instead of individual files
-  // This allows new standards to be auto-discovered without updating CLAUDE.md
-  let standardsSection = '';
+  // Build standards import (must be near top of file for Claude Code to load)
+  let standardsImport = '';
   if (selectedStandards.length > 0) {
-    standardsSection = `## Standards Compliance
-
-This project follows the standards defined in @prompts/
-
+    standardsImport = `
+@.claude/marr/standards/
 `;
   }
 
-  // Simple template - no fancy multi-template system
   const content = `# ${projectName}
 
 > [!IMPORTANT]
 >
-> This is the Project-level configuration (Layer 2 of 2):
+> This is the Project-level MARR configuration.
+> It is imported by \`./CLAUDE.md\` at the project root.
 >
-> - User file: \`~/.claude/CLAUDE.md\` - contains User preferences & default standards
-> - This file: \`./CLAUDE.md\` (at project root) contains Project-specific information
+> - User config: \`~/.claude/marr/MARR-USER-CLAUDE.md\`
+> - Project config: This file (\`.claude/marr/MARR-PROJECT-CLAUDE.md\`)
 >
-> **Precedence**
->
-> Project \`./CLAUDE.md\` overrides technical standards but preserves personal preferences.
-
+> **Precedence:** Project overrides user for technical standards; user preferences preserved.
+${standardsImport}
 ## Project Overview
 
 **${projectName}** - [Add project description]
@@ -526,7 +547,7 @@ When starting work in this repository:
 - Review the project structure
 - Check for any project-specific configuration files
 
-${standardsSection}## Development Notes
+## Development Notes
 
 Add project-specific notes, conventions, or important reminders here.
 
@@ -540,54 +561,117 @@ Document common development tasks, commands, or workflows.
 `;
 
   fileOps.writeFile(destPath, content);
-  logger.success('Created: CLAUDE.md');
+  logger.success('Created: .claude/marr/MARR-PROJECT-CLAUDE.md');
 }
 
 /**
- * Copy project-level prompts to ./prompts/
+ * Create README.md for .claude/marr/ directory
  */
-function copyProjectPrompts(targetDir: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
+function createMarrReadme(marrPath: string): void {
+  const destPath = join(marrPath, 'README.md');
+
+  const content = `# MARR Project Configuration
+
+This directory contains MARR (Making Agents Really Reliable) configuration for this project.
+
+## Structure
+
+\`\`\`
+.claude/marr/
+├── MARR-PROJECT-CLAUDE.md   # Project-specific AI agent configuration
+├── README.md                # This file
+└── standards/               # Project-level standards (if installed)
+    ├── prj-git-workflow-standard.md
+    ├── prj-testing-standard.md
+    └── ...
+\`\`\`
+
+## How It Works
+
+1. Project root \`CLAUDE.md\` imports \`@.claude/marr/MARR-PROJECT-CLAUDE.md\`
+2. MARR-PROJECT-CLAUDE.md references \`@.claude/marr/standards/\` for standards
+3. Claude Code loads all standards when working in this project
+
+## Customization
+
+Edit files in this directory to match your project's needs. Changes are version-controlled with your project.
+
+## Validation
+
+Run \`marr validate\` to check configuration is correct.
+`;
+
+  fileOps.writeFile(destPath, content);
+  logger.success('Created: .claude/marr/README.md');
+}
+
+/**
+ * Copy project-level standards to standards/ directory
+ */
+function copyProjectStandards(standardsPath: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
   const resourcesDir = marrSetup.getResourcesDir();
-  const promptsSource = join(resourcesDir, 'project/common');
-  const promptsDest = join(targetDir, 'prompts');
+  const standardsSource = join(resourcesDir, 'project/common');
 
   // Copy selected standard files
   for (const std of selectedStandards) {
-    const srcPath = join(promptsSource, std.file);
-    const destPath = join(promptsDest, std.file);
+    const srcPath = join(standardsSource, std.file);
+    const destPath = join(standardsPath, std.file);
 
     if (fileOps.exists(srcPath)) {
       fileOps.copyFile(srcPath, destPath);
-      logger.success(`Created: prompts/${std.file}`);
+      logger.success(`Created: .claude/marr/standards/${std.file}`);
     } else {
       logger.warning(`Resource not found: ${std.file}`);
     }
   }
 
-  // Always copy README.md
-  const readmeSrc = join(promptsSource, 'README.md');
-  const readmeDest = join(promptsDest, 'README.md');
-  if (fileOps.exists(readmeSrc)) {
-    fileOps.copyFile(readmeSrc, readmeDest);
-    logger.success('Created: prompts/README.md');
-  }
+  // Note: No README in standards/ - it would be loaded as a prompt by Claude Code
 }
 
 /**
- * Copy README files to docs/ and plans/ directories
+ * Add MARR import to project root CLAUDE.md
+ * Creates file if it doesn't exist, adds import if it does
  */
-function copyFolderReadmes(targetDir: string): void {
-  const resourcesDir = marrSetup.getResourcesDir();
+function addProjectClaudeMdImport(claudeMdPath: string, targetDir: string): void {
+  const projectName = targetDir.split('/').pop() || 'Project';
 
-  const folders = ['docs', 'plans'];
+  if (!fileOps.exists(claudeMdPath)) {
+    // Create new CLAUDE.md with MARR import
+    const content = `# ${projectName}
 
-  for (const folder of folders) {
-    const srcPath = join(resourcesDir, 'project', folder, 'README.md');
-    const destPath = join(targetDir, folder, 'README.md');
+${MARR_PROJECT_IMPORT_COMMENT}
+${MARR_PROJECT_IMPORT_LINE}
 
-    if (fileOps.exists(srcPath)) {
-      fileOps.copyFile(srcPath, destPath);
-      logger.success(`Created: ${folder}/README.md`);
-    }
+Add project-specific Claude Code configuration here.
+`;
+    fileOps.writeFile(claudeMdPath, content);
+    logger.success('Created: CLAUDE.md with MARR import');
+    return;
   }
+
+  // File exists - check if import already present
+  const existingContent = fileOps.readFile(claudeMdPath);
+  if (existingContent.includes(MARR_PROJECT_IMPORT_LINE)) {
+    logger.info('MARR import already present in CLAUDE.md');
+    return;
+  }
+
+  // Add import after first heading or at top
+  const lines = existingContent.split('\n');
+  const firstHeadingIndex = lines.findIndex(line => line.startsWith('# '));
+
+  const importBlock = `\n${MARR_PROJECT_IMPORT_COMMENT}\n${MARR_PROJECT_IMPORT_LINE}\n`;
+
+  let newContent: string;
+  if (firstHeadingIndex >= 0) {
+    // Insert after first heading
+    lines.splice(firstHeadingIndex + 1, 0, importBlock);
+    newContent = lines.join('\n');
+  } else {
+    // Prepend to file
+    newContent = importBlock + '\n' + existingContent;
+  }
+
+  fileOps.writeFile(claudeMdPath, newContent);
+  logger.success('Added: MARR import to CLAUDE.md');
 }
