@@ -12,7 +12,7 @@
 **MARR** (Making Agents Really Reliable) is a configuration system that provides AI coding agents with consistent project context and standards across all repositories. The system uses a two-layer approach:
 
 - **User-level** (`~/.claude/marr/`) - Personal preferences and universal standards, integrated with Claude Code via import mechanism
-- **Project-level** (`./MARR-PROJECT-CLAUDE.md` + `./.claude/marr/`) - Project-specific requirements and standards
+- **Project-level** (`./CLAUDE.md` or `./.claude/CLAUDE.md` imports `./.claude/marr/MARR-PROJECT-CLAUDE.md`) - Project-specific requirements and standards
 
 MARR is installed via npm (`npm install -g @virtualian/marr`) and configured with a simple CLI.
 
@@ -187,6 +187,12 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 - Changes tracked like code
 - **Rationale:** Configuration is code, treat it accordingly
 
+**CR4a: CLAUDE.md Location Flexibility**
+- Project CLAUDE.md can be at `./CLAUDE.md` or `./.claude/CLAUDE.md`
+- MARR detects and works with either location
+- Supports projects that prefer hidden config directories
+- **Rationale:** Different projects have different conventions; flexibility reduces friction
+
 **CR5: Simple CLI**
 - `marr init --user` - Set up user-level configuration (one-time)
 - `marr init --project [path]` - Set up project configuration
@@ -202,7 +208,7 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 - **Rationale:** Discoverability and consistency
 
 **CR7: Helper Scripts Management**
-- GitHub sub-issue scripts (`gh-add-subissue.sh`, `gh-list-subissues.sh`)
+- GitHub sub-issue scripts (`marr-gh-add-subissue.sh`, `marr-gh-list-subissues.sh`)
 - Installed to `~/bin/` as part of `marr init --user`
 - Removed as part of `marr clean --user`
 - **Rationale:** Configuration references scripts; single command installs everything
@@ -283,8 +289,8 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
     └── MARR-USER-CLAUDE.md   ← MARR's user-level config
 
 ~/bin/                     ← Helper scripts (installed by marr init --user)
-├── gh-add-subissue.sh
-└── gh-list-subissues.sh
+├── marr-gh-add-subissue.sh
+└── marr-gh-list-subissues.sh
 ```
 
 **MARR integrates with Claude Code via the official import mechanism**
@@ -315,17 +321,16 @@ MARR is installed via npm (`npm install -g @virtualian/marr`) and configured wit
 
 ```
 project-root/
-├── MARR-PROJECT-CLAUDE.md       # Project configuration
-├── .claude/marr/                       # Project-level standards
-│   ├── prj-git-workflow-standard.md
-│   ├── prj-testing-standard.md
-│   ├── prj-mcp-usage-standard.md
-│   └── [domain-specific].md
-├── docs/                        # Technical documentation
-├── plans/                       # Implementation plans
-├── research/                    # Research reports
-└── src/                         # Source code
+├── CLAUDE.md                           # Project config (imports MARR config)
+└── .claude/
+    └── marr/
+        ├── MARR-PROJECT-CLAUDE.md      # MARR project configuration
+        ├── README.md                   # Explains MARR structure
+        └── standards/                  # Project-level standards (prj-*.md)
+            └── README.md
 ```
+
+Note: CLAUDE.md can alternatively be at `.claude/CLAUDE.md` for projects preferring hidden config.
 
 ---
 
@@ -384,8 +389,14 @@ project-root/
 
 ### Phase 4 (Long-term - Expansion)
 - Multi-agent support (Cursor, Jules, Codex)
-- Community standards sharing
+- Community standards sharing (see CR8)
 - Team collaboration features
+
+**CR8: Community Contribution Workflow**
+- Users can customize MARR files and create new standards
+- Updated and new standards can be contributed via GitHub issues and PRs
+- Quality contributions may be included in future MARR versions by default
+- **Rationale:** Community-driven improvement creates better standards over time
 
 ### Deferred to v2+
 - Configuration UI/dashboard
