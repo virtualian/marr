@@ -197,11 +197,11 @@ log_blank
 log_info "Test 6: Checking generated project files..."
 check_passed=true
 [ -f MARR-PROJECT-CLAUDE.md ] && log_info "  ✅ MARR-PROJECT-CLAUDE.md exists" || { log_info "  ❌ MARR-PROJECT-CLAUDE.md missing"; check_passed=false; }
-[ -d .marr ] && log_info "  ✅ .marr/ directory exists" || { log_info "  ❌ .marr/ missing"; check_passed=false; }
-[ -f .marr/prj-git-workflow-standard.md ] && log_info "  ✅ Git workflow prompt exists" || { log_info "  ❌ Git workflow prompt missing"; check_passed=false; }
-[ -f .marr/prj-testing-standard.md ] && log_info "  ✅ Testing prompt exists" || { log_info "  ❌ Testing prompt missing"; check_passed=false; }
-[ -f .marr/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage prompt exists" || { log_info "  ❌ MCP usage prompt missing"; check_passed=false; }
-[ -f .marr/prj-documentation-standard.md ] && log_info "  ✅ Documentation prompt exists" || { log_info "  ❌ Documentation prompt missing"; check_passed=false; }
+[ -d .marr ] && log_info "  ✅ .claude/marr/ directory exists" || { log_info "  ❌ .claude/marr/ missing"; check_passed=false; }
+[ -f .claude/marr/prj-git-workflow-standard.md ] && log_info "  ✅ Git workflow prompt exists" || { log_info "  ❌ Git workflow prompt missing"; check_passed=false; }
+[ -f .claude/marr/prj-testing-standard.md ] && log_info "  ✅ Testing prompt exists" || { log_info "  ❌ Testing prompt missing"; check_passed=false; }
+[ -f .claude/marr/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage prompt exists" || { log_info "  ❌ MCP usage prompt missing"; check_passed=false; }
+[ -f .claude/marr/prj-documentation-standard.md ] && log_info "  ✅ Documentation prompt exists" || { log_info "  ❌ Documentation prompt missing"; check_passed=false; }
 [ -d docs ] && log_info "  ✅ docs/ directory exists" || { log_info "  ❌ docs/ missing"; check_passed=false; }
 [ -d plans ] && log_info "  ✅ plans/ directory exists" || { log_info "  ❌ plans/ missing"; check_passed=false; }
 if $check_passed; then

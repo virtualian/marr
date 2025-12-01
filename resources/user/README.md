@@ -15,10 +15,10 @@ User-level configuration (`~/.claude/marr/`) contains **personal preferences** t
 
 **Standards and prompts belong at project level**, not user level:
 
-- Git workflow standards → `./.marr/prj-git-workflow-standard.md`
-- Testing standards → `./.marr/prj-testing-standard.md`
-- MCP usage standards → `./.marr/prj-mcp-usage-standard.md`
-- Documentation standards → `./.marr/prj-documentation-standard.md`
+- Git workflow standards → `./.claude/marr/prj-git-workflow-standard.md`
+- Testing standards → `./.claude/marr/prj-testing-standard.md`
+- MCP usage standards → `./.claude/marr/prj-mcp-usage-standard.md`
+- Documentation standards → `./.claude/marr/prj-documentation-standard.md`
 
 This keeps projects self-contained and allows per-project customization.
 

@@ -91,7 +91,7 @@ function cleanUser(dryRun: boolean): { removed: string[]; errors: string[] } {
 }
 
 /**
- * Clean project-level MARR configuration (./MARR-PROJECT-CLAUDE.md and ./.marr/)
+ * Clean project-level MARR configuration (./MARR-PROJECT-CLAUDE.md and ./.claude/marr/)
  */
 function cleanProject(dryRun: boolean): { removed: string[]; errors: string[] } {
   const removed: string[] = [];
@@ -99,7 +99,7 @@ function cleanProject(dryRun: boolean): { removed: string[]; errors: string[] } 
 
   const cwd = process.cwd();
   const claudeMdPath = join(cwd, 'MARR-PROJECT-CLAUDE.md');
-  const marrPath = join(cwd, '.marr');
+  const marrPath = join(cwd, '.claude', 'marr');
 
   // Remove ./MARR-PROJECT-CLAUDE.md if it exists
   if (fileOps.exists(claudeMdPath)) {
@@ -115,16 +115,16 @@ function cleanProject(dryRun: boolean): { removed: string[]; errors: string[] } 
     }
   }
 
-  // Remove ./.marr/ directory if it exists
+  // Remove ./.claude/marr/ directory if it exists
   if (fileOps.exists(marrPath) && fileOps.isDirectory(marrPath)) {
     if (dryRun) {
-      removed.push('./.marr/ directory');
+      removed.push('./.claude/marr/ directory');
     } else {
       try {
         rmSync(marrPath, { recursive: true, force: true });
-        removed.push('./.marr/ directory');
+        removed.push('./.claude/marr/ directory');
       } catch (err) {
-        errors.push(`Failed to remove ./.marr/: ${(err as Error).message}`);
+        errors.push(`Failed to remove ./.claude/marr/: ${(err as Error).message}`);
       }
     }
   }
@@ -145,7 +145,7 @@ function executeClean(options: CleanOptions): void {
   // Validate there's something to clean
   const userHasContent = isMarrSetup() || hasMarrImport() || hasHelperScripts();
   const projectHasContent = fileOps.exists(join(process.cwd(), 'MARR-PROJECT-CLAUDE.md')) ||
-    fileOps.exists(join(process.cwd(), '.marr'));
+    fileOps.exists(join(process.cwd(), '.claude', 'marr'));
 
   if (cleanUserConfig && !userHasContent && cleanProjectConfig && !projectHasContent) {
     logger.info('Nothing to clean - no MARR configuration found.');
@@ -224,14 +224,14 @@ export function cleanCommand(program: Command): void {
     .command('clean')
     .description('Remove MARR configuration files')
     .option('-u, --user', 'Remove user-level config (~/.claude/marr/, helper scripts)')
-    .option('-p, --project', 'Remove project-level config (./MARR-PROJECT-CLAUDE.md, ./.marr/)')
+    .option('-p, --project', 'Remove project-level config (./MARR-PROJECT-CLAUDE.md, ./.claude/marr/)')
     .option('-a, --all', 'Remove both user and project config')
     .option('-n, --dry-run', 'Preview what would be removed without deleting')
     .option('-f, --force', 'Skip confirmation prompts')
     .addHelpText('after', `
 What gets removed:
   --user      ~/.claude/marr/, import line in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
-  --project   ./MARR-PROJECT-CLAUDE.md, ./.marr/ directory
+  --project   ./MARR-PROJECT-CLAUDE.md, ./.claude/marr/ directory
 
 Examples:
   $ marr clean --project              Remove MARR from current project

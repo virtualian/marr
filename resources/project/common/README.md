@@ -15,10 +15,10 @@ This directory contains **project-specific standards** that Claude Code follows 
 
 The project `CLAUDE.md` references these files:
 ```markdown
-@.marr/prj-git-workflow-standard.md
-@.marr/prj-testing-standard.md
-@.marr/prj-mcp-usage-standard.md
-@.marr/prj-documentation-standard.md
+@.claude/marr/prj-git-workflow-standard.md
+@.claude/marr/prj-testing-standard.md
+@.claude/marr/prj-mcp-usage-standard.md
+@.claude/marr/prj-documentation-standard.md
 ```
 
 Claude Code loads them when starting work in this project.

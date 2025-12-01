@@ -24,9 +24,9 @@ export function validateCommand(program: Command): void {
     .addHelpText('after', `
 What it checks:
   • MARR-PROJECT-CLAUDE.md exists and has required sections
-  • .marr/ directory exists with standard files
+  • .claude/marr/ directory exists with standard files
   • Prompt files follow naming convention (prj-*, user-*)
-  • All @.marr/ references in MARR-PROJECT-CLAUDE.md are valid
+  • All @.claude/marr/ references in MARR-PROJECT-CLAUDE.md are valid
 
 Examples:
   $ marr validate              Standard validation (warnings allowed)
@@ -125,15 +125,15 @@ function validateClaudeMd(result: ValidationResult): void {
 }
 
 function validateMarrDirectory(result: ValidationResult): void {
-  const marrDir = join(process.cwd(), '.marr');
+  const marrDir = join(process.cwd(), '.claude', 'marr');
 
   if (!fileOps.exists(marrDir)) {
-    result.errors.push('.marr/ directory not found');
+    result.errors.push('.claude/marr/ directory not found');
     return;
   }
 
   if (!fileOps.isDirectory(marrDir)) {
-    result.errors.push('.marr/ exists but is not a directory');
+    result.errors.push('.claude/marr/ exists but is not a directory');
     return;
   }
 
@@ -152,11 +152,11 @@ function validateMarrDirectory(result: ValidationResult): void {
     }
   }
 
-  logger.success('.marr/ directory validated');
+  logger.success('.claude/marr/ directory validated');
 }
 
 function validatePromptNaming(result: ValidationResult): void {
-  const marrDir = join(process.cwd(), '.marr');
+  const marrDir = join(process.cwd(), '.claude', 'marr');
 
   if (!fileOps.exists(marrDir)) {
     return; // Already reported error
@@ -183,9 +183,9 @@ function validatePromptNaming(result: ValidationResult): void {
       result.warnings.push('  Expected: prj-* or user-*');
     }
 
-    // Warn about user-level prompts in project .marr/
+    // Warn about user-level prompts in project .claude/marr/
     if (filename.startsWith('user-')) {
-      result.warnings.push(`User-level prompt found in project .marr/: ${filename}`);
+      result.warnings.push(`User-level prompt found in project .claude/marr/: ${filename}`);
       result.warnings.push('  User-level prompts should be in ~/.claude/marr/');
     }
   }
@@ -198,30 +198,30 @@ function validatePromptReferences(result: ValidationResult): void {
   const content = fileOps.readFile(claudeMdPath);
 
   // Check for folder reference (preferred pattern)
-  const hasFolderRef = content.includes('@.marr/') &&
-    (content.match(/@\.marr\/\s/) || content.match(/@\.marr\/$/m) || content.includes('@.marr/\n'));
+  const hasFolderRef = content.includes('@.claude/marr/') &&
+    (content.match(/@\.marr\/\s/) || content.match(/@\.marr\/$/m) || content.includes('@.claude/marr/\n'));
 
-  // Find individual @.marr/*.md references
+  // Find individual @.claude/marr/*.md references
   const promptRefs = content.match(/@\.marr\/[\w-]+\.md/g) || [];
 
   if (!hasFolderRef && promptRefs.length === 0) {
     result.warnings.push('No prompt references found in MARR-PROJECT-CLAUDE.md');
-    result.warnings.push('  Consider using @.marr/ folder reference');
+    result.warnings.push('  Consider using @.claude/marr/ folder reference');
   }
 
   // Validate individual file references if present
   for (const ref of promptRefs) {
-    const filename = ref.substring('@.marr/'.length);
-    const promptPath = join(process.cwd(), '.marr', filename);
+    const filename = ref.substring('@.claude/marr/'.length);
+    const promptPath = join(process.cwd(), '.claude', 'marr', filename);
 
     if (!fileOps.exists(promptPath)) {
       result.errors.push(`Broken prompt reference: ${ref}`);
-      result.errors.push(`  File not found: .marr/${filename}`);
+      result.errors.push(`  File not found: .claude/marr/${filename}`);
     }
   }
 
   if (hasFolderRef) {
-    logger.success('Prompt folder reference validated (@.marr/)');
+    logger.success('Prompt folder reference validated (@.claude/marr/)');
   } else if (promptRefs.length > 0) {
     logger.success('Prompt file references validated');
   }

@@ -92,7 +92,7 @@ The test script will:
 4. ✅ Test `marr init --user` (user-level setup)
 5. ✅ Verify user setup (`~/.claude/marr/`, helper scripts)
 6. ✅ Test `marr init --project` (project-level setup)
-7. ✅ Verify project files (MARR-PROJECT-CLAUDE.md, .marr/)
+7. ✅ Verify project files (MARR-PROJECT-CLAUDE.md, .claude/marr/)
 8. ✅ Test `marr validate`
 9. ✅ Test `marr clean --project --dry-run`
 10. ✅ Test `marr clean --user --dry-run`
@@ -137,7 +137,7 @@ Test 5: marr init --project
 
 Test 6: Checking generated project files...
   ✅ MARR-PROJECT-CLAUDE.md exists
-  ✅ .marr/ directory exists
+  ✅ .claude/marr/ directory exists
   ✅ Git workflow prompt exists
   ✅ Testing prompt exists
   ✅ MCP usage prompt exists
@@ -206,7 +206,7 @@ marr clean --user --dry-run
 ```bash
 # Check project files
 cat MARR-PROJECT-CLAUDE.md
-ls -la .marr/
+ls -la .claude/marr/
 
 # Check user-level setup
 ls -la ~/.claude/marr/
@@ -370,20 +370,20 @@ ls -la ~/.claude/marr/
 
 ### Project-Level Setup (`marr init --project`)
 - ✅ Creates MARR-PROJECT-CLAUDE.md with project name from directory
-- ✅ Creates .marr/ directory
+- ✅ Creates .claude/marr/ directory
 - ✅ Copies project-level prompt files
 - ✅ Creates docs/ and plans/ directories
 - ✅ File permissions correct
 
 ### Validate Command
 - ✅ Validates MARR-PROJECT-CLAUDE.md exists
-- ✅ Validates .marr/ directory exists
+- ✅ Validates .claude/marr/ directory exists
 - ✅ Checks prompt file naming conventions
 - ✅ Validates prompt references
 
 ### Clean Command
 - ✅ `--user` removes `~/.claude/marr/`, import, and `~/bin/` scripts
-- ✅ `--project` removes `./MARR-PROJECT-CLAUDE.md` and `./.marr/`
+- ✅ `--project` removes `./MARR-PROJECT-CLAUDE.md` and `./.claude/marr/`
 - ✅ `--dry-run` shows what would be removed
 - ✅ `--all` removes everything
 

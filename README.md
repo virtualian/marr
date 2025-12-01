@@ -10,7 +10,7 @@
 MARR provides a two-layer configuration system for AI agents (Claude Code first):
 
 1. **User-level configuration** (`~/.claude/marr/`) - Personal preferences and universal standards
-2. **Project-level configuration** (`./MARR-PROJECT-CLAUDE.md` + `./.marr/`) - Project-specific technical requirements
+2. **Project-level configuration** (`./MARR-PROJECT-CLAUDE.md` + `./.claude/marr/`) - Project-specific technical requirements
 
 **Key principle**: All repositories use the same comprehensive standards (git workflow, testing, MCP usage) regardless of project type or technology stack.
 
@@ -49,7 +49,7 @@ marr init [options]
 
 **Options:**
 - `-u, --user` - Set up user-level config (~/.claude/marr/, helper scripts in ~/bin/)
-- `-p, --project [path]` - Set up project-level config (./MARR-PROJECT-CLAUDE.md, ./.marr/)
+- `-p, --project [path]` - Set up project-level config (./MARR-PROJECT-CLAUDE.md, ./.claude/marr/)
 - `-a, --all [path]` - Set up both user and project config
 - `-s, --standards <value>` - Standards to install: `all`, `list`, `none`, or comma-separated names
 - `-n, --dry-run` - Show what would be created without actually creating
@@ -119,8 +119,8 @@ Note: Standards (git workflow, testing, MCP usage) live at **project level** onl
 **What `--project` creates:**
 ```
 your-project/
-├── MARR-PROJECT-CLAUDE.md      # Project configuration (references @.marr/)
-├── .marr/
+├── MARR-PROJECT-CLAUDE.md      # Project configuration (references @.claude/marr/)
+├── .claude/marr/
 │   ├── prj-git-workflow-standard.md
 │   ├── prj-testing-standard.md
 │   ├── prj-mcp-usage-standard.md
@@ -129,7 +129,7 @@ your-project/
 └── plans/                      # Implementation plans
 ```
 
-Note: MARR-PROJECT-CLAUDE.md references `@.marr/` as a folder, so new standards added to `.marr/` are automatically discovered.
+Note: MARR-PROJECT-CLAUDE.md references `@.claude/marr/` as a folder, so new standards added to `.claude/marr/` are automatically discovered.
 
 ### `marr validate`
 
@@ -145,10 +145,10 @@ marr validate [options]
 
 **What it checks:**
 - MARR-PROJECT-CLAUDE.md exists and has required sections
-- .marr/ directory exists
+- .claude/marr/ directory exists
 - Required prompt files present
 - Naming conventions followed (user-*, prj-*)
-- Prompt references (@.marr/) are valid
+- Prompt references (@.claude/marr/) are valid
 - No broken file references
 
 **Examples:**
@@ -175,7 +175,7 @@ marr clean [options]
 
 **Options:**
 - `-u, --user` - Clean user-level config (~/.claude/marr/, helper scripts)
-- `-p, --project` - Clean project-level config (./MARR-PROJECT-CLAUDE.md, ./.marr/)
+- `-p, --project` - Clean project-level config (./MARR-PROJECT-CLAUDE.md, ./.claude/marr/)
 - `-a, --all` - Clean both user and project config
 - `-n, --dry-run` - Show what would be removed without actually removing
 - `-f, --force` - Skip confirmation prompts
@@ -205,7 +205,7 @@ marr clean --all
 - Approval requirements (commits, pushes, PRs)
 - Helper scripts for GitHub sub-issues
 
-**Project Level** (`./MARR-PROJECT-CLAUDE.md` and `./.marr/`):
+**Project Level** (`./MARR-PROJECT-CLAUDE.md` and `./.claude/marr/`):
 - Project-specific technical requirements
 - Team conventions
 - All standards (git workflow, testing, MCP usage, documentation)

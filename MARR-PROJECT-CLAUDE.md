@@ -27,7 +27,7 @@
 ## Startup Imperatives
 
 When starting work in this repository:
-- Read all standards in ./.marr/
+- Read all standards in ./.claude/marr/
 
 ## Project-Specific Reminders
 
@@ -47,14 +47,14 @@ Show user exactly what will be committed/pushed before taking action.
 
 ## Standards Compliance
 
-This project follows the standards defined in @.marr/
+This project follows the standards defined in @.claude/marr/
 
 ## Documentation Organization
 
 - `docs/` - Functional specification and technical documentation
 - `examples/` - Real-world configuration examples from active projects
 - `plans/` - Implementation plans for building the system
-- `.marr/` - Project-level standard prompt files
+- `.claude/marr/` - Project-level standard prompt files
 
 ## Development
 
