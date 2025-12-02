@@ -1,10 +1,10 @@
-# Git Workflow Standard
+# Workflow Standard
 
-> **AI Agent Instructions**: This document defines how to work with Git and GitHub in this project. Follow these rules exactly for all code changes.
+> **AI Agent Instructions**: This document defines the development workflow for this project. Git and GitHub are the tools, but the standard governs how all implementation work proceeds.
 >
 > **Scope**: Project-level standard (applies to this project only)
 >
-> **Rationale**: Consistent git workflow prevents errors, maintains code quality, and enables collaboration.
+> **Rationale**: Consistent workflow ensures traceability, prevents errors, and enables collaboration.
 
 ---
 
@@ -82,11 +82,11 @@ git commit -m "Create functional specification document"
 
 ## This Project Specifics
 
-- **Repository**: virtualian/marr
+- **Repository**: virtualian/repo-setup
 - **Main branch**: main
 - **Merge strategy**: Squash only
 - **Branch cleanup**: Automatic after merge
 
 ---
 
-**This git workflow standard ensures traceable, clean, and maintainable code history.**
+**This workflow standard ensures traceable, clean, and maintainable development practices.**
