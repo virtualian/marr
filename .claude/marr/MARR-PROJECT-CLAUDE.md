@@ -1,90 +1,40 @@
 # MARR Project Configuration
 
-> **MARR (Making Agents Really Reliable)** - A Claude Code configuration system.
-> See: https://github.com/virtualian/marr#readme
+> **AI Agent Instructions**: This document is the entry point for project-level AI agent configuration. Read this file at the start of any session and follow its directives.
 >
-> This file provides project-level configuration.
-> It is imported by `./CLAUDE.md` at the project root.
+> **Scope**: All AI agent work in this project
+>
+> **Rationale**: Centralized configuration ensures consistent agent behavior across all tasks.
+
+---
+
+MARR (Making Agents Really Reliable) provides project-level AI agent configuration.
+
+See `.claude/marr/README.md` for how MARR works.
 
 ## Standards
 
-- **Git Workflow** (`.claude/marr/standards/prj-git-workflow-standard.md`): Read before any git commit, push, or PR operation
-- **Testing** (`.claude/marr/standards/prj-testing-standard.md`): Read before running or writing tests
-- **Documentation** (`.claude/marr/standards/prj-documentation-standard.md`): Read before creating or modifying documentation
-- **MCP Usage** (`.claude/marr/standards/prj-mcp-usage-standard.md`): Read before using MCP tools
+`standards/` contains standard prompt files that must be followed when working on a related activity.
 
-## Project Overview
+**READ `.claude/marr/standards/prj-what-is-a-standard.md` NOW**.
 
-**MARR** is a Claude Code configuration system CLI that provides:
-- Two-layer configuration (user-level + project-level)
-- Unified standards (git workflow, testing, MCP usage, documentation)
-- Templates for initializing new projects
-- Validation of configuration consistency
+In the table below the **Trigger** column is a condition that mandates the reading of its corresponding **Standard** before proceeding. When a Trigger is met, read its Standard immediately—the trigger is the authorization to read the Standard. When more than one Trigger is met, read all the corresponding Standards before proceeding further.
 
-**This repository is both:**
-- The source code for the `marr` npm package
-- A working example of MARR configuration itself
+This trigger mechanism exists because standards contain binding constraints that vary by activity. Reading standards on-demand ensures agents have the right rules loaded at the right time without overwhelming context.
 
-## Tech Stack
+| Trigger | Standard |
+|---------|----------|
+| First time reading any standard in this session. | `prj-what-is-a-standard.md` |
+| Starting any feature, task, or implementation work. Also: git operations, branching, commits, PRs. Always when on main branch. | `prj-workflow-standard.md` |
+| Running, writing, or modifying tests. Also: any code change that requires test coverage. | `prj-testing-standard.md` |
+| Using MCP tools or integrating external services. | `prj-mcp-usage-standard.md` |
+| Creating or modifying documentation files (READMEs, docs/, plans/). Also: restructuring project documentation. | `prj-documentation-standard.md` |
+| Creating or modifying files in `.claude/marr/`. Also: editing any CLAUDE.md file. | `prj-writing-prompts-standard.md` |
 
-- **Language**: TypeScript
-- **Runtime**: Node.js >= 18
-- **Build**: TypeScript compiler (tsc)
-- **Package Manager**: npm
-- **Distribution**: npm registry (@virtualian/marr)
+---
 
-## Architecture
+## Anti-Patterns (FORBIDDEN)
 
-```
-src/
-├── index.ts              # CLI entry point (commander.js)
-├── commands/             # Command implementations
-│   ├── init.ts           # marr init (user/project setup)
-│   ├── validate.ts       # marr validate
-│   └── clean.ts          # marr clean
-└── utils/                # Shared utilities
-    ├── file-ops.ts       # File system operations
-    ├── logger.ts         # Console output formatting
-    └── marr-setup.ts     # User-level setup logic
-
-resources/
-├── project/              # Project-level templates
-│   └── common/           # Standard files (prj-*.md)
-├── user/                 # User-level templates (future use)
-└── helper-scripts/       # GitHub helper scripts
-```
-
-## Key Commands
-
-```bash
-npm run build             # Compile TypeScript
-npm run build:watch       # Watch mode compilation
-npm link                  # Link for local development
-marr --version            # Verify installation
-```
-
-## Development Notes
-
-### Testing Approach
-
-MARR uses isolated user account testing to verify clean installations:
-- Test account: `testuser` on development machine
-- Test script: `tests/testuser/test-in-testuser.sh`
-- Tests verify: user setup, project setup, validation, cleanup
-
-### Release Process
-
-```bash
-./scripts/release.sh patch   # Bump version
-git push origin main --tags
-npm publish --access public
-```
-
-## Documentation Organization
-
-- Technical docs and guides: `docs/`
-- Implementation plans: `plans/`
-- Research notes: `research/`
-- Configuration examples: `examples/`
-
-Follow existing project patterns. This repo uses the structure above.
+- **Skipping triggered standards** — Never assume familiarity; always read the standard when triggered
+- **Partial standard reads** — Read the entire standard, not just sections that seem relevant
+- **Proceeding before reading** — The trigger must be satisfied before continuing work
