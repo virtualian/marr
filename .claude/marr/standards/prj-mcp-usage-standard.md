@@ -1,73 +1,77 @@
 # MCP Usage Standard
 
-> **AI Agent Instructions**: This document defines how to use Model Context Protocol (MCP) tools in this project.
+> **AI Agent Instructions**: This document defines how to use Model Context Protocol (MCP) tools. Follow these rules when using MCP tools or integrating external services.
 >
-> **Scope**: Project-level standard (applies to this project only)
+> **Scope**: All MCP tool usage
 >
-> **Rationale**: MCP tools are powerful but require clear usage patterns to avoid confusion.
+> **Rationale**: MCP tools are powerful but require clear usage patterns to avoid confusion and errors.
 
 ---
 
-## Core Principles (MANDATORY)
+## Triggers
 
-1. **ALWAYS be specific in tool requests** because ambiguous requests cause wrong tool selection
-2. **ALWAYS use explicit tool names when unclear** because AI cannot read minds
-3. **NEVER assume tool capabilities** because each MCP has specific, limited functionality
-
----
-
-## MCP Tools Relevant to This Project
-
-### Not Applicable (Yet)
-
-This project is currently in the specification/planning phase and does not involve:
-- UI component generation (v0 MCP)
-- Accessibility testing (a11y MCP)
-- Visual testing (playwright MCP)
-- Component libraries (shadcn-ui MCP)
-
-### Future Considerations
-
-If this project develops initialization tools with UI:
-- May use v0 for generating setup wizard interfaces
-- May use playwright for testing installation flows
-- May use a11y for ensuring accessible tooling
+**You MUST follow this standard when:**
+- Using any MCP tool
+- Integrating external services via MCP
+- Selecting which MCP tool to use for a task
+- Troubleshooting MCP tool behavior
 
 ---
 
-## Current Project Focus
+## Core Rules (NEVER VIOLATE)
 
-**This project is about:**
-- Creating specifications (markdown documents)
-- Collecting examples (configuration files)
-- Planning implementation (text-based plans)
-- Writing validation tools (future - scripts/code)
-
-**MCP tools are not currently needed** for the core work.
+1. **Be specific in tool requests** because ambiguous requests cause wrong tool selection
+2. **Use explicit tool names when unclear** because AI cannot infer intent from vague descriptions
+3. **Never assume tool capabilities** because each MCP has specific, limited functionality
+4. **Verify tool availability before use** because not all environments have all MCPs
 
 ---
 
-## When MCP Tools Become Relevant
+## MCP Tool Selection
 
-**If building a web-based initialization tool:**
-- Use v0 for UI generation
-- Use tailwind for styling
-- Use a11y for accessibility validation
-- Use playwright for E2E testing
+### Before Using an MCP Tool
 
-**If building CLI initialization tool:**
-- MCP tools generally not applicable
-- Focus on bash/Node.js scripting
-- Use standard testing approaches
+- Confirm the tool is available in the current environment
+- Understand what the tool does and does not do
+- Know the tool's required inputs and expected outputs
+- Be aware of any rate limits or usage constraints
 
----
+### Choosing the Right Tool
 
-## This Project Specifics
-
-- **Current phase**: Specification and planning
-- **MCP usage**: Not currently applicable
-- **Future**: May use for web-based tooling
+- Match the tool to the specific task at hand
+- Prefer specialized tools over general-purpose ones
+- Use the simplest tool that accomplishes the goal
+- Consider tool limitations before starting work
 
 ---
 
-**This MCP usage standard will be updated when the project enters implementation phase and MCP tools become relevant.**
+## Usage Patterns
+
+### Making Requests
+
+- Provide all required parameters explicitly
+- Use clear, unambiguous language
+- Specify expected output format when relevant
+- Include context necessary for the tool to succeed
+
+### Handling Responses
+
+- Verify the response matches expectations
+- Handle errors gracefully
+- Do not retry failed requests without understanding the failure
+- Document unexpected behavior for future reference
+
+---
+
+## Anti-Patterns (FORBIDDEN)
+
+- **Assuming tool availability** — Always verify before use
+- **Vague tool requests** — Be specific about what you need
+- **Ignoring tool limitations** — Respect documented constraints
+- **Blind retries on failure** — Understand why a request failed before retrying
+- **Using wrong tool for the job** — Match tools to tasks appropriately
+- **Overloading single requests** — Break complex tasks into focused tool calls
+
+---
+
+**This MCP usage standard ensures effective and reliable use of Model Context Protocol tools.**

@@ -1,10 +1,17 @@
+---
+title: Testing Standard
+scope: All testing activities
+rationale: Testing ensures code works correctly and prevents regressions.
+triggers:
+  - Running tests
+  - Writing or modifying tests
+  - Evaluating test failures or flaky tests
+  - Determining what needs test coverage
+---
+
 # Testing Standard
 
-> **AI Agent Instructions**: This document defines testing philosophy and practices for this project. Follow these rules for code quality.
->
-> **Scope**: Project-level standard (applies to this project only)
->
-> **Rationale**: Testing ensures configuration system works correctly and prevents regressions.
+> **AI Agent Instructions**: This document defines testing philosophy and practices. Follow these rules when running, writing, or modifying tests.
 
 ---
 
@@ -17,81 +24,65 @@
 
 ---
 
-## Testing Priorities for This Project
+## Testing Priorities
 
 ### High-Value Testing (ALWAYS test)
 
-1. **Configuration Validation**
-   - CLAUDE.md files parse correctly
-   - Prompt references resolve correctly
-   - Required sections present
-
-2. **Template Generation**
-   - Templates produce valid configuration files
-   - Variable substitution works correctly
-   - Generated files pass validation
-
-3. **Initialization Logic**
-   - Directory structure created correctly
-   - Files copied to correct locations
-   - Permissions set appropriately
+- Critical user workflows
+- Data validation and transformation
+- Error handling paths
+- Security-sensitive operations
+- Integration points between systems
 
 ### Low-Value Testing (SKIP these)
 
-- Markdown rendering appearance
-- File system operations (framework responsibility)
-- Git operations (tested by Git itself)
+- Framework functionality (tested by the framework)
+- Third-party library behavior
+- Trivial getters/setters
+- UI appearance (unless critical to functionality)
 
 ---
 
 ## Testing Approach
 
-### For Configuration Validation
-- Read example configurations
-- Verify required sections exist
-- Check prompt file references valid
-- Confirm naming conventions followed
+### Unit Tests
+- Test individual functions and methods
+- Mock external dependencies
+- Fast execution, run frequently
 
-### For Template System
-- Generate from template with test data
-- Validate output structure
-- Verify substitutions correct
-- Check for edge cases
+### Integration Tests
+- Test component interactions
+- Use real dependencies where practical
+- Verify data flows correctly
 
-### For Initialization Tools
-- Create test directory
-- Run initialization
-- Verify expected files exist
-- Check file contents correct
-- Clean up after test
+### End-to-End Tests
+- Test complete user workflows
+- Run against realistic environments
+- Focus on critical paths only
 
 ---
 
 ## Coverage Philosophy
 
-**Realistic thresholds for this project:**
-- Configuration validation: High coverage (70-80%)
-- Template generation: Moderate coverage (50-70%)
-- Helper scripts: Lower coverage (30-50%)
-
 **Focus on meaningful tests, not coverage numbers.**
+
+- High coverage on critical paths
+- Moderate coverage on supporting code
+- Lower coverage acceptable for utilities and helpers
+
+**Coverage is a guide, not a goal.** A well-tested critical path is more valuable than 100% coverage of trivial code.
 
 ---
 
 ## Anti-Patterns (FORBIDDEN)
 
-❌ **Don't test framework features** - Don't test Git, file I/O, etc.
-❌ **Don't test examples** - Examples are reference, not code to test
-❌ **Don't test documentation** - Focus on functional code
+- **Testing framework features** — Don't test what the framework already guarantees
+- **Testing third-party libraries** — Trust published, maintained libraries
+- **Chasing coverage metrics** — Focus on meaningful tests
+- **Committing with failing tests** — All tests must pass before commit
+- **Writing tests after the fact only** — Consider testability during design
+- **Ignoring flaky tests** — Fix or remove unreliable tests immediately
 
 ---
 
-## This Project Specifics
-
-- **Testing approach**: Validation scripts for configurations
-- **No automated tests yet**: In scaffold/planning phase
-- **Future**: Validation tools will need comprehensive tests
-
----
-
-**This testing philosophy ensures high-quality configuration system without wasting effort on low-value tests.**
+**This testing standard ensures high-quality code without wasting effort on low-value tests.**

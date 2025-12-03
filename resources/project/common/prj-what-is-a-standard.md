@@ -1,19 +1,16 @@
+---
+title: What is a Standard
+scope: All standards
+rationale: Understanding what a standard is ensures correct compliance behavior.
+triggers:
+  - Reading any standard for the first time in a session
+  - Before modifying any standard file
+  - Questioning whether a rule is mandatory or optional
+---
+
 # What is a Standard
 
 > **AI Agent Instructions**: This document defines what a standard is and how to treat it. Read this to understand the nature of standards before reading any specific standard.
->
-> **Scope**: All standards
->
-> **Rationale**: Understanding what a standard is ensures correct compliance behavior.
-
----
-
-## Triggers
-
-**You MUST read this standard when:**
-- Reading any standard for the first time in a session
-- Uncertain about whether a rule is mandatory or optional
-- Considering whether to deviate from a standard
 
 ---
 

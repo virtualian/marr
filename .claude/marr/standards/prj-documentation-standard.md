@@ -1,164 +1,57 @@
 # Documentation Standard
 
-> **AI Agent Instructions**: This document defines documentation organization and maintenance for this project. Follow these rules for all documentation work.
+> **AI Agent Instructions**: This document defines documentation organization and maintenance. Follow these rules for all documentation work.
 >
-> **Scope**: Project-level standard (applies to this project only)
+> **Scope**: All documentation activities
 >
-> **Rationale**: Clear documentation organization ensures the configuration system is discoverable and understandable.
+> **Rationale**: Clear documentation organization ensures projects are discoverable and understandable.
+
+---
+
+## Triggers
+
+**You MUST follow this standard when:**
+- Creating or modifying documentation files
+- Restructuring project documentation
+- Adding READMEs or guides
+- Updating existing documentation
 
 ---
 
 ## Core Rules (NEVER VIOLATE)
 
 1. **Documentation lives in designated directories** because scattered docs are invisible
-2. **Update docs when specs change** because outdated docs mislead users
-3. **Use clear, direct language** because this is a technical specification, not marketing
+2. **Update docs when code changes** because outdated docs mislead users
+3. **Use clear, direct language** because technical documentation is not marketing
 4. **Provide examples** because concrete is clearer than abstract
-5. **No AI attribution comments** because code stands on merit, not origin
+5. **No AI attribution comments** because code and docs stand on merit, not origin
 
 ---
 
 ## Documentation Organization
 
-### Directory Structure
+### Recommended Structure
 
-```
-repo-setup/
-├── docs/                          # Role-first documentation
-│   ├── product/                   # Product Owner/Manager role
-│   │   └── prd.md
-│   ├── implementation/            # Developer/Implementer role
-│   │   └── functional-specification.md
-│   └── user/                      # User/Adopter role
-│       └── getting-started.md
-├── examples/                      # Real-world reference implementations
-│   ├── user-level/
-│   ├── project-level/
-│   └── README.md
-├── plans/                         # Implementation plans
-│   └── {plan-name}.md
-└── prompts/                       # Standard prompt files
-    └── prj-*.md
-```
+- **docs/** — Project documentation organized by audience or purpose
+- **examples/** — Real-world reference implementations
+- **plans/** — Implementation plans (if applicable)
 
 ### Directory Purposes
 
-**docs/** (Role-First Organization)
-- Purpose: All MARR documentation organized by user role
-- Structure: Following user-documentation-standard (Diataxis/role-first pattern)
-- Rationale: Users think "I'm a product owner" before "I need a specification"
-
-**docs/product/**
-- Role: Product Owner/Manager
-- Content: Strategic direction, requirements, success criteria, roadmaps
-- Audience: Stakeholders, product managers
-- Examples: PRD, roadmaps, success metrics
-
-**docs/implementation/**
-- Role: Developer/Implementer
-- Content: Technical specifications, architecture, implementation details
-- Audience: Developers building MARR
-- Examples: Functional specs, architecture docs, API design
-
-**docs/user/**
-- Role: User/Adopter
-- Content: Getting started guides, how-tos, templates reference
-- Audience: People using MARR to configure their projects
-- Examples: Getting started, template guides, troubleshooting
+**docs/**
+- Technical specifications and guides
+- Organized by user role or topic
+- Updated when system design changes
 
 **examples/**
-- Purpose: Real working configurations from production projects
-- Audience: Users looking for reference implementations
-- Format: Actual config files with README documentation
-- Updates: When collecting new patterns or updating existing examples
+- Working code examples
+- Real configurations from actual use
+- Include README explaining each example
 
 **plans/**
-- Purpose: Implementation plans for AI agents
-- Audience: AI agents executing work
-- Format: Step-by-step task lists with validation
-- Updates: Created per issue/feature, archived when complete
-
-**prompts/**
-- Purpose: Project-level standard directives
-- Audience: AI agents working in this repo
-- Format: WHAT and WHY, never HOW
-- Updates: When project standards evolve
-
----
-
-## Documentation Standards by Type
-
-### Functional Specifications (docs/)
-
-**Required Sections:**
-- Date (for quick reference)
-- Overview/Executive Summary
-- Detailed specifications
-- Rationale for key decisions
-- Examples where helpful
-
-**Writing Style:**
-- Clear, direct, technical
-- Assume reader is technical
-- Use examples to clarify
-- Explain WHY, not just WHAT
-
-**Maintenance:**
-- Update when system design changes
-- Keep examples current
-- Remove obsolete sections
-- Track major changes via Git history
-
-### Examples (examples/)
-
-**Structure:**
-- Organized by category (user-level, project-level)
-- Include README.md explaining patterns
-- Actual files from real projects (not synthetic)
-- Document what makes each example valuable
-
-**Maintenance:**
-- Update when source projects evolve
-- Add new patterns as discovered
-- Remove patterns no longer relevant
-- Keep README.md current with directory structure
-
-### Plans (plans/)
-
-**Format:**
-- Title: Clear description of objective
-- Overview: What this plan achieves
-- Steps: STEP01, STEP02, etc.
-- Each step: 3-10 tasks in checklist format
-- Validation: How to confirm step completed
-
-**Naming:**
-- Descriptive snake_case names
-- Related to issue/branch if applicable
-- Example: `initialize_new_repo.md`
-
-**Lifecycle:**
-- Created: When starting planned work
-- Updated: As work progresses
-- Completed: All steps checked off
-- Archived: Can be deleted or kept for reference
-
-### Prompts (prompts/)
-
-**Format:**
-- Imperative directives (MUST, NEVER, ALWAYS)
-- State WHAT and WHY, never HOW
-- No code examples or commands
-- Rationale for each rule
-
-**Naming:**
-- `prj-{standard-name}.md`
-- Examples: `prj-git-workflow-standard.md`
-
-**Maintenance:**
-- Update when project standards change
-- Ensure consistency with user-level prompts
-- Test changes on this repo first
+- Implementation plans for specific work
+- Created per issue/feature
+- Archived or deleted when complete
 
 ---
 
@@ -172,7 +65,7 @@ repo-setup/
 
 ### Accuracy
 - Keep docs synchronized with implementation
-- Update examples when source projects change
+- Update examples when code changes
 - Remove obsolete information
 - Verify links and references work
 
@@ -190,90 +83,31 @@ repo-setup/
 
 ---
 
+## Writing Style
+
+### Technical Documentation
+- Clear, direct, technical
+- Assume reader is technical
+- Use examples to clarify
+- Explain WHY, not just WHAT
+
+### READMEs
+- Start with what the project/directory does
+- Include quick start or usage instructions
+- Link to more detailed documentation
+- Keep concise and scannable
+
+---
+
 ## Anti-Patterns (FORBIDDEN)
 
-❌ **Don't scatter documentation** - Use designated directories only
-❌ **Don't create redundant docs** - One source of truth per topic
-❌ **Don't leave outdated docs** - Update or remove, never ignore
-❌ **Don't use marketing language** - This is technical documentation
-❌ **Don't add AI attribution** - No "Generated with Claude" comments
+- **Scattering documentation** — Use designated directories only
+- **Creating redundant docs** — One source of truth per topic
+- **Leaving outdated docs** — Update or remove, never ignore
+- **Using marketing language** — This is technical documentation
+- **Adding AI attribution** — No "Generated with AI" comments
+- **Documenting obvious code** — Don't explain what is self-evident
 
 ---
 
-## This Project Specifics
-
-### Current Documentation
-
-**Product Documentation (docs/product/):**
-- PRD: `docs/product/prd.md` - Product Requirements Document
-- Status: Complete, defines MARR vision and requirements
-- Audience: Product owners, stakeholders
-
-**Implementation Documentation (docs/implementation/):**
-- Status: Empty (ready for functional specs, architecture docs)
-- Future: Functional specifications, technical designs
-- Audience: Developers building MARR
-
-**User Documentation (docs/user/):**
-- Status: Empty (ready for getting started, guides)
-- Future: Getting started, template guides, how-tos
-- Audience: People using MARR
-
-**Examples:**
-- Location: `examples/`
-- Source: Real projects (gainfunction, marrbox, specverse-app-portal, npm-protect)
-- Status: Reference implementations
-- Updates: When source projects evolve or new patterns discovered
-
-**Plans:**
-- Location: `plans/`
-- Current: `phase1-marr-implementation.md`
-- Usage: Created as needed for specific work
-
-**Standards:**
-- Location: `prompts/`
-- Files: Git workflow, testing, MCP usage, documentation (this file)
-- Status: Initial versions, will evolve with project
-
-### Documentation Workflow
-
-**When updating functional spec:**
-1. Make changes to `docs/functional-specification.md`
-2. Update examples if affected
-3. Update this repo's CLAUDE.md if needed
-4. Verify cross-references still valid
-5. Commit with clear message
-
-**When adding examples:**
-1. Copy from source project
-2. Update `examples/README.md`
-3. Document what pattern this demonstrates
-4. Commit with source project reference
-
-**When creating plans:**
-1. Create in `plans/` with descriptive name
-2. Follow plan format (overview, steps, validation)
-3. Work through steps
-4. Delete or archive when complete
-
----
-
-## Integration with Other Standards
-
-**Git Workflow:**
-- Documentation updates are code changes
-- Commit documentation with related code
-- Include doc updates in commit messages
-
-**Testing:**
-- Validate examples still work
-- Check links and references
-- Verify directory structure correct
-
-**MCP Usage:**
-- Not applicable to documentation work
-- Focus on clear markdown writing
-
----
-
-**This documentation standard ensures the configuration system remains discoverable, understandable, and maintainable.**
+**This documentation standard ensures projects remain discoverable, understandable, and maintainable.**
