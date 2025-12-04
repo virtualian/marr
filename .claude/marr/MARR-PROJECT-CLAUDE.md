@@ -34,15 +34,54 @@ Standards define the boundary between acceptable and unacceptable work. They are
 
 `standards/` contains standard prompt files that must be followed when working on a related activity.
 
-In the table below the **Trigger** column is a condition that mandates the reading of its corresponding **Standard** before proceeding. When a Trigger is met, read its Standard immediately—the trigger is the authorization to read the Standard. When more than one Trigger is met, read all the corresponding Standards before proceeding further.
+**IMPORTANT: Conditional Reading Protocol**
 
-| Trigger | Standard |
-|---------|----------|
-| WHEN starting any feature, task, or implementation work. Also: git operations, branching, commits, PRs. Always when on main branch. | `prj-workflow-standard.md` |
-| WHEN running, writing, or modifying tests. Also: any code change that requires test coverage. | `prj-testing-standard.md` |
-| WHEN using MCP tools or integrating external services. | `prj-mcp-usage-standard.md` |
-| WHEN creating or modifying documentation files (READMEs, docs/, plans/). Also: restructuring project documentation. | `prj-documentation-standard.md` |
-| WHEN creating or modifying files in `.claude/marr/`. Also: editing any CLAUDE.md file. | `prj-writing-prompts-standard.md` |
+1. **DO NOT read standards proactively** — Only read a standard when its trigger condition matches your current task
+2. **Evaluate triggers against your current task** — Before each task, scan the trigger list below and identify which (if any) apply
+3. **Read triggered standards before proceeding** — When a trigger matches, read the full standard file immediately
+4. **Multiple triggers = multiple reads** — If more than one trigger matches, read all corresponding standards
+
+### `prj-documentation-standard.md`
+Read this standard when:
+- WHEN creating, modifying, or organizing project documentation
+- WHEN working with README files, guides, or technical specifications
+- WHEN deciding where documentation should live in the project structure
+- WHEN adding explanations, examples, or user-facing content
+
+### `prj-mcp-usage-standard.md`
+Read this standard when:
+- WHEN using MCP tools or integrating external services
+- WHEN selecting which tool to use for a task
+- WHEN troubleshooting tool behavior or failures
+- WHEN configuring or setting up MCP servers
+
+### `prj-testing-standard.md`
+Read this standard when:
+- WHEN running, writing, or modifying tests
+- WHEN evaluating test coverage or testing strategy
+- WHEN investigating test failures or flaky tests
+- WHEN making code changes that should have test coverage
+
+### `prj-ui-ux-standard.md`
+Read this standard when:
+- WHEN creating or modifying UI components or layouts
+- WHEN making visual design or styling decisions
+- WHEN implementing user interactions, forms, or navigation
+- WHEN evaluating accessibility or usability
+
+### `prj-workflow-standard.md`
+Read this standard when:
+- WHEN starting any feature, task, or implementation work
+- WHEN working with git branches, commits, or pull requests
+- WHEN making changes while on the main branch
+- WHEN preparing code for review or merge
+
+### `prj-writing-prompts-standard.md`
+Read this standard when:
+- WHEN creating or modifying prompt files or standards
+- WHEN editing CLAUDE.md or MARR configuration files
+- WHEN reviewing prompts or standards for quality
+- WHEN defining rules or constraints for AI agent behavior
 
 ---
 
