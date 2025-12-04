@@ -31,6 +31,7 @@ program
   .description('MARR - Making Agents Really Reliable\nAI agent configuration system for consistent project context and standards')
   .version(packageJson.version, '-v, --version', 'Show version number')
   .helpOption('-h, --help', 'Show help information')
+  .addHelpCommand(false)
   .addHelpText('after', `
 Examples:
   $ marr init --user              Set up user-level config (run once per machine)
