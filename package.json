@@ -13,7 +13,8 @@
     "lint": "eslint src/**/*.ts",
     "check-bin": "node scripts/check-binary-name.js",
     "prepack": "npm run check-bin && tsc",
-    "prepublishOnly": "npm run check-bin && npm run build && npm test"
+    "prepublishOnly": "npm run check-bin && npm run build && npm test",
+    "reinstall": "npm run build && npm install -g ."
   },
   "keywords": [
     "ai",
