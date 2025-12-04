@@ -1,12 +1,24 @@
 /**
  * Conflict detector for MARR integration
  *
- * Scans user and project configurations to detect potential conflicts
- * with MARR standards and philosophy.
+ * Dynamically scans user and project configurations against installed
+ * MARR standards to detect potential conflicts.
  */
 
 import { join, basename } from 'path';
 import * as fileOps from './file-ops.js';
+import {
+  readInstalledStandards,
+  type Directive,
+  type ParsedStandard,
+} from './standards-reader.js';
+import {
+  scanAllConfigs,
+  scanUserConfig,
+  scanProjectConfig,
+  getTransitiveImports,
+  type ConfigFile,
+} from './config-scanner.js';
 import type {
   Conflict,
   ConflictReport,
@@ -18,78 +30,11 @@ import type {
 const MARR_USER_IMPORT = '@~/.claude/marr/MARR-USER-CLAUDE.md';
 const MARR_PROJECT_IMPORT = '@.claude/marr/MARR-PROJECT-CLAUDE.md';
 
-/** Standard topic keywords for duplicate detection */
-const STANDARD_TOPICS: Record<string, string[]> = {
-  workflow: ['git', 'workflow', 'branch', 'commit', 'merge', 'squash'],
-  testing: ['test', 'testing', 'spec', 'jest', 'vitest', 'pytest'],
-  documentation: ['doc', 'documentation', 'readme', 'docs'],
-  mcp: ['mcp', 'tool', 'server'],
-  prompts: ['prompt', 'standard', 'rule'],
-};
+/** Minimum keyword overlap to consider a potential conflict */
+const MIN_KEYWORD_OVERLAP = 2;
 
-/** Patterns that contradict MARR philosophy */
-interface ConflictPattern {
-  pattern: RegExp;
-  category: ConflictCategory;
-  severity: 'error' | 'warning';
-  description: string;
-  marrExpects: string;
-  marrSource?: string;
-}
-
-const CONFLICT_PATTERNS: ConflictPattern[] = [
-  // Git workflow conflicts
-  {
-    pattern: /\b(always|prefer|use)\s+(merge\s+commits?|regular\s+merges?)\b/i,
-    category: 'directive_conflict',
-    severity: 'warning',
-    description: 'Contradicts MARR squash merge preference',
-    marrExpects: 'Always squash merge for clean history',
-    marrSource: 'prj-workflow-standard.md',
-  },
-  {
-    pattern: /\b(auto[- ]?commit|commit\s+automatically|without\s+approval)\b/i,
-    category: 'directive_conflict',
-    severity: 'warning',
-    description: 'Contradicts MARR approval requirements',
-    marrExpects: 'Always get explicit user approval before commits',
-    marrSource: 'MARR-USER-CLAUDE.md',
-  },
-  {
-    pattern: /\b(force\s+push|push\s+--force)\b/i,
-    category: 'directive_conflict',
-    severity: 'warning',
-    description: 'Force pushing can cause issues',
-    marrExpects: 'Avoid force pushing to shared branches',
-    marrSource: 'prj-workflow-standard.md',
-  },
-  // Attribution conflicts
-  {
-    pattern: /\b(add|include|use)\s+(claude|ai|generated)\s+(attribution|credit|comment)/i,
-    category: 'directive_conflict',
-    severity: 'warning',
-    description: 'Contradicts MARR attribution restrictions',
-    marrExpects: 'Never add AI attribution comments to any file',
-    marrSource: 'MARR-USER-CLAUDE.md',
-  },
-  {
-    pattern: /\bgenerated\s+(with|by)\s+claude\b/i,
-    category: 'directive_conflict',
-    severity: 'warning',
-    description: 'Contains AI attribution directive',
-    marrExpects: 'No "Generated with Claude" or "Co-Authored-By" comments',
-    marrSource: 'MARR-USER-CLAUDE.md',
-  },
-  // Testing conflicts
-  {
-    pattern: /\b(skip|don't\s+run|no)\s+tests?\b/i,
-    category: 'directive_conflict',
-    severity: 'warning',
-    description: 'Contradicts MARR testing requirements',
-    marrExpects: 'Run tests before committing changes',
-    marrSource: 'MARR-USER-CLAUDE.md',
-  },
-];
+/** Minimum similarity score (0-1) to flag as conflict */
+const MIN_SIMILARITY_THRESHOLD = 0.3;
 
 /**
  * Create standard resolutions for a conflict
@@ -194,35 +139,165 @@ function generateConflictId(location: string, category: string, line?: number): 
 }
 
 /**
- * Find line number of a pattern match in content
+ * Find line number of text in content
  */
-function findLineNumber(content: string, match: RegExpMatchArray): number {
-  const beforeMatch = content.substring(0, match.index);
-  return beforeMatch.split('\n').length;
+function findLineNumber(content: string, searchText: string): number | undefined {
+  const index = content.indexOf(searchText);
+  if (index === -1) return undefined;
+  return content.substring(0, index).split('\n').length;
 }
 
 /**
- * Scan a file for directive conflicts
+ * Extract keywords from text for matching
  */
-function scanForDirectiveConflicts(filePath: string, content: string): Conflict[] {
+function extractKeywords(text: string): Set<string> {
+  const stopWords = new Set([
+    'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+    'should', 'may', 'might', 'must', 'shall', 'can', 'need', 'to', 'of',
+    'in', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through',
+    'and', 'but', 'if', 'or', 'because', 'that', 'this', 'it', 'its',
+    'they', 'them', 'their', 'what', 'which', 'who', 'any', 'all',
+  ]);
+
+  const words = text.toLowerCase()
+    .replace(/[^\w\s-]/g, ' ')
+    .split(/\s+/)
+    .filter(word => word.length > 2 && !stopWords.has(word));
+
+  return new Set(words);
+}
+
+/**
+ * Calculate keyword overlap between two sets
+ */
+function keywordOverlap(set1: Set<string>, set2: Set<string>): number {
+  let overlap = 0;
+  for (const word of set1) {
+    if (set2.has(word)) {
+      overlap++;
+    }
+  }
+  return overlap;
+}
+
+/**
+ * Check if text contains negation of a concept
+ */
+function containsNegation(text: string, concept: string): boolean {
+  const lowerText = text.toLowerCase();
+  const lowerConcept = concept.toLowerCase();
+
+  // Common negation patterns
+  const negationPatterns = [
+    `don't ${lowerConcept}`,
+    `do not ${lowerConcept}`,
+    `never ${lowerConcept}`,
+    `no ${lowerConcept}`,
+    `avoid ${lowerConcept}`,
+    `skip ${lowerConcept}`,
+    `without ${lowerConcept}`,
+    `disable ${lowerConcept}`,
+  ];
+
+  return negationPatterns.some(pattern => lowerText.includes(pattern));
+}
+
+/**
+ * Check if text contains affirmation of a concept
+ */
+function containsAffirmation(text: string, concept: string): boolean {
+  const lowerText = text.toLowerCase();
+  const lowerConcept = concept.toLowerCase();
+
+  // Common affirmation patterns
+  const affirmationPatterns = [
+    `always ${lowerConcept}`,
+    `must ${lowerConcept}`,
+    `require ${lowerConcept}`,
+    `use ${lowerConcept}`,
+    `prefer ${lowerConcept}`,
+    `enable ${lowerConcept}`,
+  ];
+
+  return affirmationPatterns.some(pattern => lowerText.includes(pattern));
+}
+
+/**
+ * Detect semantic conflicts between config content and MARR directives
+ */
+function detectDirectiveConflicts(
+  configFile: ConfigFile,
+  directives: Directive[]
+): Conflict[] {
   const conflicts: Conflict[] = [];
+  const contentKeywords = extractKeywords(configFile.content);
 
-  for (const pattern of CONFLICT_PATTERNS) {
-    const matches = content.matchAll(new RegExp(pattern.pattern, 'gi'));
+  for (const directive of directives) {
+    const directiveKeywords = new Set(directive.keywords);
+    const overlap = keywordOverlap(contentKeywords, directiveKeywords);
 
-    for (const match of matches) {
-      const line = findLineNumber(content, match);
+    // Skip if not enough keyword overlap
+    if (overlap < MIN_KEYWORD_OVERLAP) {
+      continue;
+    }
+
+    // Check for semantic conflicts based on directive type
+    let isConflict = false;
+    let conflictDescription = '';
+    let matchedText = '';
+
+    if (directive.type === 'rule') {
+      // Rules are things you MUST do
+      // Check if config contradicts by negating the rule
+      const ruleKeyword = directive.keywords[0] || '';
+
+      if (containsNegation(configFile.content, ruleKeyword)) {
+        isConflict = true;
+        conflictDescription = `Config may contradict MARR rule: "${directive.text}"`;
+
+        // Try to find the conflicting line
+        const lines = configFile.content.split('\n');
+        for (const line of lines) {
+          if (containsNegation(line, ruleKeyword)) {
+            matchedText = line.trim();
+            break;
+          }
+        }
+      }
+    } else if (directive.type === 'anti-pattern') {
+      // Anti-patterns are things you must NOT do
+      // Check if config encourages the anti-pattern
+      const antiKeyword = directive.keywords[0] || '';
+
+      if (containsAffirmation(configFile.content, antiKeyword)) {
+        isConflict = true;
+        conflictDescription = `Config may encourage forbidden pattern: "${directive.text}"`;
+
+        // Try to find the conflicting line
+        const lines = configFile.content.split('\n');
+        for (const line of lines) {
+          if (containsAffirmation(line, antiKeyword)) {
+            matchedText = line.trim();
+            break;
+          }
+        }
+      }
+    }
+
+    if (isConflict && matchedText) {
+      const line = findLineNumber(configFile.content, matchedText);
       conflicts.push({
-        id: generateConflictId(filePath, pattern.category, line),
-        category: pattern.category,
-        severity: pattern.severity,
-        location: filePath,
+        id: generateConflictId(configFile.path, 'directive_conflict', line),
+        category: 'directive_conflict',
+        severity: 'warning',
+        location: configFile.path,
         line,
-        existing: match[0],
-        marrExpects: pattern.marrExpects,
-        marrSource: pattern.marrSource,
-        description: pattern.description,
-        resolutions: createResolutions(pattern.category),
+        existing: matchedText,
+        marrExpects: directive.text,
+        marrSource: directive.source,
+        description: conflictDescription,
+        resolutions: createResolutions('directive_conflict'),
       });
     }
   }
@@ -231,42 +306,60 @@ function scanForDirectiveConflicts(filePath: string, content: string): Conflict[
 }
 
 /**
- * Check for duplicate standards in a directory
+ * Detect duplicate/overlapping standards
  */
-function scanForDuplicateStandards(promptsDir: string): Conflict[] {
+function detectDuplicateStandards(
+  configFile: ConfigFile,
+  installedStandards: ParsedStandard[]
+): Conflict[] {
   const conflicts: Conflict[] = [];
 
-  if (!fileOps.exists(promptsDir)) {
+  // Skip MARR files - they're not duplicates
+  if (configFile.type === 'marr-config' || configFile.type === 'marr-standard') {
     return conflicts;
   }
 
-  const files = fileOps.listFiles(promptsDir, true);
+  // Only check files that look like they define standards
+  if (configFile.type !== 'custom-standard' &&
+      configFile.type !== 'cursor-rules' &&
+      configFile.type !== 'copilot-instructions') {
+    return conflicts;
+  }
 
-  for (const file of files) {
-    if (!file.endsWith('.md')) continue;
+  const contentKeywords = extractKeywords(configFile.content);
 
-    const filename = basename(file).toLowerCase();
-    const content = fileOps.readFile(file).toLowerCase();
+  for (const standard of installedStandards) {
+    // Extract topic from standard title
+    const topic = standard.frontmatter.title
+      .toLowerCase()
+      .replace(/\s*standard\s*/i, '')
+      .trim();
 
-    // Check if file name or content matches any standard topic
-    for (const [topic, keywords] of Object.entries(STANDARD_TOPICS)) {
-      const matchesName = keywords.some(kw => filename.includes(kw));
-      const matchesContent = keywords.filter(kw => content.includes(kw)).length >= 2;
-
-      if (matchesName || matchesContent) {
-        conflicts.push({
-          id: generateConflictId(file, 'duplicate_standard'),
-          category: 'duplicate_standard',
-          severity: 'warning',
-          location: file,
-          existing: `Custom ${topic} standard`,
-          marrExpects: `MARR provides prj-${topic}-standard.md`,
-          marrSource: `prj-${topic}-standard.md`,
-          description: `You have a custom ${topic} standard that may conflict with MARR`,
-          resolutions: createResolutions('duplicate_standard'),
-        });
-        break; // One conflict per file
+    // Get keywords from standard content
+    const standardKeywords = new Set<string>();
+    for (const directive of standard.directives) {
+      for (const kw of directive.keywords) {
+        standardKeywords.add(kw);
       }
+    }
+    // Add topic keywords
+    topic.split(/\s+/).forEach(w => standardKeywords.add(w));
+
+    const overlap = keywordOverlap(contentKeywords, standardKeywords);
+    const similarity = overlap / Math.max(standardKeywords.size, 1);
+
+    if (overlap >= MIN_KEYWORD_OVERLAP && similarity >= MIN_SIMILARITY_THRESHOLD) {
+      conflicts.push({
+        id: generateConflictId(configFile.path, 'duplicate_standard'),
+        category: 'duplicate_standard',
+        severity: 'warning',
+        location: configFile.path,
+        existing: `Custom ${topic} rules in ${configFile.filename}`,
+        marrExpects: `MARR provides ${standard.filename}`,
+        marrSource: standard.filename,
+        description: `File "${configFile.filename}" appears to define ${topic} rules that overlap with MARR standard`,
+        resolutions: createResolutions('duplicate_standard'),
+      });
     }
   }
 
@@ -306,10 +399,13 @@ function checkMissingImport(
 /**
  * Detect conflicts in user-level configuration
  */
-export function detectUserConflicts(): Conflict[] {
+export function detectUserConflicts(projectDir: string = process.cwd()): Conflict[] {
   const conflicts: Conflict[] = [];
-  const claudeRoot = fileOps.getClaudeRoot();
   const claudeMdPath = fileOps.getUserClaudeMdPath();
+
+  // Get installed standards and directives
+  const standards = readInstalledStandards(projectDir);
+  const directives = standards.flatMap(s => s.directives);
 
   // Check for missing import
   const missingImport = checkMissingImport(claudeMdPath, MARR_USER_IMPORT, 'user');
@@ -317,17 +413,32 @@ export function detectUserConflicts(): Conflict[] {
     conflicts.push(missingImport);
   }
 
-  // Scan CLAUDE.md for directive conflicts
-  if (fileOps.exists(claudeMdPath)) {
-    const content = fileOps.readFile(claudeMdPath);
-    conflicts.push(...scanForDirectiveConflicts(claudeMdPath, content));
+  // Scan all user config files
+  const userFiles = scanUserConfig();
+
+  for (const file of userFiles) {
+    // Skip MARR's own files
+    if (file.type === 'marr-config' || file.type === 'marr-standard') {
+      continue;
+    }
+
+    // Check for directive conflicts
+    conflicts.push(...detectDirectiveConflicts(file, directives));
+
+    // Check for duplicate standards
+    conflicts.push(...detectDuplicateStandards(file, standards));
+
+    // Also check transitively imported files
+    const imports = getTransitiveImports(file);
+    for (const imported of imports) {
+      if (imported.type !== 'marr-config' && imported.type !== 'marr-standard') {
+        conflicts.push(...detectDirectiveConflicts(imported, directives));
+        conflicts.push(...detectDuplicateStandards(imported, standards));
+      }
+    }
   }
 
-  // Check for duplicate standards in ~/.claude/prompts/
-  const promptsDir = join(claudeRoot, 'prompts');
-  conflicts.push(...scanForDuplicateStandards(promptsDir));
-
-  return conflicts;
+  return deduplicateConflicts(conflicts);
 }
 
 /**
@@ -335,6 +446,10 @@ export function detectUserConflicts(): Conflict[] {
  */
 export function detectProjectConflicts(projectDir: string = process.cwd()): Conflict[] {
   const conflicts: Conflict[] = [];
+
+  // Get installed standards and directives
+  const standards = readInstalledStandards(projectDir);
+  const directives = standards.flatMap(s => s.directives);
 
   // Check both possible CLAUDE.md locations
   const rootClaudeMdPath = join(projectDir, 'CLAUDE.md');
@@ -352,50 +467,106 @@ export function detectProjectConflicts(projectDir: string = process.cwd()): Conf
     if (missingImport) {
       conflicts.push(missingImport);
     }
-
-    // Scan for directive conflicts
-    const content = fileOps.readFile(claudeMdPath);
-    conflicts.push(...scanForDirectiveConflicts(claudeMdPath, content));
   }
 
-  // Check for duplicate standards in .claude/prompts/
-  const promptsDir = join(projectDir, '.claude', 'prompts');
-  conflicts.push(...scanForDuplicateStandards(promptsDir));
+  // Scan all project config files
+  const projectFiles = scanProjectConfig(projectDir);
 
-  return conflicts;
+  for (const file of projectFiles) {
+    // Skip MARR's own files
+    if (file.type === 'marr-config' || file.type === 'marr-standard') {
+      continue;
+    }
+
+    // Check for directive conflicts
+    conflicts.push(...detectDirectiveConflicts(file, directives));
+
+    // Check for duplicate standards
+    conflicts.push(...detectDuplicateStandards(file, standards));
+
+    // Also check transitively imported files
+    const imports = getTransitiveImports(file);
+    for (const imported of imports) {
+      if (imported.type !== 'marr-config' && imported.type !== 'marr-standard') {
+        conflicts.push(...detectDirectiveConflicts(imported, directives));
+        conflicts.push(...detectDuplicateStandards(imported, standards));
+      }
+    }
+  }
+
+  return deduplicateConflicts(conflicts);
+}
+
+/**
+ * Remove duplicate conflicts (same file + category + line)
+ */
+function deduplicateConflicts(conflicts: Conflict[]): Conflict[] {
+  const seen = new Set<string>();
+  return conflicts.filter(conflict => {
+    if (seen.has(conflict.id)) {
+      return false;
+    }
+    seen.add(conflict.id);
+    return true;
+  });
 }
 
 /**
  * Generate a full conflict report
  */
 export function generateConflictReport(
-  scope: 'user' | 'project' | 'both' = 'both'
+  scope: 'user' | 'project' | 'both' = 'both',
+  projectDir: string = process.cwd()
 ): ConflictReport {
   const conflicts: Conflict[] = [];
   let filesScanned = 0;
 
   if (scope === 'user' || scope === 'both') {
-    conflicts.push(...detectUserConflicts());
-    filesScanned += 2; // CLAUDE.md + prompts dir
+    const userFiles = scanUserConfig();
+    filesScanned += userFiles.length;
+    conflicts.push(...detectUserConflicts(projectDir));
   }
 
   if (scope === 'project' || scope === 'both') {
-    conflicts.push(...detectProjectConflicts());
-    filesScanned += 3; // CLAUDE.md (2 locations) + prompts dir
+    const projectFiles = scanProjectConfig(projectDir);
+    filesScanned += projectFiles.length;
+    conflicts.push(...detectProjectConflicts(projectDir));
   }
 
-  const errors = conflicts.filter(c => c.severity === 'error').length;
-  const warnings = conflicts.filter(c => c.severity === 'warning').length;
+  const dedupedConflicts = deduplicateConflicts(conflicts);
+  const errors = dedupedConflicts.filter(c => c.severity === 'error').length;
+  const warnings = dedupedConflicts.filter(c => c.severity === 'warning').length;
 
   return {
     timestamp: new Date().toISOString(),
     scope,
     filesScanned,
-    conflicts,
+    conflicts: dedupedConflicts,
     summary: {
       errors,
       warnings,
-      total: conflicts.length,
+      total: dedupedConflicts.length,
     },
+  };
+}
+
+/**
+ * Get summary of what will be scanned
+ */
+export function getScanSummary(projectDir: string = process.cwd()): {
+  standards: number;
+  directives: number;
+  configFiles: number;
+  customStandards: number;
+} {
+  const standards = readInstalledStandards(projectDir);
+  const directives = standards.flatMap(s => s.directives);
+  const scanResult = scanAllConfigs(projectDir);
+
+  return {
+    standards: standards.length,
+    directives: directives.length,
+    configFiles: scanResult.files.length,
+    customStandards: scanResult.customStandards.length,
   };
 }
