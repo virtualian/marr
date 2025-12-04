@@ -1,12 +1,14 @@
 ---
+marr: standard
+version: 1
 title: UI/UX Development Standard
-scope: All UI/UX development activities
-rationale: Consistent UI/UX standards ensure accessible, usable, and professional interfaces.
+scope: All UI/UX development including component generation and design decisions
+
 triggers:
-  - Creating or modifying UI components
-  - Making visual design or layout decisions
-  - Implementing user interactions or forms
-  - Validating accessibility compliance
+  - WHEN creating or modifying UI components or layouts
+  - WHEN making visual design or styling decisions
+  - WHEN implementing user interactions, forms, or navigation
+  - WHEN evaluating accessibility or usability
 ---
 
 # UI/UX Development Standard

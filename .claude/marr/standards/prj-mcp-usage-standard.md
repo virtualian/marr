@@ -1,3 +1,16 @@
+---
+marr: standard
+version: 1
+title: MCP Usage Standard
+scope: All MCP tool usage and external service integration
+
+triggers:
+  - WHEN using MCP tools or integrating external services
+  - WHEN selecting which tool to use for a task
+  - WHEN troubleshooting tool behavior or failures
+  - WHEN configuring or setting up MCP servers
+---
+
 # MCP Usage Standard
 
 > **AI Agent Instructions**: This document defines how to use Model Context Protocol (MCP) tools. Follow these rules when using MCP tools or integrating external services.

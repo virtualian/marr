@@ -1,3 +1,16 @@
+---
+marr: standard
+version: 1
+title: Documentation Standard
+scope: All documentation activities including READMEs, docs, and guides
+
+triggers:
+  - WHEN creating, modifying, or organizing project documentation
+  - WHEN working with README files, guides, or technical specifications
+  - WHEN deciding where documentation should live in the project structure
+  - WHEN adding explanations, examples, or user-facing content
+---
+
 # Documentation Standard
 
 > **AI Agent Instructions**: This document defines documentation organization and maintenance. Follow these rules for all documentation work.

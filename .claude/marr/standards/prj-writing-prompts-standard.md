@@ -1,3 +1,16 @@
+---
+marr: standard
+version: 1
+title: Writing Prompts Standard
+scope: Creating and modifying prompt files and standards
+
+triggers:
+  - WHEN creating or modifying prompt files or standards
+  - WHEN editing CLAUDE.md or MARR configuration files
+  - WHEN reviewing prompts or standards for quality
+  - WHEN defining rules or constraints for AI agent behavior
+---
+
 # Writing Prompts Standard
 
 > **AI Agent Instructions**: This document defines how to create and modify prompt and standard files. ALWAYS follow these rules when writing or updating any prompt or standard.
@@ -10,7 +23,7 @@
 
 ## Prerequisite
 
-**READ `prj-what-is-a-standard.md` FIRST**, then READ ALL lines in this file. DO NOT only read sections.
+**READ the "What is a Standard" section in `MARR-PROJECT-CLAUDE.md` FIRST** if you haven't already this session.
 
 Standards are binding constraints, not guidelines. Understanding what a standard is ensures you write them correctly.
 
@@ -84,11 +97,88 @@ When you write a prompt or standard, you are programming AI behavior through nat
 ### Structure Requirements
 
 Each standard file must have:
-1. **Header** - AI agent instructions, scope, rationale
-2. **Triggers** - A list of conditions that trigger the standard
-3. **Core rules** - The non-negotiable requirements
-4. **Detailed sections** - Expanded guidance organized by topic
-5. **Anti-patterns** - Explicitly forbidden behaviors
+1. **YAML frontmatter** - Structured metadata (see Frontmatter Specification below)
+2. **Header** - AI agent instructions, scope, rationale
+3. **Triggers section** - Human-readable list matching frontmatter triggers
+4. **Core rules** - The non-negotiable requirements
+5. **Detailed sections** - Expanded guidance organized by topic
+6. **Anti-patterns** - Explicitly forbidden behaviors
+
+---
+
+## Frontmatter Specification
+
+Every standard file MUST begin with YAML frontmatter between `---` delimiters. This frontmatter is machine-parseable and validated by the `marr standard validate` command.
+
+### Required Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `marr` | `"standard"` | Literal string discriminator. Must be exactly `"standard"`. |
+| `version` | positive integer | Schema version. Currently `1`. |
+| `title` | non-empty string | Human-readable title of the standard. |
+| `scope` | non-empty string | Brief description of when this standard applies. |
+| `triggers` | array of strings | Natural language descriptions of triggering situations. At least one required. |
+
+### Example Frontmatter
+
+```yaml
+---
+marr: standard
+version: 1
+title: Documentation Standard
+scope: All documentation activities including READMEs, docs, and guides
+
+triggers:
+  - WHEN creating, modifying, or organizing project documentation
+  - WHEN working with README files, guides, or technical specifications
+  - WHEN deciding where documentation should live in the project structure
+---
+```
+
+### Validation
+
+Run `marr standard validate --all` to validate all standards against this schema. The CLI exits non-zero on validation failure, enabling CI integration.
+
+---
+
+## Trigger Design
+
+Triggers determine when an AI agent should read and follow a standard. They are **natural language descriptions** of situations, not mechanical patterns.
+
+### Trigger Philosophy
+
+1. **Semantic over mechanical** — Describe situations an AI can recognize, not file patterns or keywords
+2. **Broad over narrow** — It is better to trigger a standard than to miss it
+3. **Overlaps allowed** — Multiple standards may be triggered for the same task; scopes should not overlap, but triggers can
+4. **Describe situations** — Write triggers as situations the agent might encounter, not mental states
+
+### Trigger Format
+
+Every trigger MUST begin with "WHEN" to make it imperative that an agent reads the standard when the condition is met.
+
+### Good Triggers
+
+- "WHEN creating, modifying, or organizing project documentation"
+- "WHEN working with git branches, commits, or pull requests"
+- "WHEN making code changes that should have test coverage"
+- "WHEN evaluating accessibility or usability"
+
+### Bad Triggers
+
+- "When the user mentions docs" — too narrow, keyword-based
+- "*.md files" — mechanical file pattern, not semantic
+- "If you think documentation is relevant" — describes mental state, not situation
+- "documentation" — single keyword, not a situation description
+- "Creating documentation" — missing WHEN prefix
+
+### Trigger Overlap Example
+
+A task like "add a README explaining the new feature" could trigger:
+- **Documentation Standard** — "WHEN creating, modifying, or organizing project documentation"
+- **Workflow Standard** — "WHEN starting any feature, task, or implementation work"
+
+This overlap is correct. Both standards apply; the agent MUST read both.
 
 ---
 

@@ -1,12 +1,14 @@
 ---
+marr: standard
+version: 1
 title: MCP Usage Standard
-scope: All MCP tool usage
-rationale: MCP tools are powerful but require clear usage patterns to avoid confusion and errors.
+scope: All MCP tool usage and external service integration
+
 triggers:
-  - Using any MCP tool
-  - Integrating external services via MCP
-  - Selecting which MCP tool to use for a task
-  - Troubleshooting MCP tool behavior
+  - WHEN using MCP tools or integrating external services
+  - WHEN selecting which tool to use for a task
+  - WHEN troubleshooting tool behavior or failures
+  - WHEN configuring or setting up MCP servers
 ---
 
 # MCP Usage Standard

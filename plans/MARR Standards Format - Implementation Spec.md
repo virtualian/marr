@@ -11,14 +11,13 @@
   version: 1
   title: Example Standard
   scope: When this applies
-  
+
   triggers:
-    - intent: code_review
-    - file_patterns: ["*.py", "*.ts"]
-    - keywords: ["review", "check this"]
-    - always: true
+    - WHEN creating or modifying documentation
+    - WHEN working with README files or guides
+    - WHEN deciding where documentation should live
   ---
-  
+
   Markdown body with instructions...
   ```
 
@@ -27,32 +26,28 @@
   - `marr`: literal `"standard"` (discriminator to ignore other frontmatter formats)
   - `version`: integer, currently `1`
   - `title`: string, required
-  - `scope`: string, required  
-  - `triggers`: array of trigger objects, at least one required
+  - `scope`: string, required
+  - `triggers`: array of strings, at least one required
 
   ## Triggers
 
-  The `triggers` array contains one or more trigger objects. Each object represents a distinct condition. Any matching trigger activates the standard (OR logic).
+  Triggers are **natural language descriptions** of situations where the standard applies. They should be:
 
-  | Trigger Type    | Value    | Description                        |
-  | --------------- | -------- | ---------------------------------- |
-  | `always`        | `true`   | Always load this standard          |
-  | `intent`        | string   | Match against inferred user intent |
-  | `file_patterns` | string[] | Match against files in context     |
-  | `keywords`      | string[] | Match against user message         |
+  - **Semantic**: Describe the situation, not specific files or keywords
+  - **Broad**: It's better to trigger a standard than miss it
+  - **Overlapping allowed**: Multiple standards can be triggered for the same task
 
-  Each trigger object must contain exactly one of these types.
+  Every trigger MUST begin with "WHEN" to make it imperative.
 
-  Example with multiple triggers:
+  Example triggers:
   ```yaml
   triggers:
-    - intent: code_review
-    - intent: refactoring
-    - file_patterns: ["*.py", "*.ts"]
-    - keywords: ["review", "check this code"]
+    - WHEN running, writing, or modifying tests
+    - WHEN evaluating test coverage or testing strategy
+    - WHEN making code changes that should have test coverage
   ```
 
-  This standard activates if intent is `code_review` OR intent is `refactoring` OR any matching file pattern OR any matching keyword.
+  The AI agent MUST read the standard when any trigger condition is met (OR logic).
 
   ## CLI Commands
   ```bash

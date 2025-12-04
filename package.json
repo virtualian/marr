@@ -41,7 +41,9 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
-    "yaml": "^2.6.1"
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.6.1",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
@@ -51,7 +53,11 @@
     "typescript": "^5.7.2"
   },
   "files": [
-    "dist/",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts.map",
+    "!dist/**/*.test.*",
     "resources/",
     "README.md",
     "LICENSE"

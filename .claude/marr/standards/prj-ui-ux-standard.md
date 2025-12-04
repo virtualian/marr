@@ -1,3 +1,16 @@
+---
+marr: standard
+version: 1
+title: UI/UX Development Standard
+scope: All UI/UX development including component generation and design decisions
+
+triggers:
+  - WHEN creating or modifying UI components or layouts
+  - WHEN making visual design or styling decisions
+  - WHEN implementing user interactions, forms, or navigation
+  - WHEN evaluating accessibility or usability
+---
+
 # UI/UX Development Standard
 
 > **AI Agent Instructions**: This document defines UI/UX development standards. Follow these rules for all component generation, design decisions, and user interface work.

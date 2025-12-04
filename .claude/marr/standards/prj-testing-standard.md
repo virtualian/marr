@@ -1,3 +1,16 @@
+---
+marr: standard
+version: 1
+title: Testing Standard
+scope: All testing activities including running, writing, and modifying tests
+
+triggers:
+  - WHEN running, writing, or modifying tests
+  - WHEN evaluating test coverage or testing strategy
+  - WHEN investigating test failures or flaky tests
+  - WHEN making code changes that should have test coverage
+---
+
 # Testing Standard
 
 > **AI Agent Instructions**: This document defines testing philosophy and practices. Follow these rules when running, writing, or modifying tests.

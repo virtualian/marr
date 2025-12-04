@@ -1,3 +1,16 @@
+---
+marr: standard
+version: 1
+title: Workflow Standard
+scope: All development work involving git, branches, commits, and pull requests
+
+triggers:
+  - WHEN starting any feature, task, or implementation work
+  - WHEN working with git branches, commits, or pull requests
+  - WHEN making changes while on the main branch
+  - WHEN preparing code for review or merge
+---
+
 # Workflow Standard
 
 > **AI Agent Instructions**: This document defines the development workflow. Follow these rules for all implementation work.
