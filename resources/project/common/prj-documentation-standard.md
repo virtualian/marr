@@ -1,11 +1,14 @@
 ---
+marr: standard
+version: 1
 title: Documentation Standard
-scope: All documentation activities
-rationale: Clear documentation organization ensures projects are discoverable and understandable.
+scope: All documentation activities including READMEs, docs, and guides
+
 triggers:
-  - Creating, modifying, or deleting documentation files
-  - Restructuring documentation organization
-  - Deciding where documentation should live
+  - WHEN creating, modifying, or organizing project documentation
+  - WHEN working with README files, guides, or technical specifications
+  - WHEN deciding where documentation should live in the project structure
+  - WHEN adding explanations, examples, or user-facing content
 ---
 
 # Documentation Standard

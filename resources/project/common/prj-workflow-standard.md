@@ -1,12 +1,14 @@
 ---
+marr: standard
+version: 1
 title: Workflow Standard
 scope: All development work involving git, branches, commits, and pull requests
-rationale: Consistent workflow ensures traceability, prevents errors, and enables collaboration.
+
 triggers:
-  - Starting any feature, task, or implementation work
-  - Performing git operations (branching, committing, pushing)
-  - Creating or updating pull requests
-  - On the main branch (branch immediately before any changes)
+  - WHEN starting any feature, task, or implementation work
+  - WHEN working with git branches, commits, or pull requests
+  - WHEN making changes while on the main branch
+  - WHEN preparing code for review or merge
 ---
 
 # Workflow Standard

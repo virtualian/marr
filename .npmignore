@@ -1,21 +1,17 @@
-# Source files (only ship compiled dist/)
+# Test files
+*.test.js
+*.test.d.ts
+*.test.js.map
+*.test.d.ts.map
+dist/**/*.test.js
+dist/**/*.test.d.ts
+dist/**/*.test.js.map
+dist/**/*.test.d.ts.map
+
+# Source files
 src/
-tsconfig.json
 
 # Development
-node_modules/
-.DS_Store
-*.log
-
-# IDE
-.vscode/
-.idea/
-
-# Tests
-test/
-*.test.js
-coverage/
-
-# Git
-.git/
-.gitignore
+tests/
+.eslintrc*
+tsconfig.json

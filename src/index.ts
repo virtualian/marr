@@ -14,6 +14,7 @@ import { dirname, join } from 'path';
 import { initCommand } from './commands/init.js';
 import { validateCommand } from './commands/validate.js';
 import { cleanCommand } from './commands/clean.js';
+import { standardCommand } from './commands/standard.js';
 
 // Get package.json for version
 const __filename = fileURLToPath(import.meta.url);
@@ -37,6 +38,8 @@ Examples:
   $ marr init --all               Set up both user and project config
   $ marr validate                 Check configuration is valid
   $ marr clean --project          Remove project MARR config
+  $ marr standard validate --all  Validate all standard frontmatter
+  $ marr standard list            List standards with triggers
 
 Run 'marr <command> --help' for detailed help on each command.`);
 
@@ -44,6 +47,7 @@ Run 'marr <command> --help' for detailed help on each command.`);
 initCommand(program);
 validateCommand(program);
 cleanCommand(program);
+standardCommand(program);
 
 // Parse arguments
 program.parse(process.argv);

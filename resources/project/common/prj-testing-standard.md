@@ -1,12 +1,14 @@
 ---
+marr: standard
+version: 1
 title: Testing Standard
-scope: All testing activities
-rationale: Testing ensures code works correctly and prevents regressions.
+scope: All testing activities including running, writing, and modifying tests
+
 triggers:
-  - Running tests
-  - Writing or modifying tests
-  - Evaluating test failures or flaky tests
-  - Determining what needs test coverage
+  - WHEN running, writing, or modifying tests
+  - WHEN evaluating test coverage or testing strategy
+  - WHEN investigating test failures or flaky tests
+  - WHEN making code changes that should have test coverage
 ---
 
 # Testing Standard
