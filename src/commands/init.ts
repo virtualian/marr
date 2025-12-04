@@ -8,8 +8,9 @@
  */
 
 import { Command } from 'commander';
-import { join, resolve } from 'path';
+import { join, resolve, basename } from 'path';
 import * as readline from 'readline';
+import matter from 'gray-matter';
 import * as logger from '../utils/logger.js';
 import * as fileOps from '../utils/file-ops.js';
 import * as marrSetup from '../utils/marr-setup.js';
@@ -23,18 +24,76 @@ interface InitOptions {
   force: boolean;
 }
 
-/** Required standard - always installed regardless of selection */
-const REQUIRED_STANDARD = 'prj-what-is-a-standard.md';
+/** Standard metadata extracted from frontmatter */
+interface StandardInfo {
+  name: string;       // Short name derived from filename (e.g., 'workflow')
+  file: string;       // Full filename (e.g., 'prj-workflow-standard.md')
+  title: string;      // From frontmatter
+  description: string; // From frontmatter scope
+}
 
-/** Available project standards with trigger conditions */
-const AVAILABLE_STANDARDS = [
-  { name: 'workflow', file: 'prj-workflow-standard.md', description: 'Workflow and branch management', trigger: 'Read before starting work, git commits, PRs' },
-  { name: 'testing', file: 'prj-testing-standard.md', description: 'Testing philosophy and practices', trigger: 'Read before running or writing tests' },
-  { name: 'mcp', file: 'prj-mcp-usage-standard.md', description: 'MCP tool usage patterns', trigger: 'Read before using MCP tools' },
-  { name: 'docs', file: 'prj-documentation-standard.md', description: 'Documentation organization', trigger: 'Read before creating or modifying documentation' },
-  { name: 'prompts', file: 'prj-writing-prompts-standard.md', description: 'How to write and modify prompts', trigger: 'Read before modifying prompt or standard files' },
-  { name: 'ui-ux', file: 'prj-ui-ux-standard.md', description: 'UI/UX development standards', trigger: 'Read before UI/UX work or component generation' },
-];
+/**
+ * Discover available standards from resources/project/common/
+ * Reads frontmatter to extract metadata
+ */
+function discoverAvailableStandards(): StandardInfo[] {
+  const resourcesDir = marrSetup.getResourcesDir();
+  const standardsSource = join(resourcesDir, 'project/common');
+
+  if (!fileOps.exists(standardsSource)) {
+    return [];
+  }
+
+  const files = fileOps.listFiles(standardsSource, false);
+  const standards: StandardInfo[] = [];
+
+  for (const filePath of files) {
+    const filename = basename(filePath);
+
+    // Only process prj-*-standard.md files
+    if (!filename.startsWith('prj-') || !filename.endsWith('-standard.md')) {
+      continue;
+    }
+
+    try {
+      const content = fileOps.readFile(filePath);
+      const parsed = matter(content);
+
+      // Skip files without valid frontmatter
+      if (parsed.data.marr !== 'standard') {
+        continue;
+      }
+
+      // Extract short name from filename: prj-workflow-standard.md -> workflow
+      const name = filename
+        .replace(/^prj-/, '')
+        .replace(/-standard\.md$/, '');
+
+      standards.push({
+        name,
+        file: filename,
+        title: parsed.data.title || name,
+        description: parsed.data.scope || 'No description',
+      });
+    } catch {
+      // Skip files that can't be parsed
+      continue;
+    }
+  }
+
+  // Sort alphabetically by name for consistent ordering
+  return standards.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Cache discovered standards (lazy loaded)
+let _availableStandards: StandardInfo[] | null = null;
+
+function getAvailableStandards(): StandardInfo[] {
+  if (_availableStandards === null) {
+    _availableStandards = discoverAvailableStandards();
+  }
+  return _availableStandards;
+}
 
 export function initCommand(program: Command): void {
   program
@@ -51,22 +110,15 @@ What gets created:
   --user      ~/.claude/marr/MARR-USER-CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
   --project   ./.claude/marr/MARR-PROJECT-CLAUDE.md, ./.claude/marr/standards/*.md, import in ./CLAUDE.md
 
-Standards available (use with --project):
-  workflow  Workflow and branch management
-  testing   Testing philosophy and practices
-  mcp       MCP tool usage patterns
-  docs      Documentation organization
-  prompts   How to write and modify prompts
-  ui-ux     UI/UX development standards
-
-Note: prj-what-is-a-standard.md is always installed (required).
+Standards are discovered from bundled resources. Use --standards list to see available.
 
 Examples:
   $ marr init --user                       First-time setup (run once per machine)
   $ marr init --project                    Interactive standard selection
   $ marr init --project --standards all    Install all standards
   $ marr init --project -s workflow,testing Install specific standards only
-  $ marr init --project -s none            Required standard only, no optional standards
+  $ marr init --project -s none            No standards (config file only)
+  $ marr init --project -s list            Show available standards
   $ marr init --all                        Both user + project setup
   $ marr init --project --dry-run          Preview what would be created
   $ marr init --project --force            Overwrite existing config`)
@@ -85,14 +137,20 @@ async function executeInit(options: InitOptions): Promise<void> {
 
   // Handle --standards list (show available and exit)
   if (standards === 'list') {
+    const availableStandards = getAvailableStandards();
     logger.section('Available Standards');
     logger.blank();
-    for (const std of AVAILABLE_STANDARDS) {
-      logger.log(`  ${std.name.padEnd(10)} ${std.description}`);
+    if (availableStandards.length === 0) {
+      logger.warning('No standards found in bundled resources');
+    } else {
+      for (const std of availableStandards) {
+        logger.log(`  ${std.name.padEnd(12)} ${std.description}`);
+      }
+      logger.blank();
+      const names = availableStandards.map(s => s.name).join(',');
+      logger.info(`Usage: marr init --project --standards ${names}`);
+      logger.info('   or: marr init --project --standards all');
     }
-    logger.blank();
-    logger.info('Usage: marr init --project --standards git,testing,mcp,docs');
-    logger.info('   or: marr init --project --standards all');
     logger.blank();
     return;
   }
@@ -107,7 +165,7 @@ async function executeInit(options: InitOptions): Promise<void> {
     logger.log('  -u, --user              Set up user-level config (~/.claude/marr/, helper scripts)');
     logger.log('  -p, --project [path]    Set up project-level config (./.claude/marr/, import in ./CLAUDE.md)');
     logger.log('  -a, --all [path]        Set up both user and project config');
-    logger.log('  -s, --standards <value> Standards: all, list, or names (workflow,testing,mcp,docs,prompts,ui-ux)');
+    logger.log('  -s, --standards <value> Standards: all, none, list, or comma-separated names');
     logger.log('  -n, --dry-run           Show what would be created without actually creating');
     logger.log('  -f, --force             Skip confirmation prompts');
     logger.blank();
@@ -368,20 +426,21 @@ async function initializeProject(targetDir: string, standards: string | undefine
   }
 
   // Determine which standards to install
-  let selectedStandards: typeof AVAILABLE_STANDARDS;
+  const availableStandards = getAvailableStandards();
+  let selectedStandards: StandardInfo[];
 
   if (standards === 'all') {
-    selectedStandards = AVAILABLE_STANDARDS;
+    selectedStandards = availableStandards;
   } else if (standards === 'none' || standards === '') {
     // Explicit "none" or empty string means no standards
     selectedStandards = [];
   } else if (standards) {
     // Parse comma-separated list
     const requestedNames = standards.split(',').map(s => s.trim().toLowerCase()).filter(s => s);
-    selectedStandards = AVAILABLE_STANDARDS.filter(std => requestedNames.includes(std.name));
+    selectedStandards = availableStandards.filter(std => requestedNames.includes(std.name));
 
     // Warn about unknown standards
-    const knownNames = AVAILABLE_STANDARDS.map(s => s.name);
+    const knownNames = availableStandards.map(s => s.name);
     const unknownNames = requestedNames.filter(name => !knownNames.includes(name));
     if (unknownNames.length > 0) {
       logger.warning(`Unknown standards ignored: ${unknownNames.join(', ')}`);
@@ -389,21 +448,21 @@ async function initializeProject(targetDir: string, standards: string | undefine
     }
   } else if (!dryRun) {
     // Interactive selection
-    selectedStandards = await selectStandards();
+    selectedStandards = await selectStandards(availableStandards);
   } else {
     // Dry run without --standards shows all (for preview purposes)
-    selectedStandards = AVAILABLE_STANDARDS;
+    selectedStandards = availableStandards;
   }
 
   if (dryRun) {
     logger.info(`Would create: ${marrPath}/`);
     logger.info(`Would create: ${marrProjectClaudeMdPath}`);
     logger.info(`Would create: ${marrPath}/README.md`);
-    // Standards directory always created (required standard is always installed)
-    logger.info(`Would create: ${standardsPath}/`);
-    logger.info(`Would create: ${standardsPath}/${REQUIRED_STANDARD} (required)`);
-    for (const std of selectedStandards) {
-      logger.info(`Would create: ${standardsPath}/${std.file}`);
+    if (selectedStandards.length > 0) {
+      logger.info(`Would create: ${standardsPath}/`);
+      for (const std of selectedStandards) {
+        logger.info(`Would create: ${standardsPath}/${std.file}`);
+      }
     }
     if (fileOps.exists(projectClaudeMdPath)) {
       logger.info(`Would add: MARR import to ${projectClaudeMdPath}`);
@@ -413,9 +472,8 @@ async function initializeProject(targetDir: string, standards: string | undefine
     return;
   }
 
-  // Create directories (standards directory always created for required standard)
+  // Create directories
   fileOps.ensureDir(marrPath);
-  fileOps.ensureDir(standardsPath);
 
   // Copy MARR-PROJECT-CLAUDE.md template
   copyMarrProjectClaudeMd(marrPath);
@@ -423,11 +481,9 @@ async function initializeProject(targetDir: string, standards: string | undefine
   // Create .claude/marr/README.md
   createMarrReadme(marrPath);
 
-  // Copy required standard (always installed)
-  copyRequiredStandard(standardsPath);
-
   // Copy selected project-level standards
   if (selectedStandards.length > 0) {
+    fileOps.ensureDir(standardsPath);
     copyProjectStandards(standardsPath, selectedStandards);
   }
 
@@ -463,7 +519,7 @@ async function confirmPath(targetDir: string): Promise<boolean> {
 /**
  * Interactive prompt for selecting which standards to install
  */
-async function selectStandards(): Promise<typeof AVAILABLE_STANDARDS> {
+async function selectStandards(availableStandards: StandardInfo[]): Promise<StandardInfo[]> {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -480,16 +536,16 @@ async function selectStandards(): Promise<typeof AVAILABLE_STANDARDS> {
   logger.info('Select standards to install (Enter to skip, "all" for all):');
   logger.blank();
 
-  const selected: typeof AVAILABLE_STANDARDS = [];
+  const selected: StandardInfo[] = [];
 
-  for (const std of AVAILABLE_STANDARDS) {
+  for (const std of availableStandards) {
     const answer = await question(`  Install ${std.name}? (${std.description}) [y/N/all] `);
     const normalized = answer.toLowerCase().trim();
 
     if (normalized === 'all') {
       rl.close();
       logger.blank();
-      return AVAILABLE_STANDARDS;
+      return availableStandards;
     }
 
     if (normalized === 'y' || normalized === 'yes') {
@@ -530,22 +586,6 @@ function copyMarrProjectClaudeMd(marrPath: string): void {
 }
 
 /**
- * Copy the required standard (always installed regardless of selection)
- */
-function copyRequiredStandard(standardsPath: string): void {
-  const resourcesDir = marrSetup.getResourcesDir();
-  const srcPath = join(resourcesDir, 'project/common', REQUIRED_STANDARD);
-  const destPath = join(standardsPath, REQUIRED_STANDARD);
-
-  if (fileOps.exists(srcPath)) {
-    fileOps.copyFile(srcPath, destPath);
-    logger.success(`Created: .claude/marr/standards/${REQUIRED_STANDARD} (required)`);
-  } else {
-    logger.warning(`Required standard not found: ${REQUIRED_STANDARD}`);
-  }
-}
-
-/**
  * Create README.md for .claude/marr/ directory
  */
 function createMarrReadme(marrPath: string): void {
@@ -561,8 +601,7 @@ This directory contains MARR (Making Agents Really Reliable) configuration for t
 .claude/marr/
 ├── MARR-PROJECT-CLAUDE.md   # Project-specific AI agent configuration
 ├── README.md                # This file
-└── standards/               # Project-level standards
-    ├── prj-what-is-a-standard.md  # Required - always installed
+└── standards/               # Project-level standards (optional)
     ├── prj-workflow-standard.md
     ├── prj-testing-standard.md
     └── ...
@@ -578,9 +617,11 @@ This directory contains MARR (Making Agents Really Reliable) configuration for t
 
 Edit files in this directory to match your project's needs. Changes are version-controlled with your project.
 
-## Validation
+## Commands
 
-Run \`marr validate\` to check configuration is correct.
+- \`marr validate\` - Check configuration is correct
+- \`marr standard list\` - List installed standards
+- \`marr standard sync\` - Regenerate trigger list from frontmatter
 `;
 
   fileOps.writeFile(destPath, content);
@@ -590,7 +631,7 @@ Run \`marr validate\` to check configuration is correct.
 /**
  * Copy project-level standards to standards/ directory
  */
-function copyProjectStandards(standardsPath: string, selectedStandards: typeof AVAILABLE_STANDARDS): void {
+function copyProjectStandards(standardsPath: string, selectedStandards: StandardInfo[]): void {
   const resourcesDir = marrSetup.getResourcesDir();
   const standardsSource = join(resourcesDir, 'project/common');
 
