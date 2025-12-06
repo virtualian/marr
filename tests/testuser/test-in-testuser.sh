@@ -228,8 +228,53 @@ log_success "Validation passed"
 ((TESTS_PASSED++))
 log_blank
 
-# Test 8: marr clean --project --dry-run
-log_info "Test 8: marr clean --project --dry-run"
+# Test 8: marr validate --conflicts (conflict detection)
+log_info "Test 8: marr validate --conflicts"
+if [[ $QUIET -eq 1 ]]; then
+    marr validate --conflicts > /dev/null 2>&1
+else
+    marr validate --conflicts
+fi
+log_success "Conflict detection works"
+((TESTS_PASSED++))
+log_blank
+
+# Test 9: marr validate --conflicts --json (JSON output)
+log_info "Test 9: marr validate --conflicts --json"
+JSON_OUTPUT=$(marr validate --conflicts --json 2>/dev/null)
+if echo "$JSON_OUTPUT" | grep -q '"scope"'; then
+    log_success "JSON conflict report works"
+    ((TESTS_PASSED++))
+else
+    log_error "JSON output missing expected fields"
+    ((TESTS_FAILED++))
+fi
+log_blank
+
+# Test 10: marr doctor --dry-run (preview conflict resolution)
+log_info "Test 10: marr doctor --dry-run"
+if [[ $QUIET -eq 1 ]]; then
+    marr doctor --dry-run --project > /dev/null 2>&1
+else
+    marr doctor --dry-run --project
+fi
+log_success "Doctor dry-run works"
+((TESTS_PASSED++))
+log_blank
+
+# Test 11: marr doctor --help (verify command exists)
+log_info "Test 11: marr doctor --help"
+if marr doctor --help 2>&1 | grep -q "Interactive conflict resolution"; then
+    log_success "Doctor help shows correct description"
+    ((TESTS_PASSED++))
+else
+    log_error "Doctor help missing expected content"
+    ((TESTS_FAILED++))
+fi
+log_blank
+
+# Test 12: marr clean --project --dry-run
+log_info "Test 12: marr clean --project --dry-run"
 if [[ $QUIET -eq 1 ]]; then
     marr clean --project --dry-run > /dev/null 2>&1
 else
@@ -239,8 +284,8 @@ log_success "Clean dry-run works"
 ((TESTS_PASSED++))
 log_blank
 
-# Test 9: marr clean --user --dry-run
-log_info "Test 9: marr clean --user --dry-run"
+# Test 13: marr clean --user --dry-run
+log_info "Test 13: marr clean --user --dry-run"
 if [[ $QUIET -eq 1 ]]; then
     marr clean --user --dry-run > /dev/null 2>&1
 else

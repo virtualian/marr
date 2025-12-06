@@ -1,19 +1,26 @@
 /**
  * Validate command - Validate MARR configuration
+ *
+ * Performs structural validation and conflict detection
  */
 
 import { Command } from 'commander';
 import { join } from 'path';
 import * as logger from '../utils/logger.js';
 import * as fileOps from '../utils/file-ops.js';
+import { detectProjectConflicts } from '../utils/conflict-detector.js';
+import type { Conflict } from '../types/conflict.js';
 
 interface ValidateOptions {
   strict?: boolean;
+  conflicts?: boolean;
+  json?: boolean;
 }
 
 interface ValidationResult {
   errors: string[];
   warnings: string[];
+  conflicts: Conflict[];
 }
 
 export function validateCommand(program: Command): void {
@@ -21,41 +28,77 @@ export function validateCommand(program: Command): void {
     .command('validate')
     .description('Validate MARR configuration in current project')
     .option('--strict', 'Treat warnings as errors (exit code 1)')
+    .option('--conflicts', 'Only check for conflicts (skip structural validation)')
+    .option('--json', 'Output results as JSON')
     .addHelpText('after', `
 What it checks:
+  Structural validation:
   • .claude/marr/MARR-PROJECT-CLAUDE.md exists and has required sections
   • .claude/marr/standards/ directory exists with standard files
   • Prompt files follow naming convention (prj-*)
   • CLAUDE.md has MARR import line
 
+  Conflict detection:
+  • Directives that contradict MARR philosophy
+  • Duplicate standards that overlap with MARR
+  • Missing MARR imports
+
 Examples:
-  $ marr validate              Standard validation (warnings allowed)
+  $ marr validate              Standard validation
   $ marr validate --strict     Fail if any warnings found
+  $ marr validate --conflicts  Only check for conflicts
+  $ marr validate --json       Output as JSON (for tooling)
 
 Exit codes:
   0  Validation passed
   1  Validation failed (errors, or warnings in strict mode)`)
     .action((options: ValidateOptions) => {
-      const result = validateProject(options);
-      displayResults(result, options);
+      const result = options.conflicts
+        ? validateConflictsOnly()
+        : validateProject();
+
+      if (options.json) {
+        displayResultsJson(result);
+      } else {
+        displayResults(result, options);
+      }
 
       // Exit with error code if validation failed
       if (result.errors.length > 0) {
         process.exit(1);
       }
 
-      if (options.strict && result.warnings.length > 0) {
+      // Count conflicts as warnings for exit code purposes
+      const totalWarnings = result.warnings.length + result.conflicts.length;
+
+      if (options.strict && totalWarnings > 0) {
         process.exit(1);
       }
     });
 }
 
-function validateProject(_options: ValidateOptions): ValidationResult {
+/**
+ * Only check for conflicts, skip structural validation
+ */
+function validateConflictsOnly(): ValidationResult {
+  const conflicts = detectProjectConflicts();
+  return {
+    errors: [],
+    warnings: [],
+    conflicts,
+  };
+}
+
+/**
+ * Full validation: structure + conflicts
+ */
+function validateProject(): ValidationResult {
   logger.section('MARR Configuration Validation');
 
   const result: ValidationResult = {
     errors: [],
     warnings: [],
+    conflicts: [],
   };
 
   // Check if we're in a MARR project
@@ -77,6 +120,15 @@ function validateProject(_options: ValidateOptions): ValidationResult {
 
   // Validate root CLAUDE.md has import
   validateRootClaudeMd(result);
+
+  // Detect conflicts
+  logger.blank();
+  logger.info('Checking for conflicts...');
+  result.conflicts = detectProjectConflicts();
+
+  if (result.conflicts.length === 0) {
+    logger.success('No conflicts detected');
+  }
 
   return result;
 }
@@ -105,11 +157,6 @@ function validateMarrProjectClaudeMd(result: ValidationResult): void {
   const marrProjectClaudeMdPath = join(process.cwd(), '.claude', 'marr', 'MARR-PROJECT-CLAUDE.md');
   const content = fileOps.readFile(marrProjectClaudeMdPath);
 
-  // Check for required sections
-  if (!content.includes('Project Overview')) {
-    result.warnings.push('MARR-PROJECT-CLAUDE.md missing "Project Overview" section');
-  }
-
   // Check for project name heading
   const lines = content.split('\n');
   const firstHeading = lines.find(line => line.startsWith('# '));
@@ -134,20 +181,8 @@ function validateStandardsDirectory(result: ValidationResult): void {
     return;
   }
 
-  // Check for recommended standard files
-  const recommendedStandards = [
-    'prj-git-workflow-standard.md',
-    'prj-testing-standard.md',
-    'prj-mcp-usage-standard.md',
-    'prj-documentation-standard.md',
-  ];
-
-  for (const standard of recommendedStandards) {
-    const standardPath = join(standardsDir, standard);
-    if (!fileOps.exists(standardPath)) {
-      result.warnings.push(`Missing recommended standard: standards/${standard}`);
-    }
-  }
+  // Note: Removed check for specific recommended standards
+  // Projects can choose which standards to use
 
   logger.success('.claude/marr/standards/ directory validated');
 }
@@ -219,6 +254,36 @@ function validateRootClaudeMd(result: ValidationResult): void {
   }
 }
 
+/**
+ * Display results as JSON
+ */
+function displayResultsJson(result: ValidationResult): void {
+  const output = {
+    timestamp: new Date().toISOString(),
+    valid: result.errors.length === 0,
+    errors: result.errors,
+    warnings: result.warnings,
+    conflicts: result.conflicts.map(c => ({
+      id: c.id,
+      category: c.category,
+      severity: c.severity,
+      location: c.location,
+      line: c.line,
+      description: c.description,
+      existing: c.existing,
+      marrExpects: c.marrExpects,
+      marrSource: c.marrSource,
+    })),
+    summary: {
+      errors: result.errors.length,
+      warnings: result.warnings.length,
+      conflicts: result.conflicts.length,
+    },
+  };
+
+  console.log(JSON.stringify(output, null, 2));
+}
+
 function displayResults(result: ValidationResult, options: ValidateOptions): void {
   // Display errors
   if (result.errors.length > 0) {
@@ -236,18 +301,40 @@ function displayResults(result: ValidationResult, options: ValidateOptions): voi
     }
   }
 
+  // Display conflicts
+  if (result.conflicts.length > 0) {
+    logger.section('Conflicts Detected');
+    for (const conflict of result.conflicts) {
+      const severityIcon = conflict.severity === 'error' ? '✗' : '⚠';
+      logger.log(`\n${severityIcon} ${conflict.description}`);
+      logger.log(`  Location: ${conflict.location}${conflict.line ? `:${conflict.line}` : ''}`);
+      logger.log(`  Found: "${conflict.existing}"`);
+      if (conflict.marrExpects) {
+        logger.log(`  MARR expects: ${conflict.marrExpects}`);
+      }
+      if (conflict.marrSource) {
+        logger.log(`  Source: ${conflict.marrSource}`);
+      }
+    }
+    logger.blank();
+    logger.info('Run: marr doctor  to resolve conflicts interactively');
+  }
+
   // Summary
-  if (result.errors.length === 0 && result.warnings.length === 0) {
+  const totalIssues = result.errors.length + result.warnings.length + result.conflicts.length;
+
+  if (totalIssues === 0) {
     logger.blank();
     logger.success('Validation passed! Configuration is valid.');
   } else {
     logger.section('Summary');
     logger.log(`Errors: ${result.errors.length}`);
     logger.log(`Warnings: ${result.warnings.length}`);
+    logger.log(`Conflicts: ${result.conflicts.length}`);
 
-    if (options.strict && result.warnings.length > 0) {
+    if (options.strict && (result.warnings.length > 0 || result.conflicts.length > 0)) {
       logger.blank();
-      logger.error('Validation failed in strict mode (warnings treated as errors)');
+      logger.error('Validation failed in strict mode (warnings/conflicts treated as errors)');
     }
   }
 
