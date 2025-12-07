@@ -68,6 +68,73 @@ triggers:
 
 ---
 
+## Content Types (Diátaxis Framework)
+
+Documentation content falls into three types for technical projects. Each type serves a different user need—keep them distinct.
+
+See [Diátaxis](https://diataxis.fr/) for the full framework.
+
+### How-To Guides (Task-Oriented)
+
+**Purpose:** Help users accomplish specific tasks they've already decided to do.
+
+- Solve a particular problem the user has chosen to tackle
+- Assume competence—no teaching required
+- Focus on practical steps to achieve the goal
+- Title with the task: "How to configure X", "How to deploy Y"
+
+### Reference (Information-Oriented)
+
+**Purpose:** Provide technical descriptions of how the system works.
+
+- Describe the machinery and how to operate it
+- Structure around the code or product architecture
+- Be accurate, comprehensive, and austere
+- Optimized for lookup, not reading cover-to-cover
+
+### Explanation (Understanding-Oriented)
+
+**Purpose:** Clarify concepts, design decisions, and context.
+
+- Discuss the "why" behind implementations
+- Explore alternatives and trade-offs
+- Connect ideas across the system
+- No step-by-step instructions—this is about understanding
+
+### Role-First Navigation (Optional)
+
+When documentation serves multiple user roles with different needs, organize by role first:
+
+```
+docs/
+  administrator/
+    how-to/
+    reference/
+    explanation/
+  user/
+    how-to/
+    reference/
+```
+
+Users think "I'm an administrator" before "I need a how-to guide." Role-first navigation reduces cognitive load.
+
+### Avoiding Content Collapse
+
+Documentation naturally wants to blur boundaries between types. Resist this.
+
+**Warning signs:**
+- How-to guides that digress into theory unrelated to the task
+- Reference material that teaches rather than describes
+- Explanation content with step-by-step instructions
+
+**Fix:** Ask two questions:
+1. Is this **action** (practical) or **cognition** (theoretical)?
+2. Is this **acquisition** (learning) or **application** (problem-solving)?
+
+The answers reveal where content belongs.
+
+---
+
 ## Documentation Quality Standards
 
 ### Clarity
