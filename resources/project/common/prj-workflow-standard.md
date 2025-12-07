@@ -19,12 +19,13 @@ triggers:
 
 ## Core Rules (NEVER VIOLATE)
 
-1. **Verify issue exists BEFORE any action** because working without tracking causes chaos
-2. **Delete merged branches** because clean repos prevent confusion
-3. **Always squash merge** because linear history is easier to understand and debug
-4. **Branch from main only** (except hotfixes from production tags) because branching from branches creates complexity
-5. **Maximum 5-day branch lifetime** because short-lived branches reduce merge conflicts
-6. **Use issue-based branch naming** because traceability matters
+1. **NEVER make code changes on the main branch** because main must always be deployable and all work must be traceable to a feature branch
+2. **Verify issue exists BEFORE any action** because working without tracking causes chaos
+3. **Delete merged branches** because clean repos prevent confusion
+4. **Always squash merge** because linear history is easier to understand and debug
+5. **Branch from main only** (except hotfixes from production tags) because branching from branches creates complexity
+6. **Maximum 5-day branch lifetime** because short-lived branches reduce merge conflicts
+7. **Use issue-based branch naming** because traceability matters
 
 ---
 
@@ -47,10 +48,11 @@ triggers:
 1. Start from current main branch
 2. Pull latest changes
 3. Create issue-based branch
-4. Develop incrementally with meaningful commits
-5. Push to remote with upstream tracking
-6. Create draft PR immediately for CI checks
-7. When ready, mark PR ready for review
+4. **Before making ANY code changes**: Verify you are on a feature branch (not main). If on main, STOP and create a branch first.
+5. Develop incrementally with meaningful commits
+6. Push to remote with upstream tracking
+7. Create draft PR immediately for CI checks
+8. When ready, mark PR ready for review
 
 ---
 
@@ -81,6 +83,7 @@ triggers:
 
 ## Anti-Patterns (FORBIDDEN)
 
+- **Making changes on main** — All code changes must be on a feature branch, even "quick fixes"
 - **Working without an issue** — All work must be tracked
 - **Long-lived branches** — Merge or close within 5 days
 - **Merge commits** — Always squash merge
