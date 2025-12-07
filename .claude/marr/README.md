@@ -19,11 +19,11 @@ MARR uses a two-layer configuration system:
 ├── MARR-PROJECT-CLAUDE.md   # Project configuration (imported by CLAUDE.md)
 ├── README.md                # This file
 └── standards/               # Project-level standards
-    ├── prj-git-workflow-standard.md
-    ├── prj-testing-standard.md
-    ├── prj-mcp-usage-standard.md
     ├── prj-documentation-standard.md
-    ├── prj-what-is-a-standard.md
+    ├── prj-mcp-usage-standard.md
+    ├── prj-testing-standard.md
+    ├── prj-ui-ux-standard.md
+    ├── prj-workflow-standard.md
     └── prj-writing-prompts-standard.md
 ```
 
