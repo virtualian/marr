@@ -9,7 +9,6 @@
 
 import { Command } from 'commander';
 import { join, basename } from 'path';
-import { statSync } from 'fs';
 import matter from 'gray-matter';
 import * as logger from '../utils/logger.js';
 import * as fileOps from '../utils/file-ops.js';
@@ -21,11 +20,6 @@ import {
 
 // Default paths relative to project root
 const STANDARDS_DIR = join('.claude', 'marr', 'standards');
-const CONFIG_FILE = join('.claude', 'marr', 'MARR-PROJECT-CLAUDE.md');
-
-// Section markers for sync
-const STANDARDS_SECTION_START = '## Standards';
-const STANDARDS_SECTION_END = '---';
 
 interface ParsedStandard {
   path: string;
@@ -307,176 +301,6 @@ triggers:
   logger.log('  3. Run: marr standard validate ' + filename);
 }
 
-/**
- * Verify file is owned by current user (security check)
- * Returns true if owned by current user, false otherwise
- */
-function isOwnedByCurrentUser(filePath: string): boolean {
-  try {
-    const stat = statSync(filePath);
-    const currentUid = process.getuid?.();
-    // On Windows, getuid returns undefined - skip ownership check
-    if (currentUid === undefined) {
-      return true;
-    }
-    return stat.uid === currentUid;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Generate standard entry with triggers as bullet list
- */
-function generateStandardEntry(standard: ParsedStandard): string {
-  const triggers = standard.frontmatter.triggers.map(formatTrigger);
-  const bulletList = triggers.map((t) => `- ${t}`).join('\n');
-
-  return `### \`${standard.filename}\`
-Read this standard when:
-${bulletList}`;
-}
-
-/**
- * Sync subcommand - generate standards section from frontmatter
- */
-function handleSync(options: { dryRun?: boolean }): void {
-  const standardsDir = join(process.cwd(), STANDARDS_DIR);
-  const configPath = join(process.cwd(), CONFIG_FILE);
-
-  // Check standards directory exists
-  if (!fileOps.exists(standardsDir)) {
-    logger.error(`Standards directory not found: ${STANDARDS_DIR}/`);
-    logger.log('Run: marr init --project');
-    process.exit(1);
-  }
-
-  // Check config file exists
-  if (!fileOps.exists(configPath)) {
-    logger.error(`Config file not found: ${CONFIG_FILE}`);
-    logger.log('Run: marr init --project');
-    process.exit(1);
-  }
-
-  const files = findStandardFiles(standardsDir);
-
-  if (files.length === 0) {
-    logger.warning('No standard files found');
-    process.exit(0);
-  }
-
-  logger.section('Syncing standards section');
-
-  // Parse and verify ownership of each standard
-  const validStandards: ParsedStandard[] = [];
-  const skipped: { path: string; reason: string }[] = [];
-
-  for (const file of files) {
-    // Security: verify file ownership
-    if (!isOwnedByCurrentUser(file)) {
-      skipped.push({ path: file, reason: 'not owned by current user' });
-      continue;
-    }
-
-    const result = parseStandardFile(file);
-
-    if (isValidationError(result)) {
-      skipped.push({ path: file, reason: 'invalid frontmatter' });
-      continue;
-    }
-
-    validStandards.push(result);
-  }
-
-  // Report skipped files
-  if (skipped.length > 0) {
-    logger.warning(`Skipped ${skipped.length} file(s):`);
-    for (const s of skipped) {
-      logger.log(`  - ${basename(s.path)}: ${s.reason}`);
-    }
-    logger.blank();
-  }
-
-  if (validStandards.length === 0) {
-    logger.error('No valid standards to sync');
-    process.exit(1);
-  }
-
-  // Sort standards alphabetically by filename for consistent output
-  validStandards.sort((a, b) => a.filename.localeCompare(b.filename));
-
-  // Generate standard entries
-  const entries = validStandards.map(generateStandardEntry);
-  const newSection = `${STANDARDS_SECTION_START}
-
-\`standards/\` contains standard prompt files that must be followed when working on a related activity.
-
-**IMPORTANT: Conditional Reading Protocol**
-
-1. **DO NOT read standards proactively** — Only read a standard when its trigger condition matches your current task
-2. **Evaluate triggers against your current task** — Before each task, scan the trigger list below and identify which (if any) apply
-3. **Read triggered standards before proceeding** — When a trigger matches, read the full standard file immediately
-4. **Multiple triggers = multiple reads** — If more than one trigger matches, read all corresponding standards
-
-${entries.join('\n\n')}
-
-${STANDARDS_SECTION_END}`;
-
-  // Read config file
-  const configContent = fileOps.readFile(configPath);
-
-  // Find and replace existing standards section
-  const lines = configContent.split('\n');
-  let sectionStartIndex = -1;
-  let sectionEndIndex = -1;
-
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].trim() === STANDARDS_SECTION_START) {
-      sectionStartIndex = i;
-    } else if (sectionStartIndex !== -1 && sectionEndIndex === -1) {
-      // Look for the closing --- that ends this section
-      if (lines[i].trim() === STANDARDS_SECTION_END) {
-        sectionEndIndex = i + 1; // Include the ---
-        break;
-      }
-    }
-  }
-
-  if (sectionStartIndex === -1) {
-    logger.error('Could not find Standards section in config file');
-    logger.log('Expected section header: ' + STANDARDS_SECTION_START);
-    process.exit(1);
-  }
-
-  // Handle missing end marker
-  if (sectionEndIndex === -1) {
-    logger.error('Could not find end of Standards section (---)');
-    process.exit(1);
-  }
-
-  // Build new content
-  const newLines = [
-    ...lines.slice(0, sectionStartIndex),
-    ...newSection.split('\n'),
-    ...lines.slice(sectionEndIndex),
-  ];
-  const newContent = newLines.join('\n');
-
-  // Dry run: show diff
-  if (options.dryRun) {
-    logger.log('Dry run - would update standards section:\n');
-    logger.log(newSection);
-    logger.blank();
-    logger.log(`${validStandards.length} standard(s) would be synced`);
-    return;
-  }
-
-  // Write updated config
-  fileOps.writeFile(configPath, newContent);
-
-  logger.success(`Updated ${CONFIG_FILE}`);
-  logger.log(`Synced ${validStandards.length} standard(s)`);
-}
 
 /**
  * Register the standard command with subcommands
@@ -490,8 +314,7 @@ Examples:
   $ marr standard validate prj-testing-standard.md
   $ marr standard validate --all
   $ marr standard list
-  $ marr standard create my-new-standard
-  $ marr standard sync --dry-run`);
+  $ marr standard create my-new-standard`);
 
   // validate subcommand
   cmd
@@ -529,18 +352,4 @@ Examples:
 
 The 'prj-' prefix and '.md' extension are added automatically if missing.`)
     .action(handleCreate);
-
-  // sync subcommand
-  cmd
-    .command('sync')
-    .description('Generate trigger table from standard frontmatter')
-    .option('--dry-run', 'Preview changes without writing')
-    .addHelpText('after', `
-Examples:
-  $ marr standard sync           # Update trigger table
-  $ marr standard sync --dry-run # Preview changes
-
-Updates the trigger table in MARR-PROJECT-CLAUDE.md from frontmatter.
-Files not owned by current user are skipped for security.`)
-    .action(handleSync);
 }

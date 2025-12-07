@@ -14,6 +14,7 @@ import matter from 'gray-matter';
 import * as logger from '../utils/logger.js';
 import * as fileOps from '../utils/file-ops.js';
 import * as marrSetup from '../utils/marr-setup.js';
+import { registerProject } from '../utils/project-registry.js';
 
 interface InitOptions {
   user: boolean;
@@ -489,6 +490,9 @@ async function initializeProject(targetDir: string, standards: string | undefine
 
   // Handle project root CLAUDE.md
   addProjectClaudeMdImport(projectClaudeMdPath, targetDir);
+
+  // Register project in sync registry
+  registerProject(targetDir);
 
   logger.blank();
   logger.success('Project configuration created!');
