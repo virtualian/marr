@@ -2,8 +2,8 @@
 
 **MARR** is a configuration system for Claude Code that makes AI agents more predictable and effective through structured standards.
 
-> Marr is my real surname. I needed a config folder that Anthropic would never accidentally claim in `.claude/`, so I just used my own name and retrofitted a backronym ('Making Agents Really Reliable'). Peak efficiency, minimal narcissism. Honest! 😄
->
+> Marr is my real surname. I needed a configuration folder that Anthropic would never accidentally claim in `.claude/`, so I just used my own name and retrofitted a backronym. Peak efficiency, minimal narcissism. Honest! 😄
+> 
 
 ---
 

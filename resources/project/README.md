@@ -1,42 +1,31 @@
-# Project-Level Standard Templates
+# MARR Project Configuration
 
-These standard files define **project-specific standards** that are copied to each project's `.claude/marr/standards/` directory during `marr init --project`.
+**MARR** (**M**aking **A**gents **R**eally **R**eliable) is a configuration system for Claude Code that makes AI agents more predictable and effective through structured standards.
+
+> Marr is my real surname. I needed a configuration folder that Anthropic would never accidentally claim in `.claude/`, so I just used my own name and retrofitted a backronym. Peak efficiency, minimal narcissism. Honest! 😄
+
+This directory contains project-specific AI agent configuration managed by [MARR](https://virtualian.github.io/marr).
 
 ## Structure
 
 ```
-project/
-└── common/           # Standard files (prj-*.md) for all projects
+.claude/marr/
+├── MARR-PROJECT-CLAUDE.md   # Main project config
+├── README.md                # This file
+└── standards/               # Project standards (prj-*.md)
 ```
 
-## Standard Categories
+## Standards
 
-Standards cover core development concerns:
+Standards in `standards/` define rules for:
+- Git workflow
+- Testing
+- MCP tool usage
+- Documentation
+- Prompt writing
 
-- **Git workflow** - Branching, commits, PRs
-- **Testing** - Testing philosophy and approach
-- **MCP usage** - Model Context Protocol tool patterns
-- **Documentation** - Project documentation organization
-- **Prompt writing** - How to write effective AI prompts
+Edit these files to customize for your project.
 
-## Naming Convention
+## Documentation
 
-Project-level standards use the `prj-` prefix to distinguish them from user-level standards.
-
-## How They Work
-
-1. `marr init --project` copies `common/` files to `./.claude/marr/standards/`
-2. Project `CLAUDE.md` imports `@.claude/marr/MARR-PROJECT-CLAUDE.md`
-3. `MARR-PROJECT-CLAUDE.md` references `@.claude/marr/standards/` for auto-discovery
-4. Claude Code loads all standards when working in that project
-
-## Customization
-
-After initialization, edit the files in your project's `.claude/marr/` directory to match project requirements. Changes are version-controlled with your project.
-
-## Relationship to User-Level Prompts
-
-- **User-level** = universal standards (same across all projects)
-- **Project-level** = project-specific details (varies per project)
-
-Project-level standards can override user-level technical details while preserving user preferences.
+Full docs at **[virtualian.github.io/marr](https://virtualian.github.io/marr)**

@@ -1,9 +1,9 @@
 # Contributing to MARR
 
-See [docs/dev/how-to/contributing.md](./docs/dev/how-to/contributing.md) for the full contributing guide.
+See the [Contributing Guide](https://virtualian.github.io/marr/dev/how-to/contributing/) for full documentation.
 
 ## Quick Links
 
-- [Project structure](./docs/dev/how-to/contributing.md#project-structure)
-- [Testing guide](./docs/dev/how-to/testing.md)
+- [Project structure](https://virtualian.github.io/marr/dev/how-to/contributing/#project-structure)
+- [Testing guide](https://virtualian.github.io/marr/dev/how-to/testing/)
 - [Issue tracker](https://github.com/virtualian/marr/issues)
