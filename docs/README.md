@@ -9,7 +9,7 @@
 
 ## For Users
 
-Set up and customize MARR for your projects.
+Set up, use and customize MARR for your projects.
 
 ### How-To Guides
 - [Getting Started](user/how-to/getting-started.md)
