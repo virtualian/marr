@@ -10,7 +10,7 @@
 
 MARR (Making Agents Really Reliable) provides project-level AI agent configuration.
 
-See `.claude/marr/README.md` for how MARR works.
+See `.claude/marr/README.md` for how MARR works, or visit [virtualian.github.io/marr](https://virtualian.github.io/marr).
 
 ## What is a Standard
 
