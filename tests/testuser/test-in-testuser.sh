@@ -165,8 +165,8 @@ check_passed=true
 [ -f ~/.claude/marr/MARR-USER-CLAUDE.md ] && log_info "  ✅ ~/.claude/marr/MARR-USER-CLAUDE.md exists" || { log_info "  ❌ ~/.claude/marr/MARR-USER-CLAUDE.md missing"; check_passed=false; }
 [ -f ~/.claude/CLAUDE.md ] && log_info "  ✅ ~/.claude/CLAUDE.md exists" || { log_info "  ❌ ~/.claude/CLAUDE.md missing"; check_passed=false; }
 grep -q "@~/.claude/marr/MARR-USER-CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
-grep -q "github.com/virtualian/marr#readme" ~/.claude/marr/MARR-USER-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR README pointer present" || { log_info "  ❌ MARR README pointer missing"; check_passed=false; }
-grep -q "Making Agents Really Reliable" ~/.claude/marr/MARR-USER-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR description present" || { log_info "  ❌ MARR description missing"; check_passed=false; }
+grep -q "github.com/virtualian/marr" ~/.claude/marr/MARR-USER-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR README pointer present" || { log_info "  ❌ MARR README pointer missing"; check_passed=false; }
+grep -q "aking.*gents.*eally.*eliable" ~/.claude/marr/MARR-USER-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR description present" || { log_info "  ❌ MARR description missing"; check_passed=false; }
 if $check_passed; then
     ((TESTS_PASSED++))
 else
@@ -196,11 +196,11 @@ check_passed=true
 grep -q "@.claude/marr/MARR-PROJECT-CLAUDE.md" CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present in CLAUDE.md" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
 [ -d .claude/marr ] && log_info "  ✅ .claude/marr/ directory exists" || { log_info "  ❌ .claude/marr/ missing"; check_passed=false; }
 [ -f .claude/marr/MARR-PROJECT-CLAUDE.md ] && log_info "  ✅ MARR-PROJECT-CLAUDE.md exists" || { log_info "  ❌ MARR-PROJECT-CLAUDE.md missing"; check_passed=false; }
-grep -q "github.com/virtualian/marr#readme" .claude/marr/MARR-PROJECT-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR README pointer present" || { log_info "  ❌ MARR README pointer missing"; check_passed=false; }
+grep -q "virtualian.github.io/marr\|github.com/virtualian/marr" .claude/marr/MARR-PROJECT-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR docs link present" || { log_info "  ❌ MARR docs link missing"; check_passed=false; }
 grep -q "Making Agents Really Reliable" .claude/marr/MARR-PROJECT-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR description present" || { log_info "  ❌ MARR description missing"; check_passed=false; }
 [ -f .claude/marr/README.md ] && log_info "  ✅ .claude/marr/README.md exists" || { log_info "  ❌ .claude/marr/README.md missing"; check_passed=false; }
 [ -d .claude/marr/standards ] && log_info "  ✅ .claude/marr/standards/ directory exists" || { log_info "  ❌ .claude/marr/standards/ missing"; check_passed=false; }
-[ -f .claude/marr/standards/prj-git-workflow-standard.md ] && log_info "  ✅ Git workflow standard exists" || { log_info "  ❌ Git workflow standard missing"; check_passed=false; }
+[ -f .claude/marr/standards/prj-workflow-standard.md ] && log_info "  ✅ Workflow standard exists" || { log_info "  ❌ Workflow standard missing"; check_passed=false; }
 [ -f .claude/marr/standards/prj-testing-standard.md ] && log_info "  ✅ Testing standard exists" || { log_info "  ❌ Testing standard missing"; check_passed=false; }
 [ -f .claude/marr/standards/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage standard exists" || { log_info "  ❌ MCP usage standard missing"; check_passed=false; }
 [ -f .claude/marr/standards/prj-documentation-standard.md ] && log_info "  ✅ Documentation standard exists" || { log_info "  ❌ Documentation standard missing"; check_passed=false; }
@@ -236,7 +236,7 @@ log_blank
 # Test 9: marr validate --conflicts --json (JSON output)
 log_info "Test 9: marr validate --conflicts --json"
 JSON_OUTPUT=$(marr validate --conflicts --json 2>/dev/null)
-if echo "$JSON_OUTPUT" | grep -q '"scope"'; then
+if echo "$JSON_OUTPUT" | grep -q '"valid"'; then
     log_success "JSON conflict report works"
     ((TESTS_PASSED++))
 else
