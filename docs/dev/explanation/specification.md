@@ -6,6 +6,8 @@ This document defines what MARR is, its core concepts, and the boundaries of the
 
 **MARR (Making Agents Really Reliable)** is a configuration system that provides AI coding agents with consistent project context and standards.
 
+> Marr is my real surname. I needed a config folder that Anthropic would never accidentally claim in `.claude/`, so I just used my own name and retrofitted the backronym. Peak efficiency, minimal narcissism. Honest! 😄
+
 MARR treats AI agent directives as first-class project infrastructure — not ad-hoc notes scattered across READMEs or chat sessions.
 
 ## The Problem MARR Solves
