@@ -393,7 +393,6 @@ marr/
 │   └── lib/                  # Test utilities
 ├── scripts/                  # Build and release scripts
 ├── docs/                     # Documentation
-├── examples/                 # Configuration examples
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -436,7 +435,6 @@ Issues and pull requests welcome! See the main MARR repository for contribution 
 ## Related Links
 
 - [Architecture](./docs/dev/explanation/architecture.md)
-- [Configuration Examples](./examples)
 - [Issue Tracker](https://github.com/virtualian/marr/issues)
 
 ---

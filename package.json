@@ -10,7 +10,7 @@
     "build": "tsc && npm pack --pack-destination tests/",
     "dev": "tsc --watch",
     "test": "node --test dist/**/*.test.js",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint --no-warn-ignored src/**/*.ts",
     "check-bin": "node scripts/check-binary-name.js",
     "prepack": "npm run check-bin && tsc",
     "prepublishOnly": "npm run check-bin && npm run build && npm test",

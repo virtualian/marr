@@ -9,7 +9,7 @@ Sets up Node.js environment in testuser account using nvm.
 
 **Usage** (run as testuser):
 ```bash
-bash /Users/ianmarr/projects/marr/package/scripts/setup-testuser.sh
+bash /path/to/marr/scripts/setup-testuser.sh
 ```
 
 **What it does:**
@@ -24,16 +24,16 @@ bash /Users/ianmarr/projects/marr/package/scripts/setup-testuser.sh
 ### `build-test-tarball.sh`
 Builds a test tarball from the current source code.
 
-**Usage** (run as ianmarr):
+**Usage** (run from repo root):
 ```bash
-cd /Users/ianmarr/projects/marr/package
+cd /path/to/marr
 bash scripts/build-test-tarball.sh
 ```
 
 **What it does:**
 - Runs `npm run build` to compile TypeScript
 - Runs `npm pack` to create tarball
-- Creates `virtualian-marr-1.0.0.tgz` in package directory
+- Creates tarball in tests/ directory
 
 **Run after making code changes.**
 
@@ -44,7 +44,7 @@ Comprehensive automated test suite for MARR package.
 
 **Usage** (run as testuser):
 ```bash
-bash /Users/ianmarr/projects/marr/package/scripts/test-in-testuser.sh
+bash /path/to/marr/tests/testuser/test-in-testuser.sh
 ```
 
 **What it does:**
@@ -54,8 +54,6 @@ bash /Users/ianmarr/projects/marr/package/scripts/test-in-testuser.sh
 4. Tests `marr validate`
 5. Verifies generated files (CLAUDE.md, prompts/)
 6. Verifies `~/.claude/marr/` setup and import integration
-7. Tests `marr install-scripts`
-8. Verifies helper scripts installed correctly
 
 **Prerequisites:** Node.js installed via setup-testuser.sh
 
@@ -83,14 +81,13 @@ Removes all MARR artifacts from testuser account to reset to clean state.
 
 **Usage** (run as testuser):
 ```bash
-bash /path/to/package/scripts/cleanup-testuser.sh
+bash /path/to/marr/scripts/cleanup-testuser.sh
 ```
 
 **What it does:**
 - Uninstalls `@virtualian/marr` npm package
 - Removes `~/.claude/marr/` directory
 - Removes MARR import from `~/.claude/CLAUDE.md`
-- Removes helper scripts from `~/bin/`
 - Removes test project directories (`marr-test-*`)
 
 **When to use:**
@@ -99,27 +96,22 @@ bash /path/to/package/scripts/cleanup-testuser.sh
 - When debugging installation issues
 - To fully reset testuser environment
 
-**Run after cleanup:**
-```bash
-bash /path/to/package/scripts/test-in-testuser.sh
-```
-
 ---
 
 ## Permissions
 
-For testuser to access these scripts, set appropriate permissions on the package directory:
+For testuser to access these scripts, set appropriate permissions on the repo directory:
 
 ```bash
-# Make package directory accessible to testuser
+# Make repo directory accessible to testuser
 # Adjust the path to where you cloned the repo
 REPO_PATH="/path/to/marr"
 
 chmod o+rx "$HOME"
 chmod o+rx "$(dirname "$REPO_PATH")"
 chmod o+rx "$REPO_PATH"
-chmod -R o+rX "$REPO_PATH/package"
-chmod 755 "$REPO_PATH/package/scripts"
+chmod -R o+rX "$REPO_PATH/tests"
+chmod 755 "$REPO_PATH/scripts"
 ```
 
 These permissions allow testuser to:
@@ -137,22 +129,22 @@ These permissions allow testuser to:
 ```bash
 # As testuser (adjust path to your repo location)
 sudo su - testuser
-bash /path/to/marr/package/scripts/setup-testuser.sh
+bash /path/to/marr/scripts/setup-testuser.sh
 exit
 ```
 
 **Testing Cycle:**
 ```bash
 # As dev user: Build tarball
-cd /path/to/marr/package
-bash scripts/build-test-tarball.sh
+cd /path/to/marr
+npm run build
 
 # As testuser: Run tests
 sudo su - testuser
-bash /path/to/marr/package/scripts/test-in-testuser.sh
+bash /path/to/marr/tests/testuser/test-in-testuser.sh
 exit
 ```
 
 ---
 
-See [TESTING.md](../TESTING.md) for comprehensive testing documentation.
+See [docs/dev/how-to/testing.md](../docs/dev/how-to/testing.md) for comprehensive testing documentation.
