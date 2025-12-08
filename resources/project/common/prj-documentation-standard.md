@@ -13,100 +13,78 @@ triggers:
 
 # Documentation Standard
 
-> **AI Agent Instructions**: This document defines documentation organization and maintenance. Follow these rules for all documentation work.
+> **AI Agent Instructions**: Follow these rules for all documentation work.
+>
+> **Scope**: All documentation activities
+>
+> **Rationale**: Consistent documentation organization ensures projects remain discoverable and maintainable.
 
 ---
 
 ## Core Rules (NEVER VIOLATE)
 
-1. **Documentation lives in designated directories** because scattered docs are invisible
-2. **Update docs when code changes** because outdated docs mislead users
-3. **Use clear, direct language** because technical documentation is not marketing
-4. **Provide examples** because concrete is clearer than abstract
-5. **No AI attribution comments** because code and docs stand on merit, not origin
+1. **All documentation lives in `docs/`** because scattered docs are invisible
+2. **Organize by role first, then content type** because users identify by role before need
+3. **Keep content types distinct** because mixed purposes confuse readers
+4. **Update docs when code changes** because outdated docs mislead users
+5. **No AI attribution** because content stands on merit, not origin
 
 ---
 
-## Documentation Organization
+## Structure
 
-### Recommended Structure
+All project documentation MUST be organized by user role, then by content type within each role.
 
-- **docs/** — Project documentation organized by audience or purpose
-- **examples/** — Real-world reference implementations
-- **plans/** — Implementation plans (if applicable)
+**Content types** follow the [Diátaxis framework](https://diataxis.fr/). Consult the framework documentation to understand its principles before organizing documentation:
+- **how-to/** — Task-oriented guides for accomplishing specific goals
+- **reference/** — Technical descriptions of system components
+- **explanation/** — Conceptual content about design decisions and trade-offs
 
-### Directory Purposes
-
-**docs/**
-- Technical specifications and guides
-- Organized by user role or topic
-- Updated when system design changes
-
-**examples/**
-- Working code examples
-- Real configurations from actual use
-- Include README explaining each example
-
-**plans/**
-- Implementation plans for specific work
-- Created per issue/feature
-- Archived or deleted when complete
+**Role-first organization** means users navigate to their role before choosing content type. This matches how users think: "I'm an administrator" comes before "I need a how-to guide."
 
 ---
 
-## Documentation Quality Standards
+## Content Type Requirements
 
-### Clarity
-- Use simple, direct language
-- Avoid jargon unless necessary
-- Define terms when first used
-- Use examples to clarify concepts
+### How-To Guides
+- MUST solve a specific task the user has chosen to do
+- MUST assume competence — no teaching, just steps
+- MUST title with the task: "How to configure X", "How to deploy Y"
 
-### Accuracy
-- Keep docs synchronized with implementation
-- Update examples when code changes
-- Remove obsolete information
-- Verify links and references work
+### Reference
+- MUST describe the system accurately and completely
+- MUST be structured around code or product architecture
+- MUST be optimized for lookup, not sequential reading
 
-### Completeness
-- Cover all major features
-- Provide examples for complex concepts
-- Include rationale for key decisions
-- Document exceptions and edge cases
-
-### Discoverability
-- Logical directory structure
-- Clear file naming
-- README files in each major directory
-- Cross-references between related docs
+### Explanation
+- MUST discuss the "why" behind implementations
+- MUST NOT include step-by-step instructions
+- MUST connect concepts across the system
 
 ---
 
-## Writing Style
+## Quality Requirements
 
-### Technical Documentation
-- Clear, direct, technical
-- Assume reader is technical
-- Use examples to clarify
-- Explain WHY, not just WHAT
+- Use clear, direct language — technical documentation is not marketing
+- Keep docs synchronized with implementation — remove obsolete content
+- Provide examples for complex concepts — concrete is clearer than abstract
+- Maintain one source of truth per topic — no redundant documentation
 
-### READMEs
-- Start with what the project/directory does
-- Include quick start or usage instructions
-- Link to more detailed documentation
-- Keep concise and scannable
+---
+
+## Exceptions
+
+**Platform conventions take precedence.** GitHub repository and community files belong at project root per GitHub's conventions.
+
+**Documentation systems define their own structure.** When using Docusaurus, MkDocs, Sphinx, or similar systems, follow their conventions — but integrate role-first organization and Diátaxis content types where the system allows.
+
+**Non-compliant documentation requires user input.** When existing documentation does not meet this standard, ask the user whether they want to maintain, refine, restructure, or recreate it.
 
 ---
 
 ## Anti-Patterns (FORBIDDEN)
 
-- **Scattering documentation** — Use designated directories only
-- **Creating redundant docs** — One source of truth per topic
-- **Leaving outdated docs** — Update or remove, never ignore
-- **Using marketing language** — This is technical documentation
-- **Adding AI attribution** — No "Generated with AI" comments
-- **Documenting obvious code** — Don't explain what is self-evident
-
----
-
-**This documentation standard ensures projects remain discoverable, understandable, and maintainable.**
+- **Placing docs outside `docs/`** — All documentation in designated directory
+- **Mixing content types** — How-to guides with theory, reference that teaches, explanations with procedures
+- **Leaving stale docs** — Update or remove, never ignore
+- **Creating redundant docs** — One authoritative source per topic
