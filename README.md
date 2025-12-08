@@ -1,8 +1,8 @@
-# 
-
 # **M**aking **A**gents **R**eally **R**eliable (**MARR**)
 
+**MARR** is a configuration system for Claude Code that makes AI agents more predictable and effective through structured standards.
 
+> Marr is my real surname. I needed a config folder that Anthropic would never accidentally claim in `.claude/`, so I just used my own name and retrofitted the backronym. Peak efficiency, minimal narcissism. Honest! 😄
 
 [![npm version](https://img.shields.io/npm/v/@virtualian/marr.svg)](https://www.npmjs.com/package/@virtualian/marr)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)

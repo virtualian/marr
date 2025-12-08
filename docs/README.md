@@ -1,46 +1,35 @@
-# MARR Documentation
+# **M**aking **A**gents **R**eally **R**eliable [MARR]
 
-**MARR (Making Agents Really Reliable)** is a configuration system that provides AI coding agents with consistent project context and standards.
+**MARR** is a configuration system for Claude Code that makes AI agents more predictable and effective through structured standards.
 
-## Quick Start
+> Marr is my real surname. I needed a config folder that Anthropic would never accidentally claim in `.claude/`, so I just used my own name and retrofitted a backronym ('Making Agents Really Reliable'). Peak efficiency, minimal narcissism. Honest! 😄
+>
 
-```bash
-# Install
-npm install -g @virtualian/marr
+---
 
-# Set up user config (once per machine)
-marr init --user
+## For Users
 
-# Set up project config
-marr init --project
-```
+Set up, use and customize MARR for your projects.
 
-## Why MARR?
+### How-To Guides
+- [Getting Started](user/how-to/getting-started.md)
+- [Customization](user/how-to/customization.md)
 
-- **Consistent behavior** — Same standards across all your projects
-- **Two-layer config** — Personal preferences + project requirements
-- **Validated** — Catch configuration errors before they cause problems
-- **Version controlled** — Standards live in your repo, shared with your team
+### Explanation
+- [Configuration](user/explanation/configuration.md)
 
-## Documentation
+### Reference
+- [Standards Reference](user/reference/standards-reference.md)
 
-### For Users
+## For Developers
 
-- [Getting Started](user/how-to/getting-started.md) — Installation and first-time setup
-- [Configuration Guide](user/explanation/configuration.md) — Understanding the two-layer system
-- [Customization](user/how-to/customization.md) — Modifying and creating standards
-- [Standards Reference](user/reference/standards-reference.md) — What each bundled standard does
+Contribute to MARR development.
 
-### For Developers
+### How-To Guides
+- [Contributing](dev/how-to/contributing.md)
+- [Testing](dev/how-to/testing.md)
+- [Publishing](dev/how-to/publishing.md)
 
-- [Contributing](dev/how-to/contributing.md) — Setting up a dev environment
-- [Testing](dev/how-to/testing.md) — Running the test suite
-- [Publishing](dev/how-to/publishing.md) — Releasing to npm
-- [Specification](dev/explanation/specification.md) — What MARR is and isn't
-- [Architecture](dev/explanation/architecture.md) — Why MARR is designed this way
-
-## Links
-
-- [GitHub Repository](https://github.com/virtualian/marr)
-- [npm Package](https://www.npmjs.com/package/@virtualian/marr)
-- [Issue Tracker](https://github.com/virtualian/marr/issues)
+### Explanation
+- [Architecture](dev/explanation/architecture.md)
+- [Specification](dev/explanation/specification.md)
