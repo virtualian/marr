@@ -279,33 +279,6 @@ git commit -m "fix: profile view (closes #45)"
 
 ---
 
-## GitHub Helper Scripts
-
-**User-level scripts** (stored in `~/bin/` and in PATH):
-
-### GitHub Sub-Issues Management
-
-**Until native gh CLI support exists**, use helper scripts for sub-issues:
-
-**Available Scripts:**
-- `gh-add-subissue.sh <parent-issue-number> <sub-issue-number>` - Link sub-issue to parent
-- `gh-list-subissues.sh <parent-issue-number>` - List all sub-issues of parent
-
-**Usage:**
-```bash
-# Link issue #47 as sub-issue of #45
-gh-add-subissue.sh 45 47
-
-# List all sub-issues of #45
-gh-list-subissues.sh 45
-```
-
-**Rationale:** GitHub's GraphQL API requires these scripts until native CLI support. Scripts use official API with proper error handling.
-
-**NEVER use raw `gh api graphql` commands** for sub-issue operations - use the helper scripts.
-
----
-
 ## Anti-Patterns (FORBIDDEN)
 
 ❌ **Direct commits to main** - Use PRs only for code review and CI

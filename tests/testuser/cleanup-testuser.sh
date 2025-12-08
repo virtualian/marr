@@ -69,26 +69,6 @@ if [ -f "$HOME/.claude/CLAUDE.md" ]; then
     fi
 fi
 
-# Remove helper scripts from ~/bin/
-log_debug "Checking for helper scripts in ~/bin/..."
-REMOVED_SCRIPTS=()
-if [ -f "$HOME/bin/gh-add-subissue.sh" ]; then
-    rm -f "$HOME/bin/gh-add-subissue.sh"
-    REMOVED_SCRIPTS+=("gh-add-subissue.sh")
-fi
-
-if [ -f "$HOME/bin/gh-list-subissues.sh" ]; then
-    rm -f "$HOME/bin/gh-list-subissues.sh"
-    REMOVED_SCRIPTS+=("gh-list-subissues.sh")
-fi
-
-if [ ${#REMOVED_SCRIPTS[@]} -gt 0 ]; then
-    log_step "🗑️" "Removed helper scripts: ${REMOVED_SCRIPTS[*]}"
-    CLEANED+=("helper scripts")
-else
-    log_info "ℹ️  No helper scripts found in ~/bin/"
-fi
-
 # Remove test project directories
 log_debug "Checking for test project directories..."
 TEST_DIRS=$(find "$HOME" -maxdepth 1 -type d -name "marr-test-*" 2>/dev/null)

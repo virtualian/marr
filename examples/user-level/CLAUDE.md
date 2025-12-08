@@ -226,15 +226,6 @@ When starting development on any project, automatically ensure proper port confi
 - Use project-specific build and deployment commands
 - Use TodoWrite tool for complex multi-step tasks
 
-### GitHub Sub-Issues Management
-- **ALWAYS use helper scripts for GitHub sub-issues** until native gh CLI support exists
-- Scripts located in `~/bin/` (should be in PATH):
-  - `gh-add-subissue.sh <parent-issue-number> <sub-issue-number>` - Link sub-issue to parent
-  - `gh-list-subissues.sh <parent-issue-number>` - List all sub-issues of parent
-- **NEVER use raw `gh api graphql` commands** for sub-issue operations - use the scripts
-- Scripts use GitHub's official GraphQL API with proper error handling
-- When GitHub CLI adds native sub-issue support, deprecate these scripts in favor of official commands
-
 ## Session Recap Management
 - Check for existing recaps at session start in project's `recap/` directory
 - Use `/recap` command when asked to generate session summaries

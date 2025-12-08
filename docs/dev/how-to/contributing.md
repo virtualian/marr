@@ -36,8 +36,7 @@ marr/
 │   └── types/                # TypeScript type definitions
 ├── resources/                # Bundled resources (copied to projects)
 │   ├── project/              # Project-level templates and standards
-│   ├── user/                 # User-level config templates
-│   └── helper-scripts/       # GitHub helper scripts
+│   └── user/                 # User-level config templates
 ├── tests/                    # Test infrastructure
 ├── scripts/                  # Build and release scripts
 └── docs/                     # Documentation

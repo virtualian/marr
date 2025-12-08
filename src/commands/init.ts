@@ -2,7 +2,7 @@
  * Init command - Initialize MARR configuration
  *
  * Two modes:
- * - --user: Set up user-level config (~/.claude/marr/, import, helper scripts)
+ * - --user: Set up user-level config (~/.claude/marr/, import)
  * - --project: Set up project-level config (./.claude/marr/, import in ./CLAUDE.md)
  * - --all: Both user + project
  */
@@ -100,7 +100,7 @@ export function initCommand(program: Command): void {
   program
     .command('init')
     .description('Initialize MARR configuration')
-    .option('-u, --user', 'Set up user-level config (~/.claude/marr/, helper scripts)')
+    .option('-u, --user', 'Set up user-level config (~/.claude/marr/)')
     .option('-p, --project [path]', 'Set up project-level config (./.claude/marr/, import in ./CLAUDE.md)')
     .option('-a, --all [path]', 'Set up both user and project config')
     .option('-s, --standards <value>', 'Standards: all, none, list, or names (workflow,testing,mcp,docs,prompts,ui-ux)')
@@ -108,7 +108,7 @@ export function initCommand(program: Command): void {
     .option('-f, --force', 'Overwrite existing files, skip confirmations')
     .addHelpText('after', `
 What gets created:
-  --user      ~/.claude/marr/MARR-USER-CLAUDE.md, import in ~/.claude/CLAUDE.md, ~/bin/*.sh scripts
+  --user      ~/.claude/marr/MARR-USER-CLAUDE.md, import in ~/.claude/CLAUDE.md
   --project   ./.claude/marr/MARR-PROJECT-CLAUDE.md, ./.claude/marr/standards/*.md, import in ./CLAUDE.md
 
 Standards are discovered from bundled resources. Use --standards list to see available.
@@ -224,13 +224,10 @@ async function executeInit(options: InitOptions): Promise<void> {
  * Initialize user-level configuration
  * - Creates ~/.claude/marr/ with MARR configuration
  * - Adds import line to ~/.claude/CLAUDE.md
- * - Installs helper scripts to ~/bin/
  */
 async function initializeUser(dryRun: boolean, force: boolean): Promise<void> {
   logger.info('User-level setup...');
   logger.blank();
-
-  const binDir = join(fileOps.getHomeDir(), 'bin');
 
   // Check if already set up
   if (marrSetup.isMarrSetup()) {
@@ -239,14 +236,12 @@ async function initializeUser(dryRun: boolean, force: boolean): Promise<void> {
       logger.info('Use --force to overwrite existing configuration');
       logger.blank();
 
-      // Still check for import and scripts
+      // Still check for import
       if (!marrSetup.hasMarrImport() && !dryRun) {
         marrSetup.addMarrImport();
         logger.success('Added MARR import to ~/.claude/CLAUDE.md');
       }
 
-      // Still install/update scripts
-      await installHelperScripts(binDir, dryRun);
       return;
     }
   }
@@ -255,129 +250,11 @@ async function initializeUser(dryRun: boolean, force: boolean): Promise<void> {
     logger.info('Would create: ~/.claude/marr/');
     logger.info('Would create: ~/.claude/marr/MARR-USER-CLAUDE.md');
     logger.info('Would add: MARR import to ~/.claude/CLAUDE.md');
-    await installHelperScripts(binDir, true);
     return;
   }
 
   // Set up MARR infrastructure
   marrSetup.setupMarr();
-
-  // Install helper scripts
-  await installHelperScripts(binDir, false);
-}
-
-/**
- * Install helper scripts to ~/bin/
- */
-async function installHelperScripts(binDir: string, dryRun: boolean): Promise<void> {
-  logger.info('Helper scripts...');
-
-  // Ensure ~/bin/ exists
-  if (!dryRun) {
-    fileOps.ensureDir(binDir);
-  }
-
-  // Get scripts from bundled resources
-  const resourcesDir = marrSetup.getResourcesDir();
-  const scriptsSource = join(resourcesDir, 'helper-scripts');
-
-  const scripts = [
-    'marr-gh-add-subissue.sh',
-    'marr-gh-list-subissues.sh',
-  ];
-
-  for (const script of scripts) {
-    const srcPath = join(scriptsSource, script);
-    const destPath = join(binDir, script);
-
-    if (!fileOps.exists(srcPath)) {
-      logger.warning(`Script not found in package: ${script}`);
-      continue;
-    }
-
-    if (dryRun) {
-      if (fileOps.exists(destPath)) {
-        logger.info(`Would update: ~/bin/${script}`);
-      } else {
-        logger.info(`Would install: ~/bin/${script}`);
-      }
-      continue;
-    }
-
-    // Copy and make executable
-    fileOps.copyFile(srcPath, destPath);
-    fileOps.makeExecutable(destPath);
-
-    if (fileOps.exists(destPath)) {
-      logger.success(`Installed: ~/bin/${script}`);
-    }
-  }
-
-  // Check PATH
-  if (!dryRun) {
-    checkPath(binDir);
-  }
-}
-
-/**
- * Check if ~/bin is in PATH and provide clear instructions if not
- */
-function checkPath(binDir: string): void {
-  const pathEnv = process.env.PATH || '';
-  // Check both expanded path and $HOME/bin pattern
-  const homeDir = fileOps.getHomeDir();
-  const isInPath = pathEnv.split(':').some(p =>
-    p === binDir || p === `${homeDir}/bin` || p === '$HOME/bin'
-  );
-
-  if (isInPath) {
-    logger.success('~/bin is in your PATH - helper scripts are ready to use');
-    return;
-  }
-
-  logger.blank();
-  logger.warning('~/bin is NOT in your PATH');
-  logger.info('Helper scripts installed but won\'t be found until you add ~/bin to PATH.');
-  logger.blank();
-
-  const shell = process.env.SHELL || '';
-  let shellConfig = '~/.profile';  // fallback
-  let shellName = 'shell';
-
-  if (shell.includes('zsh')) {
-    shellConfig = '~/.zshrc';
-    shellName = 'zsh';
-  } else if (shell.includes('bash')) {
-    // macOS uses .bash_profile, Linux uses .bashrc
-    shellConfig = process.platform === 'darwin' ? '~/.bash_profile' : '~/.bashrc';
-    shellName = 'bash';
-  } else if (shell.includes('fish')) {
-    shellConfig = '~/.config/fish/config.fish';
-    shellName = 'fish';
-  }
-
-  logger.info(`Add to your ${shellName} config (${shellConfig}):`);
-  logger.blank();
-
-  if (shell.includes('fish')) {
-    logger.log(`  echo 'set -gx PATH $HOME/bin $PATH' >> ${shellConfig}`);
-  } else {
-    logger.log(`  echo 'export PATH="$HOME/bin:$PATH"' >> ${shellConfig}`);
-  }
-
-  logger.blank();
-  logger.info('Then restart your terminal or run:');
-
-  if (shell.includes('fish')) {
-    logger.log(`  source ${shellConfig}`);
-  } else {
-    logger.log(`  source ${shellConfig}`);
-  }
-
-  logger.blank();
-  logger.info('After that, these commands will work:');
-  logger.log('  marr-gh-add-subissue.sh <parent> <sub>');
-  logger.log('  marr-gh-list-subissues.sh <parent>');
 }
 
 /**

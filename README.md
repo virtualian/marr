@@ -106,10 +106,6 @@ marr init --project --force
 ├── CLAUDE.md                   # Updated with MARR import
 └── marr/
     └── MARR-USER-CLAUDE.md     # Personal preferences
-
-~/bin/
-├── marr-gh-add-subissue.sh     # GitHub helper script
-└── marr-gh-list-subissues.sh   # GitHub helper script
 ```
 
 Note: Standards (git workflow, testing, MCP usage) live at **project level** only. This keeps projects self-contained and allows per-project customization.
@@ -200,7 +196,6 @@ marr clean --all
 - Personal preferences and working style
 - Communication preferences
 - Approval requirements (commits, pushes, PRs)
-- Helper scripts for GitHub sub-issues
 
 **Project Level** (`./CLAUDE.md` imports `./.claude/marr/MARR-PROJECT-CLAUDE.md`):
 - Project-specific technical requirements
@@ -215,22 +210,6 @@ Standards use the `prj-*.md` naming pattern and cover core development concerns:
 
 Standards live at project level only, keeping projects self-contained and allowing per-project customization.
 
-### Helper Scripts
-
-GitHub helper scripts installed to `~/bin/`:
-
-```bash
-# Link issue #47 as sub-issue of #45
-marr-gh-add-subissue.sh 45 47
-
-# List all sub-issues of #45
-marr-gh-list-subissues.sh 45
-```
-
-**Requirements:**
-- GitHub CLI (`gh`) must be installed
-- `jq` must be installed for JSON parsing
-
 ## Common Workflows
 
 ### New Machine Setup
@@ -244,7 +223,6 @@ marr init --user
 
 # Verify installation
 ls ~/.claude/marr/
-ls ~/bin/*.sh
 ```
 
 ### Starting a New Project
@@ -349,27 +327,6 @@ This is expected behavior - MARR will add its import line to your existing CLAUD
 - Use `--force` flag to reset the import
 - Or manually add: `@.claude/marr/MARR-PROJECT-CLAUDE.md` after the first heading
 
-### Helper scripts not working
-
-**Problem:** `marr-gh-add-subissue.sh` command not found or permission denied.
-
-**Solution:**
-```bash
-# Verify installation
-ls -la ~/bin/*.sh
-
-# Check if ~/bin is in PATH
-echo $PATH | grep "$HOME/bin"
-
-# If not in PATH, add it:
-echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-
-# Verify dependencies
-gh --version  # GitHub CLI
-jq --version  # JSON processor
-```
-
 ### Validation warnings
 
 **Problem:** `marr validate` shows warnings about prompt files.
@@ -385,7 +342,6 @@ marr validate --strict
 
 - **Node.js**: >= 18.0.0
 - **npm**: Latest version recommended
-- **Optional**: GitHub CLI (`gh`) and `jq` for helper scripts
 
 ## Development
 
@@ -431,8 +387,7 @@ marr/
 ├── dist/                     # Compiled JavaScript (gitignored)
 ├── resources/                # Bundled resources
 │   ├── project/              # Project-level standards
-│   ├── user/                 # User-level config
-│   └── helper-scripts/       # GitHub helper scripts
+│   └── user/                 # User-level config
 ├── tests/                    # Test infrastructure
 │   ├── testuser/             # Isolated user account tests
 │   └── lib/                  # Test utilities
