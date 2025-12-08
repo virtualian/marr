@@ -62,13 +62,6 @@ Read this standard when:
 - WHEN investigating test failures or flaky tests
 - WHEN making code changes that should have test coverage
 
-### `prj-ui-ux-standard.md`
-Read this standard when:
-- WHEN creating or modifying UI components or layouts
-- WHEN making visual design or styling decisions
-- WHEN implementing user interactions, forms, or navigation
-- WHEN evaluating accessibility or usability
-
 ### `prj-workflow-standard.md`
 Read this standard when:
 - WHEN starting any feature, task, or implementation work

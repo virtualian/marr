@@ -14,20 +14,6 @@ triggers:
 # Workflow Standard
 
 > **AI Agent Instructions**: This document defines the development workflow. Follow these rules for all implementation work.
->
-> **Scope**: All development work involving git, branches, commits, and pull requests
->
-> **Rationale**: Consistent workflow ensures traceability, prevents errors, and enables collaboration.
-
----
-
-## Triggers
-
-**You MUST follow this standard when:**
-- Starting any feature, task, or implementation work
-- Performing git operations (branching, committing, pushing)
-- Creating or updating pull requests
-- Working on the main branch
 
 ---
 

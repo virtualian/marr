@@ -14,20 +14,6 @@ triggers:
 # UI/UX Development Standard
 
 > **AI Agent Instructions**: This document defines UI/UX development standards. Follow these rules for all component generation, design decisions, and user interface work.
->
-> **Scope**: All UI/UX development activities
->
-> **Rationale**: Consistent UI/UX standards ensure accessible, usable, and professional interfaces.
-
----
-
-## Triggers
-
-**You MUST follow this standard when:**
-- Generating UI components
-- Making design decisions
-- Implementing user interfaces
-- Reviewing UI/UX work
 
 ---
 

@@ -1,41 +1,31 @@
-# MARR Configuration Directory
+# MARR Project Configuration
 
-**MARR (Making Agents Really Reliable)** is an AI agent configuration system that provides consistent project context and standards across all your projects.
+This directory contains MARR (Making Agents Really Reliable) configuration for this project.
 
-For full documentation, see the [MARR repository](https://github.com/virtualian/marr#readme).
-
-## How MARR Works
-
-MARR uses a two-layer configuration system:
-
-1. **User-level** (`~/.claude/marr/MARR-USER-CLAUDE.md`) - Personal preferences, communication style, approval requirements. Applied across all projects.
-
-2. **Project-level** (this directory) - Project-specific standards and context. Overrides user config for technical standards while preserving user preferences.
-
-## This Directory
+## Structure
 
 ```
 .claude/marr/
-├── MARR-PROJECT-CLAUDE.md   # Project configuration (imported by CLAUDE.md)
+├── MARR-PROJECT-CLAUDE.md   # Project-specific AI agent configuration
 ├── README.md                # This file
-└── standards/               # Project-level standards
-    ├── prj-documentation-standard.md
-    ├── prj-mcp-usage-standard.md
-    ├── prj-testing-standard.md
-    ├── prj-ui-ux-standard.md
+└── standards/               # Project-level standards (optional)
     ├── prj-workflow-standard.md
-    └── prj-writing-prompts-standard.md
+    ├── prj-testing-standard.md
+    └── ...
 ```
 
-## How It Loads
+## How It Works
 
 1. Project root `CLAUDE.md` imports `@.claude/marr/MARR-PROJECT-CLAUDE.md`
-2. MARR-PROJECT-CLAUDE.md lists standards with "Read before..." triggers
-3. When a trigger is met, Claude Code reads the relevant standard
-4. Standards define required behavior for that type of work
+2. MARR-PROJECT-CLAUDE.md defines trigger conditions for standards
+3. When a trigger is met, the AI agent reads that standard before proceeding
 
 ## Customization
 
 Edit files in this directory to match your project's needs. Changes are version-controlled with your project.
 
-Run `marr validate` to check configuration is correct.
+## Commands
+
+- `marr validate` - Check configuration is correct
+- `marr standard list` - List installed standards
+- `marr standard sync` - Regenerate trigger list from frontmatter

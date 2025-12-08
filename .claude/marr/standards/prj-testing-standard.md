@@ -14,20 +14,6 @@ triggers:
 # Testing Standard
 
 > **AI Agent Instructions**: This document defines testing philosophy and practices. Follow these rules when running, writing, or modifying tests.
->
-> **Scope**: All testing activities
->
-> **Rationale**: Testing ensures code works correctly and prevents regressions.
-
----
-
-## Triggers
-
-**You MUST follow this standard when:**
-- Running tests
-- Writing new tests
-- Modifying existing tests
-- Making code changes that require test coverage
 
 ---
 
