@@ -1,27 +1,27 @@
-# User-Level Configuration
+# MARR User Configuration
 
-This directory contains templates for user-level MARR configuration.
+**MARR** (**M**aking **A**gents **R**eally **R**eliable) is a configuration system for Claude Code that makes AI agents more predictable and effective through structured standards.
 
-## What Goes at User Level
+> Marr is my real surname. I needed a configuration folder that Anthropic would never accidentally claim in `.claude/`, so I just used my own name and retrofitted a backronym. Peak efficiency, minimal narcissism. Honest! 😄
 
-User-level configuration (`~/.claude/marr/`) contains **personal preferences** that apply across all your projects:
+This directory contains your personal AI agent preferences managed by [MARR](https://virtualian.github.io/marr).
 
-- Communication style preferences
-- Approval requirements (commits, pushes, PRs)
-- Working habits
-- Tool usage preferences
-
-## What Doesn't Go at User Level
-
-**Standards belong at project level**, not user level. All `prj-*.md` files live in the project's `.claude/marr/standards/` directory, covering git workflow, testing, MCP usage, documentation, and prompts.
-
-This keeps projects self-contained and allows per-project customization.
-
-## Structure After `marr init --user`
+## Structure
 
 ```
 ~/.claude/marr/
 └── MARR-USER-CLAUDE.md    # Personal preferences
 ```
 
-Helper scripts are installed to `~/bin/`, not here.
+## What Goes Here
+
+Personal preferences that apply across all projects:
+- Communication style
+- Approval requirements (commits, pushes, PRs)
+- Working habits
+
+**Standards** (`prj-*.md` files) live at project level, not here.
+
+## Documentation
+
+Full docs at **[virtualian.github.io/marr](https://virtualian.github.io/marr)**

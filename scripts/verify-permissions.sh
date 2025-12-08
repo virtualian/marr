@@ -7,8 +7,11 @@
 #   -v, --verbose   Show detailed permission information
 #   -q, --quiet     Only show errors (silent mode)
 
-# Load logging utilities
+# Get the repo root (parent of scripts directory)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Load logging utilities
 source "$SCRIPT_DIR/lib/logging.sh"
 
 # Parse command line arguments
@@ -19,28 +22,19 @@ log_blank
 
 # Check directories
 log_info "Directory Permissions:"
-if [[ $VERBOSE -eq 1 ]]; then
+if [[ $QUIET -eq 0 ]]; then
     stat -f "%Sp %N" \
-        /Users/ianmarr \
-        /Users/ianmarr/projects \
-        /Users/ianmarr/projects/marr \
-        /Users/ianmarr/projects/marr/package \
-        /Users/ianmarr/projects/marr/package/scripts
-elif [[ $QUIET -eq 0 ]]; then
-    stat -f "%Sp %N" \
-        /Users/ianmarr \
-        /Users/ianmarr/projects \
-        /Users/ianmarr/projects/marr \
-        /Users/ianmarr/projects/marr/package \
-        /Users/ianmarr/projects/marr/package/scripts
+        "$REPO_ROOT" \
+        "$REPO_ROOT/tests" \
+        "$REPO_ROOT/scripts"
 fi
 
 log_blank
 log_info "File Permissions:"
 if [[ $QUIET -eq 0 ]]; then
-    ls -l /Users/ianmarr/projects/marr/package/virtualian-marr-1.0.0.tgz 2>/dev/null || log_warn "Tarball not found"
+    ls -l "$REPO_ROOT/tests/"*.tgz 2>/dev/null || log_warn "Tarball not found in tests/"
     log_blank
-    ls -l /Users/ianmarr/projects/marr/package/scripts/*.sh
+    ls -l "$SCRIPT_DIR"/*.sh 2>/dev/null
 fi
 
 log_blank
@@ -50,20 +44,22 @@ if [[ $VERBOSE -eq 1 ]]; then
     log_debug "Checking read permissions for 'others' on each path..."
 
     PATHS=(
-        "/Users/ianmarr"
-        "/Users/ianmarr/projects"
-        "/Users/ianmarr/projects/marr"
-        "/Users/ianmarr/projects/marr/package"
-        "/Users/ianmarr/projects/marr/package/scripts"
+        "$REPO_ROOT"
+        "$REPO_ROOT/tests"
+        "$REPO_ROOT/scripts"
     )
 
     for path in "${PATHS[@]}"; do
-        perms=$(stat -f "%Sp" "$path")
-        other_perms="${perms: -3}"
-        if [[ "$other_perms" == *"r"* ]]; then
-            log_debug "  $path: $perms (readable by others)"
+        if [[ -e "$path" ]]; then
+            perms=$(stat -f "%Sp" "$path")
+            other_perms="${perms: -3}"
+            if [[ "$other_perms" == *"r"* ]]; then
+                log_debug "  $path: $perms (readable by others)"
+            else
+                log_warn "  $path: $perms (NOT readable by others)"
+            fi
         else
-            log_warn "  $path: $perms (NOT readable by others)"
+            log_warn "  $path: does not exist"
         fi
     done
 fi
