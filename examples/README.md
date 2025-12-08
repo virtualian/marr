@@ -8,12 +8,10 @@ This directory contains real-world examples of Claude Code configuration files c
 examples/
 ├── user-level/                        # User-level configuration (~/.claude/)
 │   ├── CLAUDE.md                      # User master configuration
-│   ├── prompts/                       # User-level standards
-│   │   ├── user-git-workflow-standard.md
-│   │   ├── user-mcp-usage-standard.md
-│   │   └── user-testing-standard.md
-│   ├── gh-add-subissue.sh            # Helper script for GitHub sub-issues
-│   └── gh-list-subissues.sh          # Helper script to list sub-issues
+│   └── prompts/                       # User-level standards
+│       ├── user-git-workflow-standard.md
+│       ├── user-mcp-usage-standard.md
+│       └── user-testing-standard.md
 │
 ├── project-level/
 │   ├── comprehensive/                 # Full standards-based projects
@@ -39,7 +37,6 @@ Contains personal preferences and standards that apply across ALL projects:
 - Communication style preferences
 - Work habits and approval requirements
 - Core standards (git workflow, testing, MCP usage)
-- Helper scripts for GitHub operations
 
 ### Project-Level: Comprehensive
 **Examples:** gainfunction, marrbox, specverse-app-portal

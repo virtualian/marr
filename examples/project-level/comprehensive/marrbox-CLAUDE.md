@@ -65,14 +65,6 @@ This repository follows a structured organization pattern:
 - Agent behavior must be consistent with the Git Workflow standards
 - Any Agent working in this repository must respect the project-specific configuration
 
-**GitHub Sub-Issues Management:**
-- **ALWAYS use helper scripts for GitHub sub-issues** until native gh CLI support exists
-- Scripts located in `~/bin/`:
-  - `gh-add-subissue.sh <parent-issue-number> <sub-issue-number>` - Link sub-issue to parent
-  - `gh-list-subissues.sh <parent-issue-number>` - List all sub-issues of parent
-- **NEVER use raw `gh api graphql` commands** for sub-issue operations - use the scripts
-- When GitHub CLI adds native sub-issue support, deprecate these scripts
-
 ## Standards (MANDATORY)
 
 **Git Workflow:**

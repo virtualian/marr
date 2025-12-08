@@ -6,7 +6,6 @@ This guide walks you through installing and setting up MARR for the first time.
 
 - **Node.js** 18.0.0 or higher
 - **npm** (comes with Node.js)
-- **Optional**: GitHub CLI (`gh`) and `jq` for helper scripts
 
 ## Installation
 
@@ -62,7 +61,6 @@ marr init --user
 
 This creates:
 - `~/.claude/marr/MARR-USER-CLAUDE.md` — Your personal preferences
-- `~/bin/marr-gh-*.sh` — GitHub helper scripts
 
 ### Step 2: Project-Level Setup (Once Per Project)
 

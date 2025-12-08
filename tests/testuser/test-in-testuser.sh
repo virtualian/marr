@@ -75,9 +75,6 @@ npm uninstall -g @virtualian/marr 2>/dev/null || true
 log_debug "Removing ~/.claude/marr..."
 rm -rf ~/.claude/marr
 
-log_debug "Removing helper scripts..."
-rm -f ~/bin/marr-gh-add-subissue.sh ~/bin/marr-gh-list-subissues.sh
-
 log_debug "Removing test directories..."
 rm -rf ~/marr-test-*
 
@@ -170,9 +167,6 @@ check_passed=true
 grep -q "@~/.claude/marr/MARR-USER-CLAUDE.md" ~/.claude/CLAUDE.md 2>/dev/null && log_info "  ✅ MARR import line present" || { log_info "  ❌ MARR import line missing"; check_passed=false; }
 grep -q "github.com/virtualian/marr#readme" ~/.claude/marr/MARR-USER-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR README pointer present" || { log_info "  ❌ MARR README pointer missing"; check_passed=false; }
 grep -q "Making Agents Really Reliable" ~/.claude/marr/MARR-USER-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR description present" || { log_info "  ❌ MARR description missing"; check_passed=false; }
-[ -f ~/bin/marr-gh-add-subissue.sh ] && log_info "  ✅ marr-gh-add-subissue.sh installed" || { log_info "  ❌ marr-gh-add-subissue.sh missing"; check_passed=false; }
-[ -f ~/bin/marr-gh-list-subissues.sh ] && log_info "  ✅ marr-gh-list-subissues.sh installed" || { log_info "  ❌ marr-gh-list-subissues.sh missing"; check_passed=false; }
-[ -x ~/bin/marr-gh-add-subissue.sh ] && log_info "  ✅ Scripts are executable" || { log_info "  ❌ Scripts not executable"; check_passed=false; }
 if $check_passed; then
     ((TESTS_PASSED++))
 else
