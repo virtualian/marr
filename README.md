@@ -446,7 +446,7 @@ marr/
 
 ### Testing
 
-See [docs/dev/TESTING.md](./docs/dev/TESTING.md) for comprehensive testing documentation.
+See [docs/dev/how-to/testing.md](./docs/dev/how-to/testing.md) for testing documentation.
 
 **Quick Test Cycle:**
 
@@ -471,10 +471,17 @@ https://github.com/virtualian/marr
 
 Issues and pull requests welcome! See the main MARR repository for contribution guidelines.
 
+## Documentation
+
+- [Getting Started](./docs/user/how-to/getting-started.md) — Installation and first-time setup
+- [Configuration Guide](./docs/user/explanation/configuration.md) — Understanding the two-layer system
+- [Customization Guide](./docs/user/how-to/customization.md) — Modifying and creating standards
+- [Standards Reference](./docs/user/reference/standards-reference.md) — What each bundled standard does
+
 ## Related Links
 
-- [Product Requirements](https://github.com/virtualian/marr/blob/main/docs/product/prd.md)
-- [Configuration Examples](https://github.com/virtualian/marr/tree/main/examples)
+- [Architecture](./docs/dev/explanation/architecture.md)
+- [Configuration Examples](./examples)
 - [Issue Tracker](https://github.com/virtualian/marr/issues)
 
 ---

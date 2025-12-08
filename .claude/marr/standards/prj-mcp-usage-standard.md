@@ -14,20 +14,6 @@ triggers:
 # MCP Usage Standard
 
 > **AI Agent Instructions**: This document defines how to use Model Context Protocol (MCP) tools. Follow these rules when using MCP tools or integrating external services.
->
-> **Scope**: All MCP tool usage
->
-> **Rationale**: MCP tools are powerful but require clear usage patterns to avoid confusion and errors.
-
----
-
-## Triggers
-
-**You MUST follow this standard when:**
-- Using any MCP tool
-- Integrating external services via MCP
-- Selecting which MCP tool to use for a task
-- Troubleshooting MCP tool behavior
 
 ---
 

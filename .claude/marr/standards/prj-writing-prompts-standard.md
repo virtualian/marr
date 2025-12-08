@@ -14,10 +14,6 @@ triggers:
 # Writing Prompts Standard
 
 > **AI Agent Instructions**: This document defines how to create and modify prompt and standard files. ALWAYS follow these rules when writing or updating any prompt or standard.
->
-> **Scope**: ALL prompts and standards.
->
-> **Rationale**: Well-written prompts ensure AI agents behave predictably and correctly.
 
 ---
 
@@ -26,15 +22,6 @@ triggers:
 **READ the "What is a Standard" section in `MARR-PROJECT-CLAUDE.md` FIRST** if you haven't already this session.
 
 Standards are binding constraints, not guidelines. Understanding what a standard is ensures you write them correctly.
-
----
-
-## Triggers
-
-**You MUST follow this standard when:**
-- Creating a new prompt or standard file
-- Modifying an existing prompt or standard file
-- Reviewing prompts or standards for quality
 
 ---
 
@@ -82,17 +69,20 @@ When you write a prompt or standard, you are programming AI behavior through nat
 **Use imperative language:**
 - "Must" or "Must not" for requirements
 - "Always" or "Never" for absolute rules
+- "When" X happens do Y
 - Active voice, direct statements
 
 **Correct examples:**
 - "ALWAYS use TypeScript for all new code because type safety reduces production errors"
 - "NEVER commit secrets because exposed credentials compromise security"
 - "ALWAYS run tests before committing because untested changes introduce regressions"
+- "WHEN starting work on a feature ALWAYS follow the mandated workflow"
 
 **Incorrect examples:**
 - "Run `npm install typescript` then configure tsconfig.json with..."
 - "Consider using TypeScript if it makes sense for your project"
 - "Here's an example configuration: { ... }"
+- "The workflow document defines procedures"
 
 ### Structure Requirements
 
@@ -189,6 +179,7 @@ Prompts are directive documents that guide AI agent behavior. They follow the sa
 ### Prompt File Principles
 
 - Write directives that specify **WHAT** and **WHY**, never **HOW**
+- Write **Triggers** defining **WHEN** directives apply and/or do not apply 
 - State requirements and rationale only
 - Implementation details belong in project documentation, not prompts
 - Prompts are read by AI agents, not humans following tutorials
