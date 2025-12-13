@@ -22,6 +22,7 @@ triggers:
 1. **Verify issue exists BEFORE any action** because working without tracking causes chaos
 2. **NEVER start implementation without an issue number** because all work must be traceable
 3. **Create branch BEFORE investigation** because even exploration should be tracked
+4. **Update documentation when code changes** because outdated docs mislead users
 
 ---
 
@@ -105,6 +106,7 @@ Hotfixes are emergency fixes for production issues.
 - **Bypassing process for "quick fixes"** — Process applies to all changes
 - **Combining unrelated work** — One issue per branch (unless explicitly instructed)
 - **Releasing without clean main** — All changes must be merged first
+- **Leaving docs outdated** — Documentation must reflect current code
 
 ---
 

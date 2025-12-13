@@ -24,6 +24,7 @@ triggers:
 3. **Delete merged branches** because clean repos prevent confusion
 4. **Branch from main only** (except hotfixes from production tags)
 5. **Use issue-based branch naming** because traceability matters
+6. **Run tests before pushing** because broken code should never reach the remote
 
 ---
 
@@ -186,6 +187,7 @@ Production releases are created exclusively via tags on the main branch.
 - **Force pushing to shared branches** — Coordinate with collaborators first
 - **Skipping CI checks** — All checks must pass before merge
 - **Issue numbers in commits** — Branch names provide traceability
+- **Pushing without running tests** — Verify locally before pushing
 
 ---
 
