@@ -93,7 +93,7 @@ triggers:
 - **Large commits** — Break large changes into smaller commits
 `;
 
-    const path = createStandardFile(tempDir, 'prj-workflow-standard.md', content);
+    const path = createStandardFile(tempDir, 'prj-version-control-standard.md', content);
     const result = parseStandard(path);
 
     assert.strictEqual(result.success, true);
@@ -321,7 +321,7 @@ triggers:
 `;
 
     createStandardFile(tempDir, 'prj-testing-standard.md', standard1);
-    createStandardFile(tempDir, 'prj-workflow-standard.md', standard2);
+    createStandardFile(tempDir, 'prj-version-control-standard.md', standard2);
 
     const standards = readStandardsFromDir(tempDir);
 

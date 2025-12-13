@@ -324,7 +324,7 @@ Examples:
     .addHelpText('after', `
 Examples:
   $ marr standard validate prj-testing-standard.md
-  $ marr standard validate .claude/marr/standards/prj-workflow-standard.md
+  $ marr standard validate .claude/marr/standards/prj-version-control-standard.md
   $ marr standard validate --all
 
 Exit codes:

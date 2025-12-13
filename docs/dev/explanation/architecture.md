@@ -67,10 +67,15 @@ Claude Code only reads from `~/.claude/`. MARR places its user config there and 
 Standards aren't read upfront — they're read on-demand based on trigger conditions.
 
 ```markdown
-### `prj-workflow-standard.md`
+### `prj-development-workflow-standard.md`
 Read this standard when:
-- WHEN starting any feature, task, or implementation work
-- WHEN working with git branches, commits, or pull requests
+- WHEN starting any task or implementation work
+- WHEN creating or managing issues
+
+### `prj-version-control-standard.md`
+Read this standard when:
+- WHEN working with git branches, commits, or merges
+- WHEN creating or reviewing pull requests
 ```
 
 **Why triggers?**

@@ -4,11 +4,12 @@ This document describes each bundled standard that ships with MARR.
 
 ## Overview
 
-MARR includes six standards covering common development concerns:
+MARR includes seven standards covering common development concerns:
 
 | Standard | Purpose |
 |----------|---------|
-| [Workflow](#workflow-standard) | Git branches, commits, and pull requests |
+| [Development Workflow](#development-workflow-standard) | Issues, tasks, releases, and hotfixes |
+| [Version Control](#version-control-standard) | Git branches, commits, PRs, and tagging |
 | [Testing](#testing-standard) | Running, writing, and evaluating tests |
 | [Documentation](#documentation-standard) | Creating and organizing docs |
 | [MCP Usage](#mcp-usage-standard) | Using Model Context Protocol tools |
@@ -17,31 +18,64 @@ MARR includes six standards covering common development concerns:
 
 ---
 
-## Workflow Standard
+## Development Workflow Standard
 
-**File**: `prj-workflow-standard.md`
+**File**: `prj-development-workflow-standard.md`
 
 **Triggers**:
-- When starting any feature, task, or implementation work
-- When working with git branches, commits, or pull requests
-- When making changes while on the main branch
-- When preparing code for review or merge
+- When starting any task or implementation work
+- When creating or managing issues
+- When preparing a release
+- When responding to a production incident
 
 ### Core Rules
 
-1. **Never make code changes on main** — All work happens on feature branches
-2. **Verify issue exists before any action** — All work must be tracked
+1. **Verify issue exists before any action** — All work must be tracked
+2. **Never start implementation without an issue number** — Traceability matters
+3. **Create branch before investigation** — Even exploration should be tracked
+
+### Issue Types
+
+| Type | Definition |
+|------|------------|
+| **Bug** | Observed behavior differs from expected |
+| **Feature** | Medium/large deliverable broken into Stories |
+| **Story** | Small deliverable completable in <3 days |
+| **Task** | Bounded activity with clear completion criteria |
+
+### Release Management
+
+- **Patch** (0.0.X) — Bug fixes only
+- **Minor** (0.X.0) — New features, backwards compatible
+- **Major** (X.0.0) — Breaking changes
+
+---
+
+## Version Control Standard
+
+**File**: `prj-version-control-standard.md`
+
+**Triggers**:
+- When working with git branches, commits, or merges
+- When creating or reviewing pull requests
+- When configuring repository settings
+- When auditing version control compliance
+
+### Core Rules
+
+1. **Never make code changes on main** — Main must always be deployable
+2. **Always squash merge** — Linear history is easier to debug
 3. **Delete merged branches** — Keep the repository clean
-4. **Always squash merge** — Linear history is easier to debug
-5. **Branch from main only** — No branches from branches (except hotfixes)
-6. **Maximum 5-day branch lifetime** — Short-lived branches reduce conflicts
-7. **Use issue-based branch naming** — Format: `<issue-number>-<descriptive-name>`
+4. **Branch from main only** — Except hotfixes from production tags
+5. **Use issue-based branch naming** — Format: `<issue-number>-<descriptive-name>`
 
 ### Key Practices
 
 - **Branch naming**: `42-user-profile-view`, `67-fix-login-timeout`
+- **Branch lifetime**: Maximum 5 days
 - **Commit messages**: Imperative mood, 50 chars max, no issue numbers
 - **PR requirements**: CI passes, no conflicts, squash merge only
+- **Tags**: `vX.Y.Z` format, annotated tags only
 
 ---
 
@@ -215,7 +249,7 @@ Not every project needs every standard. Select based on your needs:
 
 | If your project... | Consider these standards |
 |-------------------|-------------------------|
-| Uses git | Workflow |
+| Uses git | Development Workflow, Version Control |
 | Has tests | Testing |
 | Has documentation | Documentation |
 | Uses AI tools | MCP Usage |
