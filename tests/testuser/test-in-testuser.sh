@@ -200,7 +200,8 @@ grep -q "virtualian.github.io/marr\|github.com/virtualian/marr" .claude/marr/MAR
 grep -q "Making Agents Really Reliable" .claude/marr/MARR-PROJECT-CLAUDE.md 2>/dev/null && log_info "  ✅ MARR description present" || { log_info "  ❌ MARR description missing"; check_passed=false; }
 [ -f .claude/marr/README.md ] && log_info "  ✅ .claude/marr/README.md exists" || { log_info "  ❌ .claude/marr/README.md missing"; check_passed=false; }
 [ -d .claude/marr/standards ] && log_info "  ✅ .claude/marr/standards/ directory exists" || { log_info "  ❌ .claude/marr/standards/ missing"; check_passed=false; }
-[ -f .claude/marr/standards/prj-workflow-standard.md ] && log_info "  ✅ Workflow standard exists" || { log_info "  ❌ Workflow standard missing"; check_passed=false; }
+[ -f .claude/marr/standards/prj-development-workflow-standard.md ] && log_info "  ✅ Development workflow standard exists" || { log_info "  ❌ Development workflow standard missing"; check_passed=false; }
+[ -f .claude/marr/standards/prj-version-control-standard.md ] && log_info "  ✅ Version control standard exists" || { log_info "  ❌ Version control standard missing"; check_passed=false; }
 [ -f .claude/marr/standards/prj-testing-standard.md ] && log_info "  ✅ Testing standard exists" || { log_info "  ❌ Testing standard missing"; check_passed=false; }
 [ -f .claude/marr/standards/prj-mcp-usage-standard.md ] && log_info "  ✅ MCP usage standard exists" || { log_info "  ❌ MCP usage standard missing"; check_passed=false; }
 [ -f .claude/marr/standards/prj-documentation-standard.md ] && log_info "  ✅ Documentation standard exists" || { log_info "  ❌ Documentation standard missing"; check_passed=false; }

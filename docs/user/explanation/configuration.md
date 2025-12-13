@@ -68,10 +68,15 @@ The project config includes a Standards section that lists available standards w
 ```markdown
 ## Standards
 
-### `prj-workflow-standard.md`
+### `prj-development-workflow-standard.md`
 Read this standard when:
-- WHEN starting any feature, task, or implementation work
-- WHEN working with git branches, commits, or pull requests
+- WHEN starting any task or implementation work
+- WHEN creating or managing issues
+
+### `prj-version-control-standard.md`
+Read this standard when:
+- WHEN working with git branches, commits, or merges
+- WHEN creating or reviewing pull requests
 ```
 
 When an AI agent's task matches a trigger, it reads that standard before proceeding.
@@ -115,7 +120,8 @@ your-project/
         ├── MARR-PROJECT-CLAUDE.md   # Project AI agent config
         ├── README.md                # Explains MARR structure
         └── standards/               # Project-level standards
-            ├── prj-workflow-standard.md
+            ├── prj-development-workflow-standard.md
+            ├── prj-version-control-standard.md
             ├── prj-testing-standard.md
             └── ...
 ```

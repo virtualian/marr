@@ -28,7 +28,7 @@ interface InitOptions {
 /** Standard metadata extracted from frontmatter */
 interface StandardInfo {
   name: string;       // Short name derived from filename (e.g., 'workflow')
-  file: string;       // Full filename (e.g., 'prj-workflow-standard.md')
+  file: string;       // Full filename (e.g., 'prj-development-workflow-standard.md')
   title: string;      // From frontmatter
   description: string; // From frontmatter scope
 }
@@ -65,7 +65,7 @@ function discoverAvailableStandards(): StandardInfo[] {
         continue;
       }
 
-      // Extract short name from filename: prj-workflow-standard.md -> workflow
+      // Extract short name from filename: prj-development-workflow-standard.md -> development-workflow
       const name = filename
         .replace(/^prj-/, '')
         .replace(/-standard\.md$/, '');
@@ -483,7 +483,8 @@ This directory contains MARR (Making Agents Really Reliable) configuration for t
 ├── MARR-PROJECT-CLAUDE.md   # Project-specific AI agent configuration
 ├── README.md                # This file
 └── standards/               # Project-level standards (optional)
-    ├── prj-workflow-standard.md
+    ├── prj-development-workflow-standard.md
+    ├── prj-version-control-standard.md
     ├── prj-testing-standard.md
     └── ...
 \`\`\`

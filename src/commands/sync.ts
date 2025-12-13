@@ -513,7 +513,7 @@ export function syncCommand(program: Command): void {
 Examples:
   $ marr sync                    Interactive mode - select source and targets
   $ marr sync --from ~/proj/a --to ~/proj/b   Sync from A to B
-  $ marr sync --only prj-workflow-standard.md   Sync specific standard
+  $ marr sync --only prj-version-control-standard.md   Sync specific standard
   $ marr sync --dry-run          Preview changes
   $ marr sync --force            Skip confirmations
   $ marr sync --register         Add current project to registry

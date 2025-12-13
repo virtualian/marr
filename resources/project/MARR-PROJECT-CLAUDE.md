@@ -62,12 +62,19 @@ Read this standard when:
 - WHEN investigating test failures or flaky tests
 - WHEN making code changes that should have test coverage
 
-### `prj-workflow-standard.md`
+### `prj-development-workflow-standard.md`
 Read this standard when:
-- WHEN starting any feature, task, or implementation work
-- WHEN working with git branches, commits, or pull requests
-- WHEN making changes while on the main branch
-- WHEN preparing code for review or merge
+- WHEN starting any task or implementation work
+- WHEN creating or managing issues
+- WHEN preparing a release
+- WHEN responding to a production incident
+
+### `prj-version-control-standard.md`
+Read this standard when:
+- WHEN working with git branches, commits, or merges
+- WHEN creating or reviewing pull requests
+- WHEN configuring repository settings
+- WHEN auditing version control compliance
 
 ### `prj-writing-prompts-standard.md`
 Read this standard when:

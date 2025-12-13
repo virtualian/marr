@@ -154,7 +154,8 @@ project/
         ├── MARR-PROJECT-CLAUDE.md   # Project config + standard registry
         ├── README.md                # Explains structure
         └── standards/
-            ├── prj-workflow-standard.md
+            ├── prj-development-workflow-standard.md
+            ├── prj-version-control-standard.md
             ├── prj-testing-standard.md
             └── ...
 ```
@@ -165,7 +166,8 @@ MARR ships with standards covering common development concerns:
 
 | Standard | Scope |
 |----------|-------|
-| Workflow | Git branches, commits, pull requests |
+| Development Workflow | Issues, tasks, releases, hotfixes |
+| Version Control | Git branches, commits, PRs, tagging |
 | Testing | Test philosophy, priorities, coverage |
 | Documentation | Organization, content types, maintenance |
 | MCP Usage | Model Context Protocol tool usage |

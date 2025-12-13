@@ -30,13 +30,13 @@ Standards live in `.claude/marr/standards/` within each project.
 
 ### Modifying an Existing Standard
 
-1. Open the standard file (e.g., `prj-workflow-standard.md`)
+1. Open the standard file (e.g., `prj-version-control-standard.md`)
 2. Edit the rules to match your project's needs
 3. Commit the changes with your project
 
 **Example: Relaxing the branch lifetime rule**
 
-The workflow standard says "Maximum 5-day branch lifetime." If your team uses weekly sprints:
+The version control standard says "Maximum 5-day branch lifetime." If your team uses weekly sprints:
 
 ```markdown
 ## Core Rules

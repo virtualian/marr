@@ -188,7 +188,7 @@ Prompts are directive documents that guide AI agent behavior. They follow the sa
 
 **Project-level prompts:**
 - Format: `prj-{topic}-standard.md`
-- Examples: `prj-workflow-standard.md`, `prj-testing-standard.md`
+- Examples: `prj-version-control-standard.md`, `prj-testing-standard.md`
 
 **Location:**
 - All prompts live in `.claude/marr/standards/` directory

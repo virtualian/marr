@@ -142,7 +142,7 @@ triggers:
     // Create a standard with anti-patterns
     createStandard(
       tempDir,
-      'prj-workflow-standard.md',
+      'prj-version-control-standard.md',
       `---
 marr: standard
 version: 1
@@ -542,7 +542,7 @@ triggers:
 
     createStandard(
       tempDir,
-      'prj-workflow-standard.md',
+      'prj-version-control-standard.md',
       `---
 marr: standard
 version: 1
@@ -778,7 +778,7 @@ triggers:
 
     createStandard(
       tempDir,
-      'prj-workflow-standard.md',
+      'prj-version-control-standard.md',
       `---
 marr: standard
 version: 1

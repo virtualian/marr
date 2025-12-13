@@ -9,7 +9,8 @@ This directory contains MARR (Making Agents Really Reliable) configuration for t
 ├── MARR-PROJECT-CLAUDE.md   # Project-specific AI agent configuration
 ├── README.md                # This file
 └── standards/               # Project-level standards (optional)
-    ├── prj-workflow-standard.md
+    ├── prj-development-workflow-standard.md
+    ├── prj-version-control-standard.md
     ├── prj-testing-standard.md
     └── ...
 ```
