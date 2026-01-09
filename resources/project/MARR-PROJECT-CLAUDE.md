@@ -62,6 +62,12 @@ Read this standard when:
 - WHEN investigating test failures or flaky tests
 - WHEN making code changes that should have test coverage
 
+### `prj-user-config-standard.md`
+Read this standard when:
+- WHEN modifying ~/.claude/CLAUDE.md or MARR-USER-CLAUDE.md
+- WHEN adding preferences intended to apply across all projects
+- WHEN deciding whether content belongs in user config or project config
+
 ### `prj-development-workflow-standard.md`
 Read this standard when:
 - WHEN starting any task or implementation work
