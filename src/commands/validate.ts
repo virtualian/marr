@@ -5,6 +5,7 @@
  */
 
 import { Command } from 'commander';
+import { execSync } from 'child_process';
 import { join } from 'path';
 import * as logger from '../utils/logger.js';
 import * as fileOps from '../utils/file-ops.js';
@@ -15,12 +16,27 @@ interface ValidateOptions {
   strict?: boolean;
   conflicts?: boolean;
   json?: boolean;
+  verbose?: boolean;
 }
 
 interface ValidationResult {
   errors: string[];
   warnings: string[];
   conflicts: Conflict[];
+  context?: DiagnosticContext;
+  notMarrProject?: boolean;
+}
+
+interface DiagnosticContext {
+  cwd: string;
+  gitRoot: string | null;
+  gitRootHasMarr: boolean;
+  partialSetup: {
+    hasClaudeDir: boolean;
+    hasMarrDir: boolean;
+    hasProjectConfig: boolean;
+    hasStandards: boolean;
+  };
 }
 
 export function validateCommand(program: Command): void {
@@ -30,6 +46,7 @@ export function validateCommand(program: Command): void {
     .option('--strict', 'Treat warnings as errors (exit code 1)')
     .option('--conflicts', 'Only check for conflicts (skip structural validation)')
     .option('--json', 'Output results as JSON')
+    .option('--verbose', 'Show additional diagnostic information')
     .addHelpText('after', `
 What it checks:
   Structural validation:
@@ -48,6 +65,7 @@ Examples:
   $ marr validate --strict     Fail if any warnings found
   $ marr validate --conflicts  Only check for conflicts
   $ marr validate --json       Output as JSON (for tooling)
+  $ marr validate --verbose    Show diagnostic details
 
 Exit codes:
   0  Validation passed
@@ -55,7 +73,7 @@ Exit codes:
     .action((options: ValidateOptions) => {
       const result = options.conflicts
         ? validateConflictsOnly()
-        : validateProject();
+        : validateProject(options);
 
       if (options.json) {
         displayResultsJson(result);
@@ -90,9 +108,116 @@ function validateConflictsOnly(): ValidationResult {
 }
 
 /**
+ * Gather diagnostic context for error messages
+ */
+function gatherDiagnosticContext(): DiagnosticContext {
+  const cwd = process.cwd();
+  const claudeDir = join(cwd, '.claude');
+  const marrDir = join(cwd, '.claude', 'marr');
+  const projectConfig = join(marrDir, 'MARR-PROJECT-CLAUDE.md');
+  const standardsDir = join(marrDir, 'standards');
+
+  // Detect git root
+  let gitRoot: string | null = null;
+  try {
+    gitRoot = execSync('git rev-parse --show-toplevel', {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+  } catch {
+    // Not in a git repository
+  }
+
+  // Check if git root has MARR
+  let gitRootHasMarr = false;
+  if (gitRoot && gitRoot !== cwd) {
+    const gitRootMarrDir = join(gitRoot, '.claude', 'marr');
+    gitRootHasMarr = fileOps.exists(gitRootMarrDir);
+  }
+
+  return {
+    cwd,
+    gitRoot,
+    gitRootHasMarr,
+    partialSetup: {
+      hasClaudeDir: fileOps.exists(claudeDir),
+      hasMarrDir: fileOps.exists(marrDir),
+      hasProjectConfig: fileOps.exists(projectConfig),
+      hasStandards: fileOps.exists(standardsDir),
+    },
+  };
+}
+
+/**
+ * Display rich error message when not in a MARR project
+ */
+function displayNotMarrProject(ctx: DiagnosticContext, verbose: boolean): void {
+  const { cwd, gitRoot, gitRootHasMarr, partialSetup } = ctx;
+
+  // Scenario 1: In a git subdirectory where MARR exists at the root
+  if (gitRootHasMarr && gitRoot) {
+    logger.error('Not in a MARR project root');
+    logger.blank();
+    logger.log(`Current directory: ${cwd}`);
+    logger.blank();
+    logger.info('Detected: You\'re in a subdirectory of a MARR project.');
+    logger.log(`Git root: ${gitRoot} (has .claude/marr/)`);
+    logger.blank();
+    logger.log('What to do:');
+    logger.log(`  • Navigate to project root: cd ${gitRoot}`);
+    logger.log('  • Then run: marr validate');
+    return;
+  }
+
+  // Scenario 2: Partial setup detected
+  if (partialSetup.hasClaudeDir && !partialSetup.hasMarrDir) {
+    logger.error('Incomplete MARR setup');
+    logger.blank();
+    logger.log(`Current directory: ${cwd}`);
+    logger.blank();
+    logger.log('Found:');
+    logger.log('  ✓ .claude/ directory exists');
+    logger.log('  ✗ .claude/marr/ directory missing');
+    logger.log('  ✗ MARR-PROJECT-CLAUDE.md missing');
+    logger.blank();
+    logger.log('What to do:');
+    logger.log('  • Complete initialization: Run \'marr init --project\'');
+    return;
+  }
+
+  // Scenario 3: Not a MARR project at all
+  logger.error('Not a MARR-initialized project');
+  logger.blank();
+  logger.log(`Current directory: ${cwd}`);
+  logger.blank();
+  logger.log('Possible causes:');
+  logger.log('  • You may be in the wrong directory');
+  logger.log('  • This project hasn\'t been initialized with MARR yet');
+  logger.log('  • The .claude/marr/ directory was deleted');
+  logger.blank();
+  logger.log('What to do:');
+  logger.log('  • If this should be a MARR project: Run \'marr init --project\'');
+  logger.log('  • If you\'re in the wrong directory: Navigate to your project root');
+  logger.log('  • To check MARR user setup: Run \'marr status\'');
+  logger.blank();
+  logger.info('Tip: MARR projects have a .claude/marr/ directory at their root.');
+
+  // Verbose output
+  if (verbose) {
+    logger.blank();
+    logger.section('Diagnostics');
+    logger.log(`  Working directory: ${cwd}`);
+    logger.log(`  Git repository: ${gitRoot ? `Yes (root: ${gitRoot})` : 'No'}`);
+    logger.log(`  .claude/ exists: ${partialSetup.hasClaudeDir ? 'Yes' : 'No'}`);
+    logger.log(`  .claude/marr/ exists: ${partialSetup.hasMarrDir ? 'Yes' : 'No'}`);
+    logger.log(`  User MARR setup: ${fileOps.exists(fileOps.getMarrRoot()) ? 'Yes' : 'No'}`);
+  }
+}
+
+/**
  * Full validation: structure + conflicts
  */
-function validateProject(): ValidationResult {
+function validateProject(options: ValidateOptions): ValidationResult {
   logger.section('MARR Configuration Validation');
 
   const result: ValidationResult = {
@@ -101,11 +226,16 @@ function validateProject(): ValidationResult {
     conflicts: [],
   };
 
+  // Gather diagnostic context first
+  const ctx = gatherDiagnosticContext();
+  result.context = ctx;
+
   // Check if we're in a MARR project
-  validateMarrProject(result);
+  const isMarrProject = validateMarrProject(result, ctx, options);
 
   // If not a MARR project, stop here
-  if (result.errors.length > 0) {
+  if (!isMarrProject) {
+    result.notMarrProject = true;
     return result;
   }
 
@@ -133,24 +263,31 @@ function validateProject(): ValidationResult {
   return result;
 }
 
-function validateMarrProject(result: ValidationResult): void {
+function validateMarrProject(
+  result: ValidationResult,
+  ctx: DiagnosticContext,
+  options: ValidateOptions
+): boolean {
   const marrDir = join(process.cwd(), '.claude', 'marr');
   const marrProjectClaudeMdPath = join(marrDir, 'MARR-PROJECT-CLAUDE.md');
 
   if (!fileOps.exists(marrDir)) {
-    result.errors.push('.claude/marr/ directory not found');
-    result.errors.push('This does not appear to be a MARR-initialized project');
-    result.errors.push('Run: marr init --project');
-    return;
+    // Use rich display for non-JSON output
+    if (!options.json) {
+      displayNotMarrProject(ctx, options.verbose ?? false);
+    }
+    result.errors.push('Not a MARR-initialized project');
+    return false;
   }
 
   if (!fileOps.exists(marrProjectClaudeMdPath)) {
     result.errors.push('.claude/marr/MARR-PROJECT-CLAUDE.md not found');
     result.errors.push('Run: marr init --project --force');
-    return;
+    return false;
   }
 
   logger.success('.claude/marr/MARR-PROJECT-CLAUDE.md exists');
+  return true;
 }
 
 function validateMarrProjectClaudeMd(result: ValidationResult): void {
@@ -258,7 +395,7 @@ function validateRootClaudeMd(result: ValidationResult): void {
  * Display results as JSON
  */
 function displayResultsJson(result: ValidationResult): void {
-  const output = {
+  const output: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
     valid: result.errors.length === 0,
     errors: result.errors,
@@ -281,10 +418,26 @@ function displayResultsJson(result: ValidationResult): void {
     },
   };
 
+  // Include diagnostic context when available
+  if (result.context) {
+    output.context = {
+      cwd: result.context.cwd,
+      gitRoot: result.context.gitRoot,
+      gitRootHasMarr: result.context.gitRootHasMarr,
+      partialSetup: result.context.partialSetup,
+    };
+  }
+
   console.log(JSON.stringify(output, null, 2));
 }
 
 function displayResults(result: ValidationResult, options: ValidateOptions): void {
+  // Skip error display if we already showed rich "not MARR project" message
+  if (result.notMarrProject) {
+    logger.blank();
+    return;
+  }
+
   // Display errors
   if (result.errors.length > 0) {
     logger.section('Errors');
