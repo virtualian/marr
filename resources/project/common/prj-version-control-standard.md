@@ -160,21 +160,22 @@ Production releases are created exclusively via tags on the main branch.
 
 **Tag Naming Convention:** `vX.Y.Z` (e.g., `v1.0.0`, `v2.3.1`)
 
-**Manual Release Process:**
+**Release Process (npm projects):**
 1. Ensure you are on main branch: `git checkout main`
 2. Pull latest: `git pull`
 3. Verify clean working directory: `git status`
-4. Verify tests pass
-5. Update version in project files (e.g., `package.json`)
-6. Commit version bump: `git commit -am "vX.Y.Z"`
-7. Create annotated tag: `git tag -a vX.Y.Z -m "vX.Y.Z"`
-8. Push commit and tag: `git push && git push --tags`
+4. Run tests: `npm test`
+5. Bump version, commit, and tag atomically: `npm version patch` (or `minor`/`major`)
+6. Push commit and tag: `git push && git push --tags`
+
+**Why `npm version`:** Handles version bump, commit, and tag atomically—fewer manual steps, less error-prone.
 
 **Rules:**
 - Tags are immutable — never delete or move a release tag
 - Only tag from main branch
 - Version bump commit should contain only version changes
 - Use annotated tags (`-a`), not lightweight tags
+- For non-npm projects, use equivalent tooling or manual steps
 
 ---
 
