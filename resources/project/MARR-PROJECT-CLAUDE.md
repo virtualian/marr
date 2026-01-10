@@ -89,6 +89,14 @@ Read this standard when:
 - WHEN reviewing prompts or standards for quality
 - WHEN defining rules or constraints for AI agent behavior
 
+### `prj-plan-execution-standard.md`
+Read this standard when:
+- WHEN executing an implementation plan from plans/
+- WHEN spawning sub-agents to perform plan tasks
+- WHEN resuming work on a partially-completed plan
+- WHEN coordinating multiple agents on a single plan
+- WHEN creating or structuring a new implementation plan
+
 ---
 
 ## Anti-Patterns (FORBIDDEN)
