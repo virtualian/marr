@@ -21,6 +21,7 @@ import {
   getAllMarrProjectImportLines,
   getMarrProjectImportLine,
 } from '../utils/marr-import.js';
+import { buildManifest, writeManifest, MANIFEST_FILENAME, isStandardFilename } from '../utils/marr-manifest.js';
 
 interface InitOptions {
   user: boolean;
@@ -57,8 +58,7 @@ function discoverAvailableStandards(): StandardInfo[] {
   for (const filePath of files) {
     const filename = basename(filePath);
 
-    // Only process prj-*-standard.md files
-    if (!filename.startsWith('prj-') || !filename.endsWith('-standard.md')) {
+    if (!isStandardFilename(filename)) {
       continue;
     }
 
@@ -342,6 +342,7 @@ async function initializeProject(targetDir: string, standards: string | undefine
     logger.info(`Would create: ${marrPath}/`);
     logger.info(`Would create: ${marrProjectClaudeMdPath}`);
     logger.info(`Would create: ${marrPath}/README.md`);
+    logger.info(`Would create: ${marrPath}/${MANIFEST_FILENAME}`);
     if (selectedStandards.length > 0) {
       logger.info(`Would create: ${standardsPath}/`);
       for (const std of selectedStandards) {
@@ -370,6 +371,17 @@ async function initializeProject(targetDir: string, standards: string | undefine
     fileOps.ensureDir(standardsPath);
     copyProjectStandards(standardsPath, selectedStandards);
   }
+
+  // Write manifest so future `marr update` knows what was installed.
+  // Subscription set = the just-copied selected standards (may be empty).
+  const selectedFileNames = new Set(selectedStandards.map((s) => s.file));
+  const manifest = buildManifest(
+    standardsPath,
+    marrSetup.getMarrVersion(),
+    (name) => selectedFileNames.has(name),
+  );
+  writeManifest(marrPath, manifest);
+  logger.success(`Created: .claude/marr/${MANIFEST_FILENAME}`);
 
   // Handle project root CLAUDE.md
   addProjectClaudeMdImport(projectClaudeMdPath, targetDir);

@@ -12,8 +12,7 @@ This file lists active bugs and known limitations. For new features and roadmap 
 
 | # | Limitation | Notes |
 |---|---|---|
-| [#86](https://github.com/virtualian/marr/issues/86) | Deprecated, deleted, old, replaced, and stale standards are not removed during sync or upgrade | A subsequent sync re-installs the latest set; orphaned files must be removed manually |
-| [#111](https://github.com/virtualian/marr/issues/111) | Consumer projects can run stale MARR standards (drift D1–D6) | Run `marr sync` from a freshly-installed source project to refresh |
+| [#86](https://github.com/virtualian/marr/issues/86) | `marr sync` does not remove deprecated/replaced standards | `marr update --project --prune` removes orphans tracked by the manifest; `sync`-side handling is still pending |
 
 ## Reporting
 

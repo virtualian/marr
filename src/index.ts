@@ -17,6 +17,7 @@ import { cleanCommand } from './commands/clean.js';
 import { standardCommand } from './commands/standard.js';
 import { doctorCommand } from './commands/doctor.js';
 import { syncCommand } from './commands/sync.js';
+import { updateCommand } from './commands/update.js';
 
 // Get package.json for version
 const __filename = fileURLToPath(import.meta.url);
@@ -45,6 +46,7 @@ Examples:
   $ marr standard validate --all  Validate all standard frontmatter
   $ marr standard list            List standards with triggers
   $ marr sync                     Sync standards between projects
+  $ marr update --project         Refresh canonical standards into this project
 
 Run 'marr <command> --help' for detailed help on each command.`);
 
@@ -55,6 +57,7 @@ cleanCommand(program);
 standardCommand(program);
 doctorCommand(program);
 syncCommand(program);
+updateCommand(program);
 
 // Parse arguments
 program.parse(process.argv);

@@ -47,6 +47,7 @@ marr validate
 | `marr doctor` | Interactive conflict resolution |
 | `marr standard` | Manage standards |
 | `marr sync` | Sync standards between projects |
+| `marr update --project` | Refresh canonical standards into this project (drift detection via `--check`) |
 
 Run `marr <command> --help` for detailed options.
 
