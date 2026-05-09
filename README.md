@@ -71,6 +71,12 @@ npm link
 
 See the [Contributing Guide](https://virtualian.github.io/marr/dev/how-to/contributing/) for more.
 
+## Releases
+
+- [Release Notes](RELEASE_NOTES.md) — cumulative, in-repo history of user-visible changes
+- [GitHub Releases](https://github.com/virtualian/marr/releases) — discoverable per-version surface
+- [Known Issues](KNOWN_ISSUES.md) — active bugs and limitations
+
 ## License
 
 ISC
