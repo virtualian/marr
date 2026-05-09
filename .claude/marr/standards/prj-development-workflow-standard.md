@@ -6,6 +6,9 @@ scope: All development work involving issues, tasks, and release processes
 
 triggers:
   - WHEN starting any task or implementation work
+  - WHEN asked to investigate, look at, check, debug, or troubleshoot something
+  - WHEN a user references an issue number or asks to work on a specific issue
+  - WHEN implementing, building, adding, changing, or modifying functionality
   - WHEN creating or managing issues
   - WHEN preparing a release
   - WHEN responding to a production incident
@@ -23,6 +26,29 @@ triggers:
 2. **NEVER start implementation without an issue number** because all work must be traceable
 3. **Create branch BEFORE investigation** because even exploration should be tracked
 4. **Update documentation when code changes** because outdated docs mislead users
+
+---
+
+## STOP-GATE: Branch Verification (MANDATORY)
+
+**THIS SECTION IS A HARD GATE. COMPLETE THESE STEPS BEFORE ANY OTHER ACTION.**
+
+When this standard is triggered, IMMEDIATELY verify branch status:
+
+1. **Check current branch** — Determine which branch you are on
+2. **If on main**: STOP. Create a feature branch BEFORE proceeding with any other action
+3. **If on a feature branch**: Verify the branch name corresponds to the issue being worked on
+
+**When on main and asked to investigate, fix, or work on something:**
+- DO NOT read code files
+- DO NOT run searches
+- DO NOT explore the codebase
+- DO NOT make any changes
+- FIRST create the appropriate feature branch, THEN proceed
+
+**Rationale:** Even "just looking" or "quick investigation" creates context that leads to changes. Branch first ensures all work—including exploration—is properly tracked and isolated.
+
+**No exceptions. No "quick looks". Branch first, always.**
 
 ---
 
@@ -74,10 +100,14 @@ Before starting any work:
 **Release Checklist:**
 1. All PRs for release are merged to main
 2. All tests passing
-3. Changelog/release notes prepared (if applicable)
+3. Release-notes section for the new version added to `RELEASE_NOTES.md` (or `CHANGELOG.md`)
+4. `KNOWN_ISSUES.md` reflects current state (see Documentation Standard for the canonical file roster)
 
 **Creating the Release:**
-See Version Control Standard for tagging process and mechanics.
+1. Tag the release on main (see Version Control Standard for tagging process and mechanics)
+2. Publish a GitHub Release against the tag, with body mirroring the new release-notes section
+
+The release-notes file and the GitHub Release are BOTH mandatory for every release — see Version Control Standard "Release Notes & GitHub Release" for the rationale and content requirements.
 
 ---
 
@@ -90,7 +120,8 @@ Hotfixes are emergency fixes for production issues.
 2. Branch from production tag, NOT main (see Version Control Standard for branching rules)
 3. Make minimal fix only
 4. Create urgent PR to main
-5. After merge, release immediately
+5. Add a one-line entry to `RELEASE_NOTES.md` (or `CHANGELOG.md`) for the hotfix version
+6. After merge, tag the release and publish a GitHub Release (release-notes + GH Release rule still applies — see Version Control Standard)
 
 **Hotfix Rules:**
 - Minimal changes only — fix the issue, nothing else
@@ -102,10 +133,12 @@ Hotfixes are emergency fixes for production issues.
 ## Anti-Patterns (FORBIDDEN)
 
 - **Working without an issue** — All work must be tracked
+- **Investigating on main** — Even "just looking" must happen on a feature branch
 - **Starting code before branching** — Branch first, then investigate
 - **Bypassing process for "quick fixes"** — Process applies to all changes
 - **Combining unrelated work** — One issue per branch (unless explicitly instructed)
 - **Releasing without clean main** — All changes must be merged first
+- **Releasing without release notes or GitHub Release** — Both are mandatory for every release (see Version Control Standard)
 - **Leaving docs outdated** — Documentation must reflect current code
 
 ---
