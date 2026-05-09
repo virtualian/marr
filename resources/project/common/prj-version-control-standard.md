@@ -25,6 +25,7 @@ triggers:
 4. **Branch from main only** (except hotfixes from production tags)
 5. **Use issue-based branch naming** because traceability matters
 6. **Run tests before pushing** because broken code should never reach the remote
+7. **Every release has release notes and a GitHub Release** because users need a discoverable record of what changed
 
 ---
 
@@ -177,6 +178,24 @@ Production releases are created exclusively via tags on the main branch.
 - Use annotated tags (`-a`), not lightweight tags
 - For non-npm projects, use equivalent tooling or manual steps
 
+### Release Notes & GitHub Release (MANDATORY)
+
+Every tagged release MUST be accompanied by **both**:
+
+1. **An updated release-notes file** — `RELEASE_NOTES.md` or `CHANGELOG.md` (see Documentation Standard for the canonical file roster). The new version's section MUST exist BEFORE the tag is created. The version-bump commit, the section addition, and the tag MUST point at the same source-tree state.
+
+2. **A GitHub Release** — created against the pushed tag, with the Release body mirroring the new section in the release-notes file. The Release MUST be published promptly after the tag is pushed.
+
+**Why both:** the in-repo file is the canonical, versioned, diffable history that lives with the code. The GitHub Release is the discoverable surface — appears in the repo sidebar, drives release-watcher tooling on npm and elsewhere, and notifies subscribers. Neither is a substitute for the other.
+
+**Content guidance for the release-notes section:**
+- Group changes by type — Added / Changed / Fixed / Removed / Security — in that order
+- Each entry MUST be user-visible (a behaviour, capability, or contract change). Internal refactors that change no observable behaviour DO NOT belong here.
+- Each entry MUST link to its issue or PR number for traceability
+- Breaking changes MUST be flagged at the top of the section
+
+**Hotfix releases:** see Hotfix Workflow in Development Workflow Standard. Hotfix releases follow the same release-notes + GitHub Release rule — a one-line "fix X (closes #N)" entry is sufficient, but the entry MUST exist.
+
 ---
 
 ## Anti-Patterns (FORBIDDEN)
@@ -189,6 +208,8 @@ Production releases are created exclusively via tags on the main branch.
 - **Skipping CI checks** — All checks must pass before merge
 - **Issue numbers in commits** — Branch names provide traceability
 - **Pushing without running tests** — Verify locally before pushing
+- **Tagging without release notes** — Every tag MUST have a corresponding section in the release-notes file
+- **Tag pushed without GitHub Release** — A tag without a published GitHub Release is incomplete
 
 ---
 

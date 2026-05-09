@@ -100,10 +100,14 @@ Before starting any work:
 **Release Checklist:**
 1. All PRs for release are merged to main
 2. All tests passing
-3. Changelog/release notes prepared (if applicable)
+3. Release-notes section for the new version added to `RELEASE_NOTES.md` (or `CHANGELOG.md`)
+4. `KNOWN_ISSUES.md` reflects current state (see Documentation Standard for the canonical file roster)
 
 **Creating the Release:**
-See Version Control Standard for tagging process and mechanics.
+1. Tag the release on main (see Version Control Standard for tagging process and mechanics)
+2. Publish a GitHub Release against the tag, with body mirroring the new release-notes section
+
+The release-notes file and the GitHub Release are BOTH mandatory for every release — see Version Control Standard "Release Notes & GitHub Release" for the rationale and content requirements.
 
 ---
 
@@ -116,7 +120,8 @@ Hotfixes are emergency fixes for production issues.
 2. Branch from production tag, NOT main (see Version Control Standard for branching rules)
 3. Make minimal fix only
 4. Create urgent PR to main
-5. After merge, release immediately
+5. Add a one-line entry to `RELEASE_NOTES.md` (or `CHANGELOG.md`) for the hotfix version
+6. After merge, tag the release and publish a GitHub Release (release-notes + GH Release rule still applies — see Version Control Standard)
 
 **Hotfix Rules:**
 - Minimal changes only — fix the issue, nothing else
@@ -133,6 +138,7 @@ Hotfixes are emergency fixes for production issues.
 - **Bypassing process for "quick fixes"** — Process applies to all changes
 - **Combining unrelated work** — One issue per branch (unless explicitly instructed)
 - **Releasing without clean main** — All changes must be merged first
+- **Releasing without release notes or GitHub Release** — Both are mandatory for every release (see Version Control Standard)
 - **Leaving docs outdated** — Documentation must reflect current code
 
 ---
