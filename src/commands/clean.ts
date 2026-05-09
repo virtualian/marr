@@ -9,6 +9,10 @@ import { join } from 'path';
 import * as fileOps from '../utils/file-ops.js';
 import * as logger from '../utils/logger.js';
 import { removeMarrImport, isMarrSetup, hasMarrImport } from '../utils/marr-setup.js';
+import {
+  MARR_PROJECT_IMPORT_COMMENT,
+  getAllMarrProjectImportLines,
+} from '../utils/marr-import.js';
 
 interface CleanOptions {
   user: boolean;
@@ -58,12 +62,17 @@ function cleanUser(dryRun: boolean): { removed: string[]; errors: string[] } {
   return { removed, errors };
 }
 
-/** MARR import line in project CLAUDE.md */
-const MARR_PROJECT_IMPORT_LINE = '@.claude/marr/MARR-PROJECT-CLAUDE.md';
-const MARR_PROJECT_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
+/**
+ * Find which (if any) MARR project import form is present in content.
+ */
+function findProjectImport(content: string): string | undefined {
+  return getAllMarrProjectImportLines().find(form => content.includes(form));
+}
 
 /**
- * Clean project-level MARR configuration (./.claude/marr/ and import from CLAUDE.md)
+ * Clean project-level MARR configuration (./.claude/marr/ and import from CLAUDE.md).
+ *
+ * Recognises every known import form so legacy installs (#106) remain cleanable.
  */
 function cleanProject(dryRun: boolean): { removed: string[]; errors: string[] } {
   const removed: string[] = [];
@@ -74,7 +83,6 @@ function cleanProject(dryRun: boolean): { removed: string[]; errors: string[] } 
   const rootClaudeMdPath = join(cwd, 'CLAUDE.md');
   const dotClaudeClaudeMdPath = join(cwd, '.claude', 'CLAUDE.md');
 
-  // Remove ./.claude/marr/ directory if it exists
   if (fileOps.exists(marrPath) && fileOps.isDirectory(marrPath)) {
     if (dryRun) {
       removed.push('./.claude/marr/ directory');
@@ -88,34 +96,32 @@ function cleanProject(dryRun: boolean): { removed: string[]; errors: string[] } 
     }
   }
 
-  // Remove MARR import from CLAUDE.md (check both locations)
   const claudeMdPaths = [
     { path: rootClaudeMdPath, label: './CLAUDE.md' },
     { path: dotClaudeClaudeMdPath, label: './.claude/CLAUDE.md' },
   ];
 
   for (const { path: claudeMdPath, label } of claudeMdPaths) {
-    if (fileOps.exists(claudeMdPath)) {
-      const content = fileOps.readFile(claudeMdPath);
-      if (content.includes(MARR_PROJECT_IMPORT_LINE)) {
-        if (dryRun) {
-          removed.push(`MARR import from ${label}`);
-        } else {
-          try {
-            let newContent = content;
-            // Remove import block (comment + import line)
-            newContent = newContent.replace(MARR_PROJECT_IMPORT_COMMENT + '\n', '');
-            newContent = newContent.replace(MARR_PROJECT_IMPORT_LINE + '\n', '');
-            newContent = newContent.replace(MARR_PROJECT_IMPORT_LINE, '');
-            // Clean up extra blank lines
-            newContent = newContent.replace(/\n{3,}/g, '\n\n');
-            fileOps.writeFile(claudeMdPath, newContent);
-            removed.push(`MARR import from ${label}`);
-          } catch (err) {
-            errors.push(`Failed to remove MARR import from ${label}: ${(err as Error).message}`);
-          }
-        }
-      }
+    if (!fileOps.exists(claudeMdPath)) continue;
+    const content = fileOps.readFile(claudeMdPath);
+    const importLine = findProjectImport(content);
+    if (!importLine) continue;
+
+    if (dryRun) {
+      removed.push(`MARR import from ${label}`);
+      continue;
+    }
+
+    try {
+      let newContent = content;
+      newContent = newContent.replace(MARR_PROJECT_IMPORT_COMMENT + '\n', '');
+      newContent = newContent.replace(importLine + '\n', '');
+      newContent = newContent.replace(importLine, '');
+      newContent = newContent.replace(/\n{3,}/g, '\n\n');
+      fileOps.writeFile(claudeMdPath, newContent);
+      removed.push(`MARR import from ${label}`);
+    } catch (err) {
+      errors.push(`Failed to remove MARR import from ${label}: ${(err as Error).message}`);
     }
   }
 
@@ -139,9 +145,9 @@ function executeClean(options: CleanOptions): void {
   const cwd = process.cwd();
   const hasMarrDir = fileOps.exists(join(cwd, '.claude', 'marr'));
   const rootClaudeMdHasImport = fileOps.exists(join(cwd, 'CLAUDE.md')) &&
-    fileOps.readFile(join(cwd, 'CLAUDE.md')).includes(MARR_PROJECT_IMPORT_LINE);
+    findProjectImport(fileOps.readFile(join(cwd, 'CLAUDE.md'))) !== undefined;
   const dotClaudeClaudeMdHasImport = fileOps.exists(join(cwd, '.claude', 'CLAUDE.md')) &&
-    fileOps.readFile(join(cwd, '.claude', 'CLAUDE.md')).includes(MARR_PROJECT_IMPORT_LINE);
+    findProjectImport(fileOps.readFile(join(cwd, '.claude', 'CLAUDE.md'))) !== undefined;
   const projectHasContent = hasMarrDir || rootClaudeMdHasImport || dotClaudeClaudeMdHasImport;
 
   if (cleanUserConfig && !userHasContent && cleanProjectConfig && !projectHasContent) {

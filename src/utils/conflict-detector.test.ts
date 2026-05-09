@@ -179,6 +179,86 @@ triggers:
     assert.ok(directiveConflicts.length > 0, 'Should detect anti-pattern violation');
   });
 
+  it('does not flag missing import when .claude/CLAUDE.md uses sibling-relative form (#106)', () => {
+    createStandard(
+      tempDir,
+      'prj-testing-standard.md',
+      `---
+marr: standard
+version: 1
+title: Testing Standard
+scope: All testing activities
+triggers:
+  - WHEN running tests
+---
+
+## Core Rules
+
+1. **Run tests** always
+`
+    );
+
+    // Use the .claude/CLAUDE.md location with the correct sibling-relative import.
+    // Remove the root CLAUDE.md so the .claude/ one is what gets discovered.
+    rmSync(join(tempDir, 'CLAUDE.md'), { force: true });
+    writeFileSync(
+      join(tempDir, '.claude', 'CLAUDE.md'),
+      `# Project Configuration
+
+@marr/MARR-PROJECT-CLAUDE.md
+
+Some project rules.
+`
+    );
+
+    const conflicts = detectProjectConflicts(tempDir);
+    const missingImportConflicts = conflicts.filter(c => c.category === 'missing_import');
+    assert.strictEqual(
+      missingImportConflicts.length,
+      0,
+      'Should accept @marr/MARR-PROJECT-CLAUDE.md as the correct form for .claude/CLAUDE.md'
+    );
+  });
+
+  it('flags missing import when .claude/CLAUDE.md uses the wrong (legacy) form', () => {
+    createStandard(
+      tempDir,
+      'prj-testing-standard.md',
+      `---
+marr: standard
+version: 1
+title: Testing Standard
+scope: All testing activities
+triggers:
+  - WHEN running tests
+---
+
+## Core Rules
+
+1. **Run tests** always
+`
+    );
+
+    rmSync(join(tempDir, 'CLAUDE.md'), { force: true });
+    writeFileSync(
+      join(tempDir, '.claude', 'CLAUDE.md'),
+      `# Project Configuration
+
+@.claude/marr/MARR-PROJECT-CLAUDE.md
+
+Legacy broken form — does not resolve from this location.
+`
+    );
+
+    const conflicts = detectProjectConflicts(tempDir);
+    const missingImportConflicts = conflicts.filter(c => c.category === 'missing_import');
+    assert.strictEqual(
+      missingImportConflicts.length,
+      1,
+      'Should flag the legacy broken form as missing the correct import'
+    );
+  });
+
   it('detects missing MARR import', () => {
     // Create standards
     createStandard(

@@ -83,10 +83,18 @@ When an AI agent's task matches a trigger, it reads that standard before proceed
 
 ### Loading Mechanism
 
-Project configuration loads through:
-1. `./CLAUDE.md` contains `@.claude/marr/MARR-PROJECT-CLAUDE.md`
-2. This import brings in the project's MARR config
-3. Standards are read on-demand based on trigger conditions
+Project configuration loads through a `CLAUDE.md` import. Claude Code resolves
+`@path` imports relative to the file containing them, so the exact import string
+depends on which CLAUDE.md location your project uses:
+
+| CLAUDE.md location | Import line |
+|--------------------|-------------|
+| `./CLAUDE.md`      | `@.claude/marr/MARR-PROJECT-CLAUDE.md` |
+| `./.claude/CLAUDE.md` | `@marr/MARR-PROJECT-CLAUDE.md` |
+
+`marr init --project` writes the correct form for whichever location it finds
+(or creates `./CLAUDE.md` by default). The import brings in the project's MARR
+config, and standards are read on-demand based on trigger conditions.
 
 ## Configuration Hierarchy
 

@@ -79,11 +79,18 @@ MARR integrates with Claude Code via markdown imports:
 ~/.claude/CLAUDE.md
   └── @~/.claude/marr/MARR-USER-CLAUDE.md    (user config)
 
-./CLAUDE.md
+./CLAUDE.md                                  (project at root)
   └── @.claude/marr/MARR-PROJECT-CLAUDE.md   (project config)
+
+./.claude/CLAUDE.md                          (project under .claude/)
+  └── @marr/MARR-PROJECT-CLAUDE.md           (project config)
 ```
 
-Claude Code reads `CLAUDE.md` files and follows import directives. MARR uses this mechanism rather than inventing a new one.
+Claude Code resolves `@path` imports relative to the file containing them, so
+the project import line differs by CLAUDE.md location. `marr init --project`
+detects which location is in use and writes the matching form.
+
+MARR uses this import mechanism rather than inventing a new one.
 
 ## System Boundaries
 
