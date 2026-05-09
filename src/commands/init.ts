@@ -15,6 +15,12 @@ import * as logger from '../utils/logger.js';
 import * as fileOps from '../utils/file-ops.js';
 import * as marrSetup from '../utils/marr-setup.js';
 import { registerProject } from '../utils/project-registry.js';
+import {
+  MARR_PROJECT_IMPORT_COMMENT,
+  classifyClaudeMdPath,
+  getAllMarrProjectImportLines,
+  getMarrProjectImportLine,
+} from '../utils/marr-import.js';
 
 interface InitOptions {
   user: boolean;
@@ -446,10 +452,6 @@ async function selectStandards(availableStandards: StandardInfo[]): Promise<Stan
   return selected;
 }
 
-/** MARR import line for project CLAUDE.md */
-const MARR_PROJECT_IMPORT_LINE = '@.claude/marr/MARR-PROJECT-CLAUDE.md';
-const MARR_PROJECT_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
-
 /**
  * Copy MARR-PROJECT-CLAUDE.md template to .claude/marr/
  */
@@ -491,7 +493,10 @@ This directory contains MARR (Making Agents Really Reliable) configuration for t
 
 ## How It Works
 
-1. Project root \`CLAUDE.md\` imports \`@.claude/marr/MARR-PROJECT-CLAUDE.md\`
+1. The project's \`CLAUDE.md\` imports \`MARR-PROJECT-CLAUDE.md\` from this directory.
+   The import line depends on which CLAUDE.md location the project uses:
+   - \`./CLAUDE.md\` → \`@.claude/marr/MARR-PROJECT-CLAUDE.md\`
+   - \`./.claude/CLAUDE.md\` → \`@marr/MARR-PROJECT-CLAUDE.md\`
 2. MARR-PROJECT-CLAUDE.md defines trigger conditions for standards
 3. When a trigger is met, the AI agent reads that standard before proceeding
 
@@ -534,49 +539,65 @@ function copyProjectStandards(standardsPath: string, selectedStandards: Standard
 }
 
 /**
- * Add MARR import to project root CLAUDE.md
- * Creates file if it doesn't exist, adds import if it does
+ * Add MARR import to project CLAUDE.md.
+ *
+ * The chosen import string depends on which CLAUDE.md location is in use:
+ * imports resolve relative to the file containing them, so a CLAUDE.md sat
+ * at `<project>/.claude/CLAUDE.md` needs `@marr/...`, while one at
+ * `<project>/CLAUDE.md` needs `@.claude/marr/...`.
+ *
+ * Creates the file if it doesn't exist. If it exists with a stale
+ * wrong-for-location form (legacy installs predating #106), replaces it.
  */
 function addProjectClaudeMdImport(claudeMdPath: string, targetDir: string): void {
-  const projectName = targetDir.split('/').pop() || 'Project';
+  const projectName = basename(targetDir) || 'Project';
+  const location = classifyClaudeMdPath(claudeMdPath);
+  const importLine = getMarrProjectImportLine(location);
+  const filename = basename(claudeMdPath);
 
   if (!fileOps.exists(claudeMdPath)) {
-    // Create new CLAUDE.md with MARR import
     const content = `# ${projectName}
 
 ${MARR_PROJECT_IMPORT_COMMENT}
-${MARR_PROJECT_IMPORT_LINE}
+${importLine}
 
 Add project-specific Claude Code configuration here.
 `;
     fileOps.writeFile(claudeMdPath, content);
-    logger.success('Created: CLAUDE.md with MARR import');
+    logger.success(`Created: ${filename} with MARR import`);
     return;
   }
 
-  // File exists - check if import already present
   const existingContent = fileOps.readFile(claudeMdPath);
-  if (existingContent.includes(MARR_PROJECT_IMPORT_LINE)) {
-    logger.info('MARR import already present in CLAUDE.md');
+  if (existingContent.includes(importLine)) {
+    logger.info(`MARR import already present in ${filename}`);
     return;
   }
 
-  // Add import after first heading or at top
+  // Replace any wrong-for-location form left behind by a legacy install
+  const staleForm = getAllMarrProjectImportLines().find(
+    form => form !== importLine && existingContent.includes(form)
+  );
+  if (staleForm) {
+    const replaced = existingContent.replace(staleForm, importLine);
+    fileOps.writeFile(claudeMdPath, replaced);
+    logger.success(`Updated MARR import in ${filename} (was: ${staleForm})`);
+    return;
+  }
+
   const lines = existingContent.split('\n');
   const firstHeadingIndex = lines.findIndex(line => line.startsWith('# '));
 
-  const importBlock = `\n${MARR_PROJECT_IMPORT_COMMENT}\n${MARR_PROJECT_IMPORT_LINE}\n`;
+  const importBlock = `\n${MARR_PROJECT_IMPORT_COMMENT}\n${importLine}\n`;
 
   let newContent: string;
   if (firstHeadingIndex >= 0) {
-    // Insert after first heading
     lines.splice(firstHeadingIndex + 1, 0, importBlock);
     newContent = lines.join('\n');
   } else {
-    // Prepend to file
     newContent = importBlock + '\n' + existingContent;
   }
 
   fileOps.writeFile(claudeMdPath, newContent);
-  logger.success('Added: MARR import to CLAUDE.md');
+  logger.success(`Added: MARR import to ${filename}`);
 }

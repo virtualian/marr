@@ -7,7 +7,6 @@ This file lists active bugs and known limitations. For new features and roadmap 
 | # | Issue | Affects | Workaround |
 |---|---|---|---|
 | [#85](https://github.com/virtualian/marr/issues/85) | `marr standard list` only lists locally-installed standards, not all available standards | `marr standard list` | Use `marr init --project --standards list` to see available bundled standards |
-| [#106](https://github.com/virtualian/marr/issues/106) | `marr init` writes incorrect import path when project uses `.claude/CLAUDE.md` location | `marr init --project` on projects with non-root CLAUDE.md | Manually correct the import line after init |
 
 ## Known Limitations
 

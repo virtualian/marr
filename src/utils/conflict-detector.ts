@@ -19,6 +19,7 @@ import {
   getTransitiveImports,
   type ConfigFile,
 } from './config-scanner.js';
+import { classifyClaudeMdPath, getMarrProjectImportLine } from './marr-import.js';
 import type {
   Conflict,
   ConflictReport,
@@ -26,9 +27,8 @@ import type {
   Resolution,
 } from '../types/conflict.js';
 
-/** MARR import markers */
+/** MARR import marker for the user-level CLAUDE.md */
 const MARR_USER_IMPORT = '@~/.claude/marr/MARR-USER-CLAUDE.md';
-const MARR_PROJECT_IMPORT = '@.claude/marr/MARR-PROJECT-CLAUDE.md';
 
 /** Minimum keyword overlap to consider a potential conflict */
 const MIN_KEYWORD_OVERLAP = 2;
@@ -461,9 +461,10 @@ export function detectProjectConflicts(projectDir: string = process.cwd()): Conf
       ? dotClaudeClaudeMdPath
       : null;
 
-  // Check for missing import
+  // Check for missing import — expected form depends on which CLAUDE.md location is used
   if (claudeMdPath) {
-    const missingImport = checkMissingImport(claudeMdPath, MARR_PROJECT_IMPORT, 'project');
+    const expectedImport = getMarrProjectImportLine(classifyClaudeMdPath(claudeMdPath));
+    const missingImport = checkMissingImport(claudeMdPath, expectedImport, 'project');
     if (missingImport) {
       conflicts.push(missingImport);
     }

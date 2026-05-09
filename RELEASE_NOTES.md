@@ -9,6 +9,9 @@ This file is the canonical, in-repo history. Each section is mirrored in a corre
 ### Added
 - Mandate release notes and GitHub Release for every tagged release ([#112](https://github.com/virtualian/marr/pull/112), closes [#89](https://github.com/virtualian/marr/issues/89))
 
+### Fixed
+- `marr init --project` now writes the correct import line when the project uses `./.claude/CLAUDE.md` instead of `./CLAUDE.md`. Previously the hardcoded `@.claude/marr/MARR-PROJECT-CLAUDE.md` form was written into both locations, silently failing to resolve from the dotclaude location. `clean`, `validate`, `doctor`, and conflict detection are now location-aware (closes [#106](https://github.com/virtualian/marr/issues/106)).
+
 ### Security
 - Override `brace-expansion` to fix transitive ReDoS ([#110](https://github.com/virtualian/marr/pull/110))
 - Bump `yaml` from 2.8.1 to 2.8.3 ([#104](https://github.com/virtualian/marr/pull/104))

@@ -10,6 +10,7 @@ import { join } from 'path';
 import * as logger from '../utils/logger.js';
 import * as fileOps from '../utils/file-ops.js';
 import { detectProjectConflicts } from '../utils/conflict-detector.js';
+import { classifyClaudeMdPath, getMarrProjectImportLine } from '../utils/marr-import.js';
 import type { Conflict } from '../types/conflict.js';
 
 interface ValidateOptions {
@@ -359,9 +360,7 @@ function validateStandardNaming(result: ValidationResult): void {
 function validateRootClaudeMd(result: ValidationResult): void {
   const rootClaudeMdPath = join(process.cwd(), 'CLAUDE.md');
   const dotClaudeClaudeMdPath = join(process.cwd(), '.claude', 'CLAUDE.md');
-  const importLine = '@.claude/marr/MARR-PROJECT-CLAUDE.md';
 
-  // Check both possible CLAUDE.md locations
   let claudeMdPath: string | null = null;
   let location = '';
 
@@ -380,6 +379,7 @@ function validateRootClaudeMd(result: ValidationResult): void {
     return;
   }
 
+  const importLine = getMarrProjectImportLine(classifyClaudeMdPath(claudeMdPath));
   const content = fileOps.readFile(claudeMdPath);
 
   if (!content.includes(importLine)) {

@@ -13,6 +13,12 @@ import {
   detectProjectConflicts,
   detectUserConflicts,
 } from '../utils/conflict-detector.js';
+import { getMarrImportLine } from '../utils/marr-setup.js';
+import {
+  MARR_PROJECT_IMPORT_COMMENT,
+  classifyClaudeMdPath,
+  getMarrProjectImportLine,
+} from '../utils/marr-import.js';
 import type {
   Conflict,
   Resolution,
@@ -270,16 +276,16 @@ async function applyResolution(
 async function addMissingImport(conflict: Conflict): Promise<void> {
   const content = fileOps.readFile(conflict.location);
 
-  // Determine which import to add based on location
-  const isUserConfig = conflict.location.includes('.claude/CLAUDE.md') &&
-    conflict.location.includes(fileOps.getHomeDir());
+  // Distinguish user vs project by exact-path equality. Substring checks for
+  // `.claude/CLAUDE.md` + the home directory misclassify any project that
+  // lives under $HOME and uses the dotclaude CLAUDE.md location.
+  const isUserConfig = conflict.location === fileOps.getUserClaudeMdPath();
 
   const importLine = isUserConfig
-    ? '@~/.claude/marr/MARR-USER-CLAUDE.md'
-    : '@.claude/marr/MARR-PROJECT-CLAUDE.md';
+    ? getMarrImportLine()
+    : getMarrProjectImportLine(classifyClaudeMdPath(conflict.location));
 
-  const importComment = '<!-- MARR: Making Agents Really Reliable -->';
-  const importBlock = `${importComment}\n${importLine}\n`;
+  const importBlock = `${MARR_PROJECT_IMPORT_COMMENT}\n${importLine}\n`;
 
   // Add after first heading or at top
   const lines = content.split('\n');

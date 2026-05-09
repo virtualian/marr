@@ -9,15 +9,13 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import * as fileOps from './file-ops.js';
 import * as logger from './logger.js';
+import { MARR_PROJECT_IMPORT_COMMENT as MARR_IMPORT_COMMENT } from './marr-import.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /** Import line that MARR adds to ~/.claude/CLAUDE.md */
 const MARR_IMPORT_LINE = '@~/.claude/marr/MARR-USER-CLAUDE.md';
-
-/** Comment marker to identify MARR's import */
-const MARR_IMPORT_COMMENT = '<!-- MARR: Making Agents Really Reliable -->';
 
 /** Full import block including comment for easy identification */
 const MARR_IMPORT_BLOCK = `${MARR_IMPORT_COMMENT}\n${MARR_IMPORT_LINE}\n`;
