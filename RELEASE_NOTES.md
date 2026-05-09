@@ -4,7 +4,7 @@ All notable user-visible changes to MARR are documented here. The format follows
 
 This file is the canonical, in-repo history. Each section is mirrored in a corresponding [GitHub Release](https://github.com/virtualian/marr/releases).
 
-## Unreleased
+## [v3.6.0] — 2026-05-10
 
 ### Added
 - `marr update --project` — refresh canonical standards into a previously-installed project. Hash manifest at `.claude/marr/.marr-version.json` distinguishes locally-edited files (prompted) from canonical advancement (silent refresh). Flags: `--check` (drift report, non-zero exit), `--prune` (remove orphans), `--dry-run`, `--force`. `marr init --project` now writes the manifest so first-time installs are tracked. (closes [#111](https://github.com/virtualian/marr/issues/111), partially addresses [#86](https://github.com/virtualian/marr/issues/86))
@@ -108,6 +108,7 @@ First public npm release as `@virtualian/marr`.
 ### Changed
 - Project rebranded from `repo-setup` to `marr` ([#9](https://github.com/virtualian/marr/pull/9))
 
+[v3.6.0]: https://github.com/virtualian/marr/releases/tag/v3.6.0
 [v3.5.0]: https://github.com/virtualian/marr/releases/tag/v3.5.0
 [v3.1.0]: https://github.com/virtualian/marr/releases/tag/v3.1.0
 [v3.0.0]: https://github.com/virtualian/marr/releases/tag/v3.0.0
