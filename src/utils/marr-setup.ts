@@ -29,6 +29,20 @@ export function getResourcesDir(): string {
 }
 
 /**
+ * Get the installed marr package version from package.json.
+ * Cached after first read.
+ */
+let _marrVersion: string | null = null;
+export function getMarrVersion(): string {
+  if (_marrVersion === null) {
+    const pkgPath = join(__dirname, '../../package.json');
+    const pkg = JSON.parse(fileOps.readFile(pkgPath)) as { version: string };
+    _marrVersion = pkg.version;
+  }
+  return _marrVersion;
+}
+
+/**
  * Check if MARR is already set up at ~/.claude/marr/
  */
 export function isMarrSetup(): boolean {

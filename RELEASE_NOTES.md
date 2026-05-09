@@ -7,6 +7,7 @@ This file is the canonical, in-repo history. Each section is mirrored in a corre
 ## Unreleased
 
 ### Added
+- `marr update --project` — refresh canonical standards into a previously-installed project. Hash manifest at `.claude/marr/.marr-version.json` distinguishes locally-edited files (prompted) from canonical advancement (silent refresh). Flags: `--check` (drift report, non-zero exit), `--prune` (remove orphans), `--dry-run`, `--force`. `marr init --project` now writes the manifest so first-time installs are tracked. (closes [#111](https://github.com/virtualian/marr/issues/111), partially addresses [#86](https://github.com/virtualian/marr/issues/86))
 - Mandate release notes and GitHub Release for every tagged release ([#112](https://github.com/virtualian/marr/pull/112), closes [#89](https://github.com/virtualian/marr/issues/89))
 
 ### Fixed

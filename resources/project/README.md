@@ -26,6 +26,10 @@ Standards in `standards/` define rules for:
 
 Edit these files to customize for your project.
 
+## Keeping Standards Current
+
+Run `marr update --project` to refresh canonical standards from the installed MARR package. Use `--check` for a non-modifying drift report. Locally-edited files are protected by a per-file prompt and timestamped backup.
+
 ## Documentation
 
 Full docs at **[virtualian.github.io/marr](https://virtualian.github.io/marr)**
